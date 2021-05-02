@@ -1,0 +1,35 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="FuelTankControl.xaml" company="OpenSky">
+  sushi.at for OpenSky 2021
+</copyright>
+<summary>
+  Fuel tank custom control
+</summary>
+====================================================================================================================
+-->
+    
+<UserControl x:Class="OpenSky.AgentMSFS.Controls.FuelTankControl"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                 mc:Ignorable="d" 
+                 d:DesignHeight="50" d:DesignWidth="250" x:Name="FuelTank">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="60" />
+        </Grid.ColumnDefinitions>
+        <Rectangle Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Fill="#404040" Stroke="Gray" RadiusX="1.5" RadiusY="1.5" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Center" Margin="5,0" Text="{Binding ElementName=FuelTank, Path=FuelTankName, Mode=OneWay}" />
+        <Slider Grid.Row="0" Grid.Column="1" MinWidth="100" Margin="10,5,10,0" TickFrequency="0.5" IsSnapToTickEnabled="True" Value="{Binding ElementName=FuelTank, Path=FuelTankQuantity, Mode=TwoWay}" Maximum="{Binding ElementName=FuelTank, Path=FuelTankCapacity, Mode=OneWay}" />
+        <TextBox Grid.Row="0" Grid.Column="2" Margin="0,5,5,0" Text="{Binding ElementName=FuelTank, Path=FuelTankQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,2,5,5" FontSize="10" HorizontalAlignment="Right" Text="{Binding ElementName=FuelTank, Path=FuelTankInfo, Mode=OneWay}" />
+    </Grid>
+</UserControl>

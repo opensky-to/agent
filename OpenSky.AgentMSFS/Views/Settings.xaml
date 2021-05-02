@@ -1,0 +1,96 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="Settings.xaml" company="OpenSky">
+  sushi.at for OpenSky 2021
+</copyright>
+<summary>
+  Settings window
+</summary>
+====================================================================================================================
+-->
+
+<controls:OpenSkyWindow x:Class="OpenSky.AgentMSFS.Views.Settings"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
+                xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+                mc:Ignorable="d"
+                Title="Settings" Height="642" Width="550" 
+                SizeToContent="Height" ShowMinMaxButtons="False" ResizeMode="NoResize" HorizontalScrollBar="False">
+    <Window.DataContext>
+        <models:SettingsViewModel />
+    </Window.DataContext>
+    <StackPanel Orientation="Vertical" Margin="20" Grid.IsSharedSizeScope="True">
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Keys and Users</TextBlock>
+            </GroupBox.Header>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">OpenSky API token</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Bing Maps key</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">SimBrief user name</TextBlock>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding OpenSkyApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding BingMapsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimBriefUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+        </GroupBox>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Microsoft Flight Simulator</TextBlock>
+            </GroupBox.Header>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,10">Use these settings if you are running the OpenSky Agent on a different computer than your simulator. If you both are running on the same computer leave these settings unchanged.</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Simulator host name</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Simulator network port</TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimulatorHostName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimulatorPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+        </GroupBox>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Notifications</TextBlock>
+            </GroupBox.Header>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Landing report</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Text-To-Speech voice</TextBlock>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding LandingReportNotifications}" SelectedItem="{Binding SelectedLandingReportNotification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <DockPanel Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
+                    <Button DockPanel.Dock="Right" Margin="5,0,0,0" Command="{Binding TestTextToSpeechVoiceCommand}">Test</Button>
+                    <ComboBox  FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding TextToSpeechVoices}" SelectedItem="{Binding SelectedTextToSpeechVoice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </Grid>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal" Margin="5,10,5,0">
+            <Button Padding="5,3" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding SaveSettingsCommand}">Save</Button>
+            <Button VerticalAlignment="Center" Margin="5,0,0,0" Padding="5,3" Command="{Binding RestoreDefaultsCommand}">Restore Defaults</Button>
+        </StackPanel>
+    </StackPanel>
+</controls:OpenSkyWindow>

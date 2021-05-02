@@ -1,0 +1,64 @@
+========================================================================================================================================================
+OpenSky Agent for MSFS Changelog
+========================================================================================================================================================
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.5.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+*) Reworked background ground handling
+   *) More robust and stream lined
+   *) De-coupled from tracking window, so this can now be closed and re-opened as many times as you like
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.4.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+*) Cleaned up flight tracking UI
+   *) Moved detailed fuel and payload management into new expandable column (hidden on default)
+   *) Landing report is now a standalone notification - you can choose when to show it in the settings
+*) Full debug logging implemented (in case I need to figure out what happened in case you run into a bug)
+*) Set time + plane registration in sim implemented
+*) Full flight saving+restoring implemented ... click on stop tracking and select Yes you want to save in the dialog
+   *) Save files are compressed, but for now at least a XML version is saved alongside (those also don't get deleted if you cancel)
+   *) Also auto-saves every 2 minutes in case of tracker crash
+   *) Saves if connection to sim is lost
+*) Slew plane into position implemented
+   *) Can move to origin airport location (if spawned in wrong location or sim doesn't have the airport)
+   *) For resuming flights - comes with instruction box, can you check if that is explained well enough
+*) Resume flight, two ways at the moment
+   *) Resume straight from flight tracking view, after stopping tracking
+   *) If you closed the tracker, so this includes resuming on the next day etc. - you need to create the same flight using the
+      test flight window (best to screenshot your old settings) + TICK THE "Resume flight?" checkbox - This would normally all come
+      from the backend, but for now this how to do it
+*) Added text-to-speech for lots of tracking start/stop events
+   *) Voice can be changed in the settings
+*) Some feedback sound effects
+*) Known issue: The ground handling background worker needs overhauled, if you close the tracking window and re-open it, it will
+   spawn another thread (to update the UI on this window, but it will play the audio twice, I fill overhaul that in the next version)
+*) A million and one small and large fixes :) - so try to brake it please
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.3.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+*) Added internal tool for collecting plane identities
+*) New layout for flight testing screen (should fit better on the screen)
+*) Added more anti-exploit checks for change of plane, add fuel, change payload etc. while flying ... who can come up with other ways of beating it?
+*) Added events for seatbelt and no smoking sign, but didn't have time to test it ... can somebody let me know if these events show up?
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.2.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+*) Hotfix: Added scrollbar to test flight screen (not fully visible on lower res monitors)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.1.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+*) First alpha test release
+*) Most basic flight tracking features implemented
+*) Ability to create custom test flights
+*) First draft of XML log file
+*) Ability to import simbrief flight plan waypoints
+*) First version of landing analysis and report
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 1.0.0 (ALPHA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Not released to testers

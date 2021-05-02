@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Product Id="*" Name="OpenSky Agent for MSFS" Language="1033" Version="!(bind.FileVersion.OpenSkyAgentExeFile)" Manufacturer="OpenSky" UpgradeCode="13497001-3D38-4CC3-B197-03DB857240BC">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+        <Icon Id="opensky.ico" SourceFile="..\OpenSky.AgentMSFS\Resources\opensky.ico" />
+        <Property Id="ARPPRODUCTICON" Value="opensky.ico" />
+
+        <PropertyRef Id="WIX_EXT_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
+        <Condition Message="This application requires .NET Framework 4.8.0. Please install the .NET Framework then run this installer again.">
+            Installed OR WIX_EXT_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED
+        </Condition>
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="ProductFeature" Title="OpenSky.AgentMSFS" Level="1">
+            <ComponentGroupRef Id="OpenSky.AgentMSFS" />
+            <ComponentGroupRef Id="OpenSky.AgentMSFS.Libraries" />
+        </Feature>
+
+        <util:CloseApplication Id="CloseOpenSky.AgentMSFS" Target="OpenSky.AgentMSFS.exe" TerminateProcess="1" RebootPrompt="no" PromptToContinue="no" />
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="OpenSkyFolder" Name="OpenSky">
+                    <Directory Id="INSTALLFOLDER" Name="Agent.MSFS" />
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="OpenSky"/>
+            </Directory>
+            <Directory Id="DesktopFolder" SourceName="Desktop" />
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="OpenSky.AgentMSFS" Directory="INSTALLFOLDER">
+            <Component Guid="{C7192B21-EB14-435E-991E-CA1BD4D6D616}" Win64="yes">
+                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.AgentMSFS.exe" KeyPath="yes" Id="OpenSkyAgentExeFile">
+                    <Shortcut Id="OpenSky.AgentMSFS.Shortcut" Directory="ApplicationProgramsFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
+                    <Shortcut Id="OpenSky.AgentMSFS.DeskShortcut" Directory="DesktopFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
+                </File>
+                <RemoveFolder Id="RemoveProgramMenuDir" Directory="ApplicationProgramsFolder" On="uninstall" />
+            </Component>
+            <Component Guid="{F58EF8AF-5D4E-4005-8D90-5A83F0D26CFF}" Win64="yes">
+                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.AgentMSFS.exe.config" KeyPath="yes" />
+            </Component>
+            <Component Guid="{388E5BC7-6F40-4E0A-A64F-32B80F1E14E5}" Win64="yes">
+                <File Source="..\changelog.txt" KeyPath="yes" />
+            </Component>
+            <Component Guid="{1C22493B-73C5-4BF1-9A99-9555EC1E7E60}" Win64="yes">
+                <File Source="Resources\SimConnect.cfg" KeyPath="yes">
+                    <util:PermissionEx User="Users" GenericAll="yes" />
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
