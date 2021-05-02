@@ -1,0 +1,90 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="PlaneIdentityCollector.xaml" company="OpenSky">
+  sushi.at for OpenSky 2021
+</copyright>
+<summary>
+  Plane identity collector window
+</summary>
+====================================================================================================================
+-->
+
+<controls:OpenSkyWindow x:Class="OpenSky.AgentMSFS.Views.PlaneIdentityCollector"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
+            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+            mc:Ignorable="d"
+            Title="Plane Identity Collector" Height="650" Width="1400">
+    <Window.DataContext>
+        <models:PlaneIdentityCollectorViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Add plane identity</TextBlock>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0">Display name</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="1">ATC Type</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="2">ATC Model</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="3">Engine Type</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="4">Engine Count</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="5">Total Fuel</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="6">Empty Weight</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="7">Max Gross Weight</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="8">Flaps?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="9">Gear Retractable?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="10">Identity Hash</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center">Description</TextBlock>
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SimConnect.PlaneIdentity.TypeProperty}" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SimConnect.PlaneIdentity.AtcTypeProperty}" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SimConnect.PlaneIdentity.AtcModelProperty}" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding SimConnect.PlaneIdentity.EngineType}" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding SimConnect.PlaneIdentity.EngineCount}" />
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding SimConnect.WeightAndBalance.FuelTotalCapacity}" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight}" />
+                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight}" />
+                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding SimConnect.PlaneIdentity.FlapsAvailable}" />
+                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding SimConnect.PlaneIdentity.GearRetractable}" />
+                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding SimConnect.PlaneIdentifierHash}" MaxWidth="300" TextWrapping="Wrap" />
+                <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,10,0,0" Command="{Binding AddPlaneIdentityCommand}">Add plane</Button>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="1">
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Collected identities</TextBlock>
+            </GroupBox.Header>
+            <TextBox FontFamily="Consolas" Text="{Binding Csv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </GroupBox>
+    </Grid>
+</controls:OpenSkyWindow>

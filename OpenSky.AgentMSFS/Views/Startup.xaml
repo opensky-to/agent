@@ -1,0 +1,49 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="Startup.xaml" company="OpenSky">
+  sushi.at for OpenSky 2021
+</copyright>
+<summary>
+  Startup windows (maybe splash screen in the future?)
+</summary>
+====================================================================================================================
+-->
+
+<Window x:Name="Window" x:Class="OpenSky.AgentMSFS.Views.Startup"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:tb="http://www.hardcodet.net/taskbar"
+            mc:Ignorable="d"
+            xmlns:debug="debug-mode"
+            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+            Title="Startup" Height="0" Width="0" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen"
+            AllowsTransparency="True" Background="Transparent" Visibility="Collapsed">
+    <Window.DataContext>
+        <models:StartupViewModel />
+    </Window.DataContext>
+    <Grid>
+        <tb:TaskbarIcon x:Name="TaskbarIcon" Visibility="{Binding NotificationVisibility}" IconSource="{Binding NotificationIcon}" ToolTipText="{Binding NotificationStatusString}" MenuActivation="RightClick" DoubleClickCommand="{Binding FlightTrackingCommand}">
+            <tb:TaskbarIcon.TrayToolTip>
+                <Border BorderThickness="2" Background="{StaticResource OpenSkyDarkGrayHeaderBrush}" BorderBrush="{StaticResource OpenSkyTealBrush}" CornerRadius="3">
+                    <TextBlock TextWrapping="Wrap" FontSize="13" Margin="10" FontWeight="SemiBold" FontFamily="/Fonts/#Metropolis" Text="{Binding NotificationStatusString}" />
+                </Border>
+            </tb:TaskbarIcon.TrayToolTip>
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu Name="NotificationContextMenu" MinWidth="200">
+                    <MenuItem Header="Flight tracking" Command="{Binding FlightTrackingCommand}" />
+                    <mc:AlternateContent>
+                        <mc:Choice Requires="debug">
+                            <MenuItem Header="Tracking debug" Command="{Binding TrackingDebugCommand}" />
+                            <MenuItem Header="Test flight" Command="{Binding TestFlightCommand}" />
+                            <MenuItem Header="Plane identity collector" Command="{Binding PlaneIdentityCollectorCommand}" />
+                        </mc:Choice>
+                    </mc:AlternateContent>
+                    <MenuItem Header="Settings" Command="{Binding SettingsCommand}" />
+                    <MenuItem Header="Quit" Command="{Binding QuitCommand}" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+    </Grid>
+</Window>
