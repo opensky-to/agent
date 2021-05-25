@@ -10,6 +10,8 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Reflection;
+    using System.Threading;
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
@@ -41,11 +43,23 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The OpenSky icon (tracking).
+        /// The grey OpenSky icon (idling, not connected).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private readonly BitmapImage openSkyPlaneIcon =
+        private readonly BitmapImage greyIcon =
+            new BitmapImage(
+                new Uri(
+                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_grey16.ico",
+                    UriKind.RelativeOrAbsolute));
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The OpenSky icon (idling, connected, but also between red recording to get blinking effect).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [NotNull]
+        private readonly BitmapImage openSkyIcon =
             new BitmapImage(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky.ico",
@@ -53,23 +67,23 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The green OpenSky icon (connected).
+        /// The pause OpenSky icon (recording).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private readonly BitmapImage greenPlaneIcon =
+        private readonly BitmapImage pauseIcon =
             new BitmapImage(
                 new Uri(
-                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_green16.ico",
+                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_pause16.ico",
                     UriKind.RelativeOrAbsolute));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The red OpenSky icon (not connected).
+        /// The red OpenSky icon (recording).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private readonly BitmapImage redPlaneIcon =
+        private readonly BitmapImage redIcon =
             new BitmapImage(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_red16.ico",
@@ -89,7 +103,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private string notificationStatusString = "OpenSky is trying to connect to MSFS 2020...";
+        private string notificationStatusString = "OpenSky is trying to connect to Flight Simulator 2020...";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -106,6 +120,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// sushi.at, 12/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
+
         // ReSharper disable NotNullMemberIsNotInitialized
         public StartupViewModel()
         {
@@ -119,7 +134,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 Instance = this;
                 SimConnect.Instance.PropertyChanged += this.SimConnectPropertyChanged;
                 SimConnect.Instance.FlightChanged += this.SimConnectFlightChanged;
-                this.notificationIcon = this.redPlaneIcon;
+                this.notificationIcon = this.greyIcon;
             }
 
             // Initialize commands
@@ -201,28 +216,72 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SimConnectPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SimConnect.Connected) || e.PropertyName == nameof(SimConnect.Instance.TrackingStatus))
+            if (e.PropertyName == nameof(SimConnect.Connected) || e.PropertyName == nameof(SimConnect.Instance.TrackingStatus) || e.PropertyName == nameof(SimConnect.Instance.IsPaused))
             {
                 if (!SimConnect.Instance.Connected)
                 {
-                    this.NotificationIcon = this.redPlaneIcon;
-                    this.NotificationStatusString = "OpenSky is trying to connect to MSFS 2020...";
+                    this.redFlashing = false;
+                    this.NotificationIcon = this.greyIcon;
+                    this.NotificationStatusString = "OpenSky is trying to connect to Flight Simulator 2020...";
                 }
                 else
                 {
                     if (SimConnect.Instance.TrackingStatus == TrackingStatus.NotTracking || SimConnect.Instance.TrackingStatus == TrackingStatus.Preparing || SimConnect.Instance.TrackingStatus == TrackingStatus.Resuming)
                     {
-                        this.NotificationIcon = this.greenPlaneIcon;
+                        this.redFlashing = false;
+                        this.NotificationIcon = this.openSkyIcon;
                         this.NotificationStatusString = "OpenSky is connected to the sim but not tracking a flight";
+                    }
+                    else if (SimConnect.Instance.IsPaused)
+                    {
+                        this.redFlashing = false;
+                        this.NotificationIcon = this.pauseIcon;
+                        this.NotificationStatusString = "OpenSky tracking and your flight are paused";
                     }
                     else
                     {
-                        this.NotificationIcon = this.openSkyPlaneIcon;
+                        this.NotificationIcon = this.redIcon;
+                        this.redFlashing = true;
                         this.NotificationStatusString = "OpenSky is tracking your flight";
+
+
+                        new Thread(
+                                () =>
+                                {
+                                    if (Monitor.TryEnter(this.openSkyIcon, new TimeSpan(0, 0, 1)))
+                                    {
+                                        try
+                                        {
+                                            while (this.redFlashing)
+                                            {
+                                                Thread.Sleep(1500);
+                                                if (this.NotificationIcon == this.redIcon && this.redFlashing)
+                                                {
+                                                    UpdateGUIDelegate updateIcon = () => this.NotificationIcon = this.openSkyIcon;
+                                                    Application.Current.Dispatcher.BeginInvoke(updateIcon);
+                                                }
+
+                                                if (this.NotificationIcon == this.openSkyIcon && this.redFlashing)
+                                                {
+                                                    UpdateGUIDelegate updateIcon = () => this.NotificationIcon = this.redIcon;
+                                                    Application.Current.Dispatcher.BeginInvoke(updateIcon);
+                                                }
+                                            }
+                                        }
+                                        finally
+                                        {
+                                            Monitor.Exit(this.openSkyIcon);
+                                        }
+                                    }
+                                })
+                        { Name = "OpenSky.StartupViewModel.RedFlashing" }.Start();
                     }
                 }
             }
         }
+
+        // Should the background worker flash the red icon?
+        private bool redFlashing;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -275,6 +334,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.NotifyPropertyChanged();
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the version string of the application assembly.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string VersionString => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
