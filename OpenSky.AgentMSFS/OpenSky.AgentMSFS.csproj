@@ -273,26 +273,24 @@
     <Page Remove="Properties\DesignTimeResources.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Fonts\SHRIMP.ttf" />
-    <Resource Include="Fonts\PeaceSans.otf" />
-    <Resource Include="Fonts\Metropolis-Black.otf" />
-    <Resource Include="Fonts\Metropolis-BlackItalic.otf" />
-    <Resource Include="Fonts\Metropolis-Bold.otf" />
-    <Resource Include="Fonts\Metropolis-BoldItalic.otf" />
-    <Resource Include="Fonts\Metropolis-ExtraBold.otf" />
-    <Resource Include="Fonts\Metropolis-ExtraBoldItalic.otf" />
-    <Resource Include="Fonts\Metropolis-ExtraLight.otf" />
-    <Resource Include="Fonts\Metropolis-ExtraLightItalic.otf" />
-    <Resource Include="Fonts\Metropolis-Light.otf" />
-    <Resource Include="Fonts\Metropolis-LightItalic.otf" />
-    <Resource Include="Fonts\Metropolis-Medium.otf" />
-    <Resource Include="Fonts\Metropolis-MediumItalic.otf" />
-    <Resource Include="Fonts\Metropolis-Regular.otf" />
-    <Resource Include="Fonts\Metropolis-RegularItalic.otf" />
-    <Resource Include="Fonts\Metropolis-SemiBold.otf" />
-    <Resource Include="Fonts\Metropolis-SemiBoldItalic.otf" />
-    <Resource Include="Fonts\Metropolis-Thin.otf" />
-    <Resource Include="Fonts\Metropolis-ThinItalic.otf" />
+    <Resource Include="Fonts\Montserrat-Black.ttf" />
+    <Resource Include="Fonts\Montserrat-BlackItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-Bold.ttf" />
+    <Resource Include="Fonts\Montserrat-BoldItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-ExtraBold.ttf" />
+    <Resource Include="Fonts\Montserrat-ExtraBoldItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-ExtraLight.ttf" />
+    <Resource Include="Fonts\Montserrat-ExtraLightItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-Italic.ttf" />
+    <Resource Include="Fonts\Montserrat-Light.ttf" />
+    <Resource Include="Fonts\Montserrat-LightItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-Medium.ttf" />
+    <Resource Include="Fonts\Montserrat-MediumItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-Regular.ttf" />
+    <Resource Include="Fonts\Montserrat-SemiBold.ttf" />
+    <Resource Include="Fonts\Montserrat-SemiBoldItalic.ttf" />
+    <Resource Include="Fonts\Montserrat-Thin.ttf" />
+    <Resource Include="Fonts\Montserrat-ThinItalic.ttf" />
     <None Include="Properties\DesignTimeResources.xaml">
       <ContainsDesignTimeResources>True</ContainsDesignTimeResources>
       <SubType>Designer</SubType>
@@ -340,13 +338,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\opensky.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\opensky_green16.ico" />
-    <Resource Include="Resources\opensky_red16.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="CTrue.FsConnect">
       <Version>1.3.1</Version>
     </PackageReference>
@@ -385,6 +376,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\OSnegative.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\opensky_green16.ico" />
+    <Resource Include="Resources\opensky_pause16.ico" />
+    <Resource Include="Resources\opensky_red16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\opensky.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
