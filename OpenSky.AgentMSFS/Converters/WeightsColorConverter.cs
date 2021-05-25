@@ -55,9 +55,9 @@ namespace OpenSky.AgentMSFS.Converters
                 switch (type)
                 {
                     case "payload":
-                        return (wab.PayloadWeight <= wab.MaxPayloadWeight) ? new SolidColorBrush(OpenSkyColors.OpenSkyTealLight) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
+                        return (wab.PayloadWeight <= wab.MaxPayloadWeight) ? new SolidColorBrush(OpenSkyColors.OpenSkyTeal) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
                     case "total":
-                        return (wab.TotalWeight <= wab.MaxGrossWeight) ? new SolidColorBrush(OpenSkyColors.OpenSkyTealLight) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
+                        return (wab.TotalWeight <= wab.MaxGrossWeight) ? new SolidColorBrush(OpenSkyColors.OpenSkyTeal) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
                 }
             }
 

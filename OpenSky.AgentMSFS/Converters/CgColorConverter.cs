@@ -52,7 +52,7 @@ namespace OpenSky.AgentMSFS.Converters
         {
             if (value is WeightAndBalance wab)
             {
-                return (wab.CgPercent >= wab.CgFwdLimit && wab.CgPercent <= wab.CgAftLimit) ? new SolidColorBrush(OpenSkyColors.OpenSkyTealLight) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
+                return (wab.CgPercent >= wab.CgFwdLimit && wab.CgPercent <= wab.CgAftLimit) ? new SolidColorBrush(OpenSkyColors.OpenSkyTeal) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
             }
 
             return new SolidColorBrush(Colors.Transparent);

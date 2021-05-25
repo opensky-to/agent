@@ -21,7 +21,7 @@
             ui:ThemeManager.IsThemeAware="True" AllowsTransparency="True" ShowInTaskbar="False"
             Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
             Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
-            FontFamily="/Fonts/#Metropolis" FontSize="13" Loaded="NewFlightNotificationOnLoaded">
+            FontFamily="/Fonts/#Montserrat" FontSize="13" Loaded="NewFlightNotificationOnLoaded">
     <Window.DataContext>
         <models:NewFlightNotificationViewModel CloseWindow="NewFlightNotificationViewModelOnCloseWindow" />
     </Window.DataContext>
@@ -29,7 +29,7 @@
         <Storyboard x:Key="Rotate">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:20" Value="360"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:4" Value="360"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <Grid Margin="0,0,0,10">
-                <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenSkyLogoGearOnly}">
+                <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenskyLogoGradientOnly}">
                     <Image.RenderTransform>
                         <TransformGroup>
                             <RotateTransform/>
@@ -53,7 +53,7 @@
                         </EventTrigger>
                     </Image.Triggers>
                 </Image>
-                <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenSkyLogoPlaneOnly}" />
+                <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenskyLogoPlaneAndTrail}" />
             </Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock>OpenSky flight #</TextBlock>
