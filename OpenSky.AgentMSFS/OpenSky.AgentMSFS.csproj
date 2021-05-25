@@ -339,7 +339,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CTrue.FsConnect">
-      <Version>1.3.1</Version>
+      <Version>1.3.2</Version>
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf">
       <Version>1.1.0</Version>
@@ -378,12 +378,14 @@
     <EmbeddedResource Include="Resources\OSnegative.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\opensky_green16.ico" />
     <Resource Include="Resources\opensky_pause16.ico" />
     <Resource Include="Resources\opensky_red16.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\opensky.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\opensky_grey16.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
