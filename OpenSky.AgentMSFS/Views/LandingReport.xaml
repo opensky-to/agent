@@ -21,7 +21,7 @@
             Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
             Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
             SizeToContent="WidthAndHeight"
-            FontFamily="/Fonts/#Metropolis" FontSize="13" Loaded="LandingReportNotificationOnLoaded">
+            FontFamily="/Fonts/#Montserrat" FontSize="13" Loaded="LandingReportNotificationOnLoaded">
     <Window.DataContext>
         <models:LandingReportViewModel CloseWindow="LandingReportViewModelOnClose" />
     </Window.DataContext>
@@ -29,7 +29,7 @@
         <Storyboard x:Key="Rotate">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:20" Value="360"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:4" Value="360"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
@@ -59,7 +59,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenSkyLogoGearOnly}">
+            <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenskyLogoGradientOnly}">
                 <Image.RenderTransform>
                     <TransformGroup>
                         <RotateTransform/>
@@ -71,8 +71,8 @@
                     </EventTrigger>
                 </Image.Triggers>
             </Image>
-            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenSkyLogoPlaneOnly}" />
-            <TextBlock Grid.Column="1" FontFamily="/Fonts/#SHRIMP" FontSize="30" VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding FlightNumberHeader}" />
+            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenskyLogoPlaneAndTrail}" />
+            <TextBlock Grid.Column="1" FontFamily="/Fonts/#Montserrat" FontSize="30" VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding FlightNumberHeader}" />
         </Grid>
         <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" IsSharedSizeScope="True">
             <Grid.RowDefinitions>

@@ -50,7 +50,7 @@ namespace OpenSky.AgentMSFS.Converters
         {
             if (value is double cg)
             {
-                return Math.Abs(cg) < 0.01 ? new SolidColorBrush(OpenSkyColors.OpenSkyTealLight) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
+                return Math.Abs(cg) < 0.01 ? new SolidColorBrush(OpenSkyColors.OpenSkyTeal) : new SolidColorBrush(OpenSkyColors.OpenSkyRed);
             }
 
             return new SolidColorBrush(Colors.Transparent);

@@ -4,17 +4,17 @@
                     xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls">
 
     <!-- OPENSKY COLOR STYLE DEFINITIONS -->
-    <Color x:Key="OpenSkyTeal">#FF1098B0</Color>
+    <Color x:Key="OpenSkyTeal">#05826c</Color>
     <SolidColorBrush x:Key="OpenSkyTealBrush" Color="{StaticResource OpenSkyTeal}" />
-    <Color x:Key="OpenSkyTealLight">#FF09C5A4</Color>
+    <Color x:Key="OpenSkyTealLight">#08c6a4</Color>
     <SolidColorBrush x:Key="OpenSkyTealLightBrush" Color="{StaticResource OpenSkyTealLight}" />
     <Color x:Key="OpenSkyRed">DarkRed</Color>
     <SolidColorBrush x:Key="OpenSkyRedBrush" Color="{StaticResource OpenSkyRed}" />
     <Color x:Key="OpenSkyRedLight">#CC0000</Color>
     <SolidColorBrush x:Key="OpenSkyRedLightBrush" Color="{StaticResource OpenSkyRedLight}" />
-    <Color x:Key="OpenSkyDarkGrayHeader">#303030</Color>
+    <Color x:Key="OpenSkyDarkGrayHeader">#29323c</Color>
     <SolidColorBrush x:Key="OpenSkyDarkGrayHeaderBrush" Color="{StaticResource OpenSkyDarkGrayHeader}" />
-    <Color x:Key="OpenSkyGroupboxBackground">#444444</Color>
+    <Color x:Key="OpenSkyGroupboxBackground">#1a1e22</Color>
     <SolidColorBrush x:Key="OpenSkyGroupboxBackgroundBrush" Color="{StaticResource OpenSkyGroupboxBackground}" />
     <Color x:Key="OpenSkyLightYellow">Yellow</Color>
     <SolidColorBrush x:Key="OpenSkyLightYellowBrush" Color="{StaticResource OpenSkyLightYellow}" />
@@ -158,7 +158,7 @@
     <Style x:Key="OpenSkyButtonStyle" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Background" Value="{StaticResource OpenSkyTealBrush}" />
-        <Setter Property="Foreground" Value="#404040" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
         <Setter Property="Padding" Value="8,5,8,6" />
@@ -224,7 +224,7 @@
             <Storyboard x:Key="Rotate">
                 <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
                     <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                    <EasingDoubleKeyFrame KeyTime="0:0:20" Value="360"/>
+                    <EasingDoubleKeyFrame KeyTime="0:0:8" Value="360"/>
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
         </Style.Resources>
@@ -234,7 +234,7 @@
         <Setter Property="ui:ThemeManager.IsThemeAware" Value="True" />
         <Setter Property="AllowsTransparency" Value="True" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontFamily" Value="/Fonts/#Metropolis" />
+        <Setter Property="FontFamily" Value="/Fonts/#Montserrat" />
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="Template">
             <Setter.Value>
@@ -252,7 +252,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="50" Height="50" x:Name="GearImage" Source="{StaticResource OpenSkyLogoGearOnly}">
+                                <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="40" Height="40" x:Name="GearImage" Source="{StaticResource OpenskyLogoGradientOnly}">
                                     <Image.RenderTransform>
                                         <TransformGroup>
                                             <RotateTransform/>
@@ -264,9 +264,9 @@
                                         </EventTrigger>
                                     </Image.Triggers>
                                 </Image>
-                                <Image Grid.Row="0" Grid.Column="0" Width="50" Height="50" Source="{StaticResource OpenSkyLogoPlaneOnly}" />
+                                <Image Grid.Row="0" Grid.Column="0" Width="40" Height="40" Source="{StaticResource OpenskyLogoPlaneAndTrail}" />
                             </Grid>
-                            <TextBlock Grid.Column="1" FontSize="30" VerticalAlignment="Center" Margin="5,0,0,0" FontFamily="/Fonts/#SHRIMP" Text="{TemplateBinding Title}" />
+                            <TextBlock Grid.Column="1" FontSize="30" VerticalAlignment="Center" Margin="5,0,0,0" FontFamily="/Fonts/#Montserrat" Text="{TemplateBinding Title}" />
                             <Rectangle Grid.Column="0" Grid.ColumnSpan="3" x:Name="MoveWindow" Fill="Transparent" Margin="-10" />
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
                                 <Button x:Name="MinimizeButton" Width="30" Height="30" FontWeight="Bold" Padding="0" Style="{StaticResource OpenSkyButtonStyle}" Margin="0,0,5,0">
@@ -280,7 +280,7 @@
                                 </Button>
                             </StackPanel>
                         </Grid>
-                        <Border Grid.Row="1" Background="#404040" />
+                        <Border Grid.Row="1" Background="#1a1e22" />
                         <ScrollViewer x:Name="ScrollViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                             <ContentPresenter
                                 x:Name="ContentPresenter"
