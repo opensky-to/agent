@@ -486,7 +486,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         public void Close()
         {
             Debug.WriteLine("SimConnect closing down...");
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 this.StopTracking(false);
             }
@@ -867,7 +867,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             Debug.WriteLine($"SimConnect fsConnect connection status changed: {e}");
             this.Connected = this.fsConnect.Connected;
 
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("Lost connection to sim, saving flight and stopping tracking session...");
                 this.Speech.SpeakAsync("Lost connection to sim, saving flight and stopping tracking session.");
@@ -894,7 +894,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             this.OnPropertyChanged(nameof(this.IsPaused));
 
             Debug.WriteLine($"SimConnect fsConnect pause state changed: {e.Paused}");
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 if (e.Paused)
                 {

@@ -118,5 +118,69 @@ namespace OpenSky.AgentMSFS.Properties {
                 this["TextToSpeechVoice"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OpenSkyRefreshToken {
+            get {
+                return ((string)(this["OpenSkyRefreshToken"]));
+            }
+            set {
+                this["OpenSkyRefreshToken"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OpenSkyUsername {
+            get {
+                return ((string)(this["OpenSkyUsername"]));
+            }
+            set {
+                this["OpenSkyUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5001/apptoken/755CC379-E8FE-43C5-B75F-6CD09772D7A7")]
+        public string OpenSkyTokenUrl {
+            get {
+                return ((string)(this["OpenSkyTokenUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5000")]
+        public string OpenSkyAPIUrl {
+            get {
+                return ((string)(this["OpenSkyAPIUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.DateTime OpenSkyTokenExpiration {
+            get {
+                return ((global::System.DateTime)(this["OpenSkyTokenExpiration"]));
+            }
+            set {
+                this["OpenSkyTokenExpiration"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.DateTime OpenSkyRefreshTokenExpiration {
+            get {
+                return ((global::System.DateTime)(this["OpenSkyRefreshTokenExpiration"]));
+            }
+            set {
+                this["OpenSkyRefreshTokenExpiration"] = value;
+            }
+        }
     }
 }

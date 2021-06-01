@@ -132,7 +132,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// The current map location.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Location Location => new Location(this.Latitude, this.Longitude, this.Altitude);
+        public Location Location => new(this.Latitude, this.Longitude, this.Altitude);
     }
 
     /// -------------------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("PLANE LATITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE LONGITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),

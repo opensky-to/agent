@@ -54,7 +54,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.Airports = $"{SimConnect.SimConnect.Instance.Flight?.OriginICAO} - {SimConnect.SimConnect.Instance.Flight?.DestinationICAO}";
 
             var assembly = Assembly.GetExecutingAssembly();
-            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSdingdong.wav"));
+            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSannouncement.wav"));
             player.Play();
 
             this.StartTrackingCommand = new Command(this.StartTracking);

@@ -120,7 +120,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("TITLE", null, SIMCONNECT_DATATYPE.STRING256),
                 new SimVar("ENGINE TYPE", "Enum", SIMCONNECT_DATATYPE.INT32),

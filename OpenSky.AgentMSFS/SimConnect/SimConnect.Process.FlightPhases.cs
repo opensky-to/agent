@@ -193,7 +193,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.FlightPhase = FlightPhase.InMenu;
                 this.NextFlightStep = string.Empty;
                 unknownFlightPhase = false;
-                if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+                if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
                 {
                     Debug.WriteLine("Tracking aborted, sim returned to main menu.");
                     var assembly = Assembly.GetExecutingAssembly();
@@ -254,7 +254,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Takeoff
-            var departureRadioHeight = this.PlaneIdentity.EngineType == EngineType.Jet || this.PlaneIdentity.EngineType == EngineType.Turboprop ? 1000 : 100;
+            var departureRadioHeight = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 1000 : 100;
             if (!this.WasAirborne && this.PrimaryTracking.GroundSpeed > 40 && this.PrimaryTracking.RadioHeight <= departureRadioHeight)
             {
                 if (unknownFlightPhase)
@@ -300,7 +300,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Cruise
-            var approachDistance = this.PlaneIdentity.EngineType == EngineType.Jet || this.PlaneIdentity.EngineType == EngineType.Turboprop ? 40 : 10;
+            var approachDistance = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
             if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)

@@ -48,7 +48,7 @@ namespace OpenSky.AgentMSFS.Views
             if (Instance == null)
             {
                 Instance = new TestFlight();
-                Instance.Closed += (sender, e) => Instance = null;
+                Instance.Closed += (_, _) => Instance = null;
                 Instance.Show();
             }
             else

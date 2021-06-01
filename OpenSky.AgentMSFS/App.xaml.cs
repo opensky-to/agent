@@ -20,6 +20,8 @@ namespace OpenSky.AgentMSFS
     using OpenSky.AgentMSFS.Properties;
     using OpenSky.AgentMSFS.Tools;
 
+    using XDMessaging;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Main entry point class for WPF application.
@@ -33,7 +35,7 @@ namespace OpenSky.AgentMSFS
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private static readonly Mutex Mutex = new Mutex(false, "OpenSky.AgentMSFS.SingleInstance");
+        private static readonly Mutex Mutex = new(false, "OpenSky.AgentMSFS.SingleInstance." + Environment.UserName);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -74,14 +76,107 @@ namespace OpenSky.AgentMSFS
         /// -------------------------------------------------------------------------------------------------
         protected override void OnStartup([NotNull] StartupEventArgs e)
         {
-            // Check for command line arguments?
+            // Check if we need to upgrade the user settings file
+            if (Settings.Default.SettingsUpdateRequired)
+            {
+                try
+                {
+                    Debug.WriteLine("Updating user settings file to new version...");
+                    Settings.Default.Upgrade();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Unable to upgrade existing user settings file to this version: " + ex);
+                }
+
+                Settings.Default.SettingsUpdateRequired = false;
+                Settings.Default.Save();
+            }
+
+            // Check for command line arguments
+            var updatedToken = false;
+            foreach (var arg in e.Args)
+            {
+                if (arg.StartsWith("opensky-agent-msfs://"))
+                {
+                    var appTokenUri = arg.Replace("opensky-agent-msfs://", string.Empty).TrimEnd('/');
+                    var parameters = appTokenUri.Split('&');
+
+                    string token = null;
+                    DateTime? tokenExpiration = null;
+                    string refresh = null;
+                    DateTime? refreshExpiration = null;
+                    string user = null;
+
+                    foreach (var parameter in parameters)
+                    {
+                        if (parameter.StartsWith("token="))
+                        {
+                            token = parameter.Replace("token=", string.Empty);
+                        }
+
+                        if (parameter.StartsWith("tokenExpiration="))
+                        {
+                            if (long.TryParse(parameter.Replace("tokenExpiration=", string.Empty), out var ticks))
+                            {
+                                tokenExpiration = DateTime.FromFileTimeUtc(ticks);
+                            }
+                        }
+
+                        if (parameter.StartsWith("refresh="))
+                        {
+                            refresh = parameter.Replace("refresh=", string.Empty);
+                        }
+
+                        if (parameter.StartsWith("refreshExpiration="))
+                        {
+                            if (long.TryParse(parameter.Replace("refreshExpiration=", string.Empty), out var ticks))
+                            {
+                                refreshExpiration = DateTime.FromFileTimeUtc(ticks);
+                            }
+                        }
+
+                        if (parameter.StartsWith("user="))
+                        {
+                            user = parameter.Replace("user=", string.Empty);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refresh) && !string.IsNullOrEmpty(user) && tokenExpiration.HasValue && refreshExpiration.HasValue)
+                    {
+                        Settings.Default.OpenSkyApiToken = token;
+                        Settings.Default.OpenSkyTokenExpiration = tokenExpiration.Value;
+                        Settings.Default.OpenSkyRefreshToken = refresh;
+                        Settings.Default.OpenSkyRefreshTokenExpiration = refreshExpiration.Value;
+                        Settings.Default.OpenSkyUsername = user;
+                        Settings.Default.Save();
+                        updatedToken = true;
+                    }
+                    else
+                    {
+                        ModernWpf.MessageBox.Show("Invalid command line parameters, aborting.", "OpenSky", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Environment.Exit(1);
+                    }
+                }
+            }
 
             // Ensure single instance
             try
             {
                 if (!Mutex.WaitOne(TimeSpan.FromSeconds(3), false))
                 {
-                    ModernWpf.MessageBox.Show("The OpenSky agent for Flight Simulator 2020 is already running.", "OpenSky", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    if (!updatedToken)
+                    {
+                        ModernWpf.MessageBox.Show("The OpenSky agent for Flight Simulator 2020 is already running.", "OpenSky", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else
+                    {
+                        // We updated the token in the settings, before we exit let the running instance now about this
+                        var client = new XDMessagingClient();
+                        var broadcaster = client.Broadcasters.GetBroadcasterForMode(XDTransportMode.Compatibility);
+                        broadcaster.SendToChannel("OPENSKY-AGENT-MSFS", "TokensUpdated");
+                    }
+
                     Environment.Exit(1);
                 }
             }
@@ -115,23 +210,6 @@ namespace OpenSky.AgentMSFS
 
             // Unexpected error handler
             this.DispatcherUnhandledException += AppDispatcherUnhandledException;
-
-            // Check if we need to upgrade the user settings file
-            if (Settings.Default.SettingsUpdateRequired)
-            {
-                try
-                {
-                    Debug.WriteLine("Updating user settings file to new version...");
-                    Settings.Default.Upgrade();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Unable to upgrade existing user settings file to this version: " + ex);
-                }
-
-                Settings.Default.SettingsUpdateRequired = false;
-                Settings.Default.Save();
-            }
 
             // Continue startup
             base.OnStartup(e);
@@ -194,7 +272,7 @@ namespace OpenSky.AgentMSFS
         private void PerformShutdown()
         {
             // Check if we are currently tracking a flight
-            if (SimConnect.SimConnect.Instance.TrackingStatus == TrackingStatus.GroundOperations || SimConnect.SimConnect.Instance.TrackingStatus == TrackingStatus.Tracking)
+            if (SimConnect.SimConnect.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("User requested shutdown, but flight tracking is still in progress...");
                 MessageBoxResult? answer = MessageBoxResult.None;

@@ -43,6 +43,12 @@
             <setting name="OpenSkyUsername" serializeAs="String">
                 <value />
             </setting>
+            <setting name="OpenSkyTokenExpiration" serializeAs="String">
+                <value />
+            </setting>
+            <setting name="OpenSkyRefreshTokenExpiration" serializeAs="String">
+                <value />
+            </setting>
         </OpenSky.AgentMSFS.Properties.Settings>
     </userSettings>
     <applicationSettings>

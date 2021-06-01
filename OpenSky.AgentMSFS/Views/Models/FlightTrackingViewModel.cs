@@ -821,7 +821,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     MessageBoxButton.YesNoCancel,
                     MessageBoxImage.Hand),
                 true);
-            if (answer == MessageBoxResult.None || answer == MessageBoxResult.Cancel)
+            if (answer is MessageBoxResult.None or MessageBoxResult.Cancel)
             {
                 return;
             }

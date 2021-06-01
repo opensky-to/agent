@@ -30,7 +30,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The simbrief waypoint markers.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<SimbriefWaypointMarker> simbriefWaypointMarkers = new List<SimbriefWaypointMarker>();
+        private readonly List<SimbriefWaypointMarker> simbriefWaypointMarkers = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

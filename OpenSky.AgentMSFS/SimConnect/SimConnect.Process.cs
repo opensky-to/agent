@@ -67,7 +67,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The tracking event markers.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<TrackingEventMarker> trackingEventMarkers = new List<TrackingEventMarker>();
+        private readonly List<TrackingEventMarker> trackingEventMarkers = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -267,7 +267,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             try
             {
                 // Make sure the player didn't use the dev mode to switch the plane
-                if (this.Flight != null && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking) && this.PlaneIdentifierHash != this.Flight.PlaneIdentifier)
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.PlaneIdentifierHash != this.Flight.PlaneIdentifier)
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
@@ -382,7 +382,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             try
             {
-                if (this.Flight != null && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     // Did the fuel go up?
                     if (newWB.FuelTotalQuantity > oldWB.FuelTotalQuantity)
