@@ -45,6 +45,7 @@
     <DocumentationFile>bin\Debug\OpenSky.AgentMSFS.xml</DocumentationFile>
     <CodeAnalysisRuleSet>..\OpenSky.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -56,6 +57,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\OpenSky.AgentMSFS.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>OpenSky.AgentMSFS.App</StartupObject>
@@ -73,6 +75,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Device" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -111,6 +114,9 @@
     <Compile Include="Converters\PayloadStationsVisibilityConverter.cs" />
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
+    <Compile Include="OpenAPIs\OpenSkyService.cs" />
+    <Compile Include="OpenAPIs\OpenSkyServiceBase.cs" />
+    <Compile Include="OpenAPIs\swagger.cs" />
     <Compile Include="OpenSkyColors.cs" />
     <Compile Include="Models\AircraftTrailLocation.cs" />
     <Compile Include="Models\API\Flight.cs" />
@@ -180,6 +186,7 @@
     <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
     <Compile Include="Tools\UpdateGUIDelegate.cs" />
+    <Compile Include="UserSessionService.cs" />
     <Compile Include="Views\FlightTracking.xaml.cs">
       <DependentUpon>FlightTracking.xaml</DependentUpon>
     </Compile>
@@ -291,6 +298,16 @@
     <Resource Include="Fonts\Montserrat-SemiBoldItalic.ttf" />
     <Resource Include="Fonts\Montserrat-Thin.ttf" />
     <Resource Include="Fonts\Montserrat-ThinItalic.ttf" />
+    <None Include="App.config.release" />
+    <None Include="App.config.debug" />
+    <None Include="OpenAPIs\swagger.json">
+      <Namespace>OpenSkyApi</Namespace>
+      <ClassName>OpenSkyService</ClassName>
+      <CodeGenerator>NSwagCSharp</CodeGenerator>
+      <SourceUri>http://localhost:5000/swagger/v1/swagger.json</SourceUri>
+      <Options>/ClientBaseClass:OpenSkyServiceBase /UseHttpRequestMessageCreationMethod:true</Options>
+    </None>
+    <None Include="pre-build.bat" />
     <None Include="Properties\DesignTimeResources.xaml">
       <ContainsDesignTimeResources>True</ContainsDesignTimeResources>
       <SubType>Designer</SubType>
@@ -367,6 +384,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
+    <PackageReference Include="XDMessaging.Lite">
+      <Version>5.0.6</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\OSdingdong.wav" />
@@ -387,5 +407,11 @@
   <ItemGroup>
     <Resource Include="Resources\opensky_grey16.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
