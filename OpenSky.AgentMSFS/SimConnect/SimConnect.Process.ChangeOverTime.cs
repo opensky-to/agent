@@ -29,14 +29,14 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// Contains the last 10 headings (recorded every 500ms) = 5s of recording.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<int> headingOverTimes = new List<int>();
+        private readonly List<int> headingOverTimes = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Contains the last 30 vertical speed readings (recorded every 500ms) = 15s of recording.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<int> verticalSpeedOverTimes = new List<int>();
+        private readonly List<int> verticalSpeedOverTimes = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

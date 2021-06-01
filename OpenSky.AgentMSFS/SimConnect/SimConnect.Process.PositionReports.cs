@@ -138,7 +138,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                var radioHeight = this.PlaneIdentity.EngineType == EngineType.Jet || this.PlaneIdentity.EngineType == EngineType.Turboprop ? 2500 : 1000;
+                var radioHeight = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
                 if (primary.RadioHeight < radioHeight)
                 {
                     if (this.IsTurning)

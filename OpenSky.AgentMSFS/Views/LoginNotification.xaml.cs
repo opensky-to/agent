@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NewFlightNotification.xaml.cs" company="OpenSky">
+// <copyright file="LoginNotification.xaml.cs" company="OpenSky">
 // sushi.at for OpenSky 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -14,27 +14,27 @@ namespace OpenSky.AgentMSFS.Views
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// New flight notification window.
+    /// Login notification window.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class NewFlightNotification
+    public partial class LoginNotification
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="NewFlightNotification"/> class.
+        /// Initializes a new instance of the <see cref="LoginNotification"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 01/04/2021.
+        /// sushi.at, 01/06/2021.
         /// </remarks>
         /// <param name="timeout">
         /// The timeout for the notification in milliseconds.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public NewFlightNotification(int timeout = 60 * 1000)
+        public LoginNotification(int timeout = 60 * 1000)
         {
             this.InitializeComponent();
 
-            if (this.DataContext is NewFlightNotificationViewModel viewModel)
+            if (this.DataContext is LoginNotificationViewModel viewModel)
             {
                 viewModel.Timeout = timeout;
             }
@@ -42,10 +42,10 @@ namespace OpenSky.AgentMSFS.Views
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// New flight notification loaded.
+        /// Login notification loaded.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 30/03/2021.
+        /// sushi.at, 01/06/2021.
         /// </remarks>
         /// <param name="sender">
         /// Source of the event.
@@ -54,7 +54,7 @@ namespace OpenSky.AgentMSFS.Views
         /// Routed event information.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void NewFlightNotificationOnLoaded(object sender, RoutedEventArgs e)
+        private void LoginNotificationOnLoaded(object sender, RoutedEventArgs e)
         {
             this.PositionWindowToNotificationArea();
         }
@@ -64,7 +64,7 @@ namespace OpenSky.AgentMSFS.Views
         /// Occurs when the view model wants to close the window.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 27/03/2021.
+        /// sushi.at, 01/06/2021.
         /// </remarks>
         /// <param name="sender">
         /// Source of the event.
@@ -73,7 +73,7 @@ namespace OpenSky.AgentMSFS.Views
         /// Event information.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void NewFlightNotificationViewModelOnCloseWindow(object sender, EventArgs e)
+        private void LoginNotificationViewModelOnCloseWindow(object sender, EventArgs e)
         {
             UpdateGUIDelegate closethis = () =>
             {

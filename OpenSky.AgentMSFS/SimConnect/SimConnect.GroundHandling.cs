@@ -25,7 +25,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The is ground handling thread running mutex.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly Mutex isGroundHandlingThreadRunning = new Mutex(false);
+        private readonly Mutex isGroundHandlingThreadRunning = new(false);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

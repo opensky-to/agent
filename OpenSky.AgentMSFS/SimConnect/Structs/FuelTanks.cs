@@ -192,7 +192,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Dictionary<FuelTank, double> Capacities =>
-            new Dictionary<FuelTank, double>
+            new()
             {
                 { FuelTank.Center, this.FuelTankCenterCapacity },
                 { FuelTank.Center2, this.FuelTankCenter2Capacity },
@@ -213,7 +213,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Dictionary<FuelTank, double> Quantities =>
-            new Dictionary<FuelTank, double>
+            new()
             {
                 { FuelTank.Center, this.FuelTankCenterQuantity },
                 { FuelTank.Center2, this.FuelTankCenter2Quantity },
@@ -271,7 +271,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("FUEL TANK CENTER CAPACITY", "Gallons", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("FUEL TANK CENTER2 CAPACITY", "Gallons", SIMCONNECT_DATATYPE.FLOAT64),

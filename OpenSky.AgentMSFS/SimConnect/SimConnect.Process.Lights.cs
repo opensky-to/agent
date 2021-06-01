@@ -45,7 +45,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
 
                 // Engine running?
-                if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+                if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Beacon turned off while engine was running");
@@ -75,7 +75,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             if (this.TrackingStatus == TrackingStatus.Tracking)
             {
-                if (this.PlaneIdentity.EngineType == EngineType.Jet || this.PlaneIdentity.EngineType == EngineType.Turboprop)
+                if (this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop)
                 {
                     // 10000 feet landing lights (give 500 feet spare)
                     if (this.PrimaryTracking.Altitude < 9500 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)

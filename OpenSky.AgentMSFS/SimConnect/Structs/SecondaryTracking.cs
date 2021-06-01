@@ -272,7 +272,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("ZULU TIME", "Seconds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("ZULU DAY OF MONTH", "Number", SIMCONNECT_DATATYPE.INT32),

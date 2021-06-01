@@ -49,7 +49,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("ATC ID", null, SIMCONNECT_DATATYPE.STRING64)
             };

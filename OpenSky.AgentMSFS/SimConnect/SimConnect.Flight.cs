@@ -39,7 +39,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The flight save mutex.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly Mutex flightSaveMutex = new Mutex(false);
+        private readonly Mutex flightSaveMutex = new(false);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -712,7 +712,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         private void TrackFlight(ProcessPrimaryTracking ppt)
         {
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 // Update info strings
                 if (this.trackingStarted.HasValue)

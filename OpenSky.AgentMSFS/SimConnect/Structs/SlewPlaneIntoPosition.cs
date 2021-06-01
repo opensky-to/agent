@@ -98,7 +98,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// Gets the geo coordinate.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public GeoCoordinate GeoCoordinate => new GeoCoordinate(this.Latitude, this.Longitude, this.RadioHeight);
+        public GeoCoordinate GeoCoordinate => new(this.Latitude, this.Longitude, this.RadioHeight);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -148,7 +148,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("PLANE LATITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE LONGITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
