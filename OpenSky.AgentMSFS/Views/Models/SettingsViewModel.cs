@@ -15,11 +15,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
-    using Newtonsoft.Json;
-
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.OpenAPIs;
     using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
@@ -31,7 +28,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 23/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class SettingsViewModel : ViewModel
     {
@@ -84,6 +81,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private uint simulatorPort;
 
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsViewModel"/> class.
@@ -92,6 +90,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// sushi.at, 23/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1304:Specify CultureInfo", Justification = "This is ok here as we want the voices for all cultures")]
         public SettingsViewModel()
         {
             // Create command first so that IsDirty can set the CanExecute property
@@ -375,62 +374,18 @@ namespace OpenSky.AgentMSFS.Views.Models
                         () =>
                         {
                             Debug.WriteLine("Error revoking application token: " + result.Message);
-                            ModernWpf.MessageBox.Show(result.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
-                        });
-                }
-            }
-            catch (ApiException ex)
-            {
-                if (ex.StatusCode == 401)
-                {
-                    // Ignore, we are logging out anyway
-                }
-                else if (!string.IsNullOrEmpty(ex.Response))
-                {
-                    var problemDetails = JsonConvert.DeserializeObject<ValidationProblemDetails>(ex.Response);
-                    if (problemDetails != null)
-                    {
-                        foreach (var problemDetailsError in problemDetails.Errors)
-                        {
-                            foreach (var errorMessage in problemDetailsError.Value)
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
                             {
-                                this.LogoutOpenSkyUserCommand.ReportProgress(
-                                    () =>
-                                    {
-                                        Debug.WriteLine("Error revoking application token: " + errorMessage);
-                                        ModernWpf.MessageBox.Show(errorMessage, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
-                                    });
+                                Debug.WriteLine(result.ErrorDetails);
                             }
-                        }
-                    }
-                    else
-                    {
-                        this.LogoutOpenSkyUserCommand.ReportProgress(
-                            () =>
-                            {
-                                Debug.WriteLine("Error revoking application token: " + ex.Message);
-                                ModernWpf.MessageBox.Show(ex.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
-                            });
-                    }
-                }
-                else
-                {
-                    this.LogoutOpenSkyUserCommand.ReportProgress(
-                        () =>
-                        {
-                            Debug.WriteLine("Error revoking application token: " + ex.Message);
-                            ModernWpf.MessageBox.Show(ex.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                 }
             }
             catch (Exception ex)
             {
-                this.LogoutOpenSkyUserCommand.ReportProgress(
-                    () =>
-                    {
-                        Debug.WriteLine("Error revoking application token: " + ex.Message);
-                        ModernWpf.MessageBox.Show(ex.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
-                    });
+                ex.HandleApiCallException(this.LogoutOpenSkyUserCommand, "Error revoking application token", false);
             }
 
             this.UserSession.Logout();

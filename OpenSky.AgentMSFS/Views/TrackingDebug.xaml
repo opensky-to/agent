@@ -204,7 +204,6 @@
         <TextBlock Grid.Column="8" Grid.Row="9" VerticalAlignment="Center" HorizontalAlignment="Right">Gear retractable?</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="10" VerticalAlignment="Center" HorizontalAlignment="Right">ATC type</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="11" VerticalAlignment="Center" HorizontalAlignment="Right">ATC model</TextBlock>
-        <TextBlock Grid.Column="8" Grid.Row="12" VerticalAlignment="Center" HorizontalAlignment="Right">Plane identifier</TextBlock>
         <TextBox Grid.Column="9" Grid.Row="2" Margin="5,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.TypeProperty, Mode=OneWay}" />
         <TextBox Grid.Column="9" Grid.Row="3" Margin="5,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.EngineType, Mode=OneWay}" />
         <TextBox Grid.Column="9" Grid.Row="4" Margin="5,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.EngineCount, Mode=OneWay}" />
@@ -215,7 +214,6 @@
         <TextBox Grid.Column="9" Grid.Row="9" Margin="5,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.GearRetractable, Mode=OneWay}" />
         <TextBox Grid.Column="9" Grid.Row="10" Margin="5,2,0,2" FontFamily="Consolas" FontSize="10" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.AtcTypeProperty, Mode=OneWay}" />
         <TextBox Grid.Column="9" Grid.Row="11" Margin="5,2,0,2" FontFamily="Consolas" FontSize="10" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentity.AtcModelProperty, Mode=OneWay}" />
-        <TextBox Grid.Column="9" Grid.Row="12" Margin="5,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PlaneIdentifierHash, Mode=OneWay}" TextWrapping="Wrap" Grid.RowSpan="4" />
 
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="22" FontWeight="Bold" HorizontalAlignment="Center">Fuel tanks</TextBlock>
         <TextBlock Grid.Column="0" Grid.Row="23" VerticalAlignment="Center" HorizontalAlignment="Right">Center</TextBlock>

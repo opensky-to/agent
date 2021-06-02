@@ -182,7 +182,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.TrackingConditions[(int)Models.TrackingConditions.DateTime].ConditionMet =
                     this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - pst.New.UtcDateTime).TotalMinutes) < 1;
-                this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.PlaneIdentifierHash.Equals(this.Flight?.PlaneIdentifier, StringComparison.InvariantCultureIgnoreCase);
+                //this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.PlaneIdentifierHash.Equals(this.Flight?.PlaneIdentifier, StringComparison.InvariantCultureIgnoreCase); // todo replace this with aircraft type check
 
                 if (this.TrackingStatus == TrackingStatus.Preparing)
                 {
@@ -267,7 +267,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             try
             {
                 // Make sure the player didn't use the dev mode to switch the plane
-                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.PlaneIdentifierHash != this.Flight.PlaneIdentifier)
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)) //&& this.PlaneIdentifierHash != this.Flight.PlaneIdentifier) // todo replace this with aircraft type check
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
