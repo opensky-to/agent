@@ -14,9 +14,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using System.Security.Cryptography;
     using System.Speech.Synthesis;
-    using System.Text;
     using System.Threading;
     using System.Windows;
 
@@ -328,31 +326,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.payloadStations = value;
                 this.OnPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the SHA-256 OpenSky plane identifier hash.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string PlaneIdentifierHash
-        {
-            get
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    var planeHash = sha256.ComputeHash(
-                        Encoding.UTF8.GetBytes(
-                            $"{this.PlaneIdentity.EngineType}{this.PlaneIdentity.EngineCount}{this.WeightAndBalance.FuelTotalCapacity}{this.WeightAndBalance.EmptyWeight}{this.WeightAndBalance.MaxGrossWeight}{this.PlaneIdentity.FlapsAvailable}{this.PlaneIdentity.GearRetractable}"));
-                    var sBuilder = new StringBuilder();
-                    foreach (var b in planeHash)
-                    {
-                        sBuilder.Append(b.ToString("x2"));
-                    }
-
-                    return sBuilder.ToString();
-                }
             }
         }
 
@@ -843,7 +816,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// </param>
         /// -------------------------------------------------------------------------------------------------
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] [CanBeNull] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName][CanBeNull] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -970,7 +943,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     new Thread(
                             () => { this.ProcessWeightAndBalance(this.WeightAndBalance, isWeightAndBalance); })
-                        { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
+                    { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
                     this.WeightAndBalance = isWeightAndBalance;
                     this.LastReceivedTimes[Requests.WeightAndBalance] = DateTime.UtcNow;
                 }
@@ -1002,7 +975,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         private void ReadFromSimconnect()
         {
-            bool veryFirstConnectError = true;
+            var veryFirstConnectError = true;
             while (!this.close)
             {
                 try
@@ -1044,6 +1017,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
 
                             // After the first one ignore, and don't log connection errors, they only fill up the logs
+                            throw;
                         }
                     }
 

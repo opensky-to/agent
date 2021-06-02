@@ -1,99 +1,136 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PlaneIdentityCollectorViewModel.cs" company="OpenSky">
+// <copyright file="AircraftTypesViewModel.cs" company="OpenSky">
 // sushi.at for OpenSky 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace OpenSky.AgentMSFS.Views.Models
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Windows;
 
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
+    using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Plane identity collector view model.
+    /// Aircraft types view model.
     /// </summary>
     /// <remarks>
     /// sushi.at, 28/03/2021.
     /// </remarks>
     /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
-    public class PlaneIdentityCollectorViewModel : ViewModel
+    public class AircraftTypesViewModel : ViewModel
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The CSV we are collecting.
+        /// The optional comments (what mod was loaded, etc.).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string csv;
+        private string comments = string.Empty;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The description we can add to the plane record (what mod was loaded, etc.).
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string description = string.Empty;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlaneIdentityCollectorViewModel"/> class.
+        /// Initializes a new instance of the <see cref="AircraftTypesViewModel"/> class.
         /// </summary>
         /// <remarks>
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public PlaneIdentityCollectorViewModel()
+        public AircraftTypesViewModel()
         {
-            this.AddPlaneIdentityCommand = new Command(this.AddPlaneIdentity);
+            this.ExistingAircraftTypes = new ObservableCollection<AircraftType>();
+
+            this.RefreshAircraftTypesCommand = new AsynchronousCommand(this.RefreshAircraftTypes);
+            this.AddAircraftTypeCommand = new AsynchronousCommand(this.AddAircraftType);
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the add plane identity command.
+        /// Refreshes the list of existing aircraft types.
         /// </summary>
+        /// <remarks>
+        /// sushi.at, 02/06/2021.
+        /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public Command AddPlaneIdentityCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the CSV we are collecting.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string Csv
+        private void RefreshAircraftTypes()
         {
-            get => this.csv;
-
-            set
+            try
             {
-                if (Equals(this.csv, value))
+                var result = OpenSkyService.Instance.GetAllAircraftTypesAsync().Result;
+                if (!result.IsError)
                 {
-                    return;
+                    this.ExistingAircraftTypes.Clear();
+                    foreach (var type in result.Data)
+                    {
+                        this.ExistingAircraftTypes.Add(type);
+                    }
                 }
+                else
+                {
+                    this.RefreshAircraftTypesCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error refreshing aircraft types: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
 
-                this.csv = value;
-                this.NotifyPropertyChanged();
+                            ModernWpf.MessageBox.Show(result.Message, "Error refreshing aircraft types", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.RefreshAircraftTypesCommand, "Error refreshing aircraft types");
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the description we can add to the plane record (what mod was loaded, etc.).
+        /// Gets the add aircraft type command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string Description
+        public AsynchronousCommand AddAircraftTypeCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the refresh aircraft types command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand RefreshAircraftTypesCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a list of of the existing aircraft types.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<AircraftType> ExistingAircraftTypes { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the optional comments (what mod was loaded, etc.).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string Comments
         {
-            get => this.description;
+            get => this.comments;
 
             set
             {
-                if (Equals(this.description, value))
+                if (Equals(this.comments, value))
                 {
                     return;
                 }
 
-                this.description = value;
+                this.comments = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -113,7 +150,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void AddPlaneIdentity()
+        private void AddAircraftType()
         {
             if (!this.SimConnect.Connected)
             {
@@ -127,16 +164,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            if (this.Description.Contains(","))
-            {
-                ModernWpf.MessageBox.Show("You cannot add commas into the description text!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            var csvRecord = $"{this.SimConnect.PlaneIdentity.TypeProperty},{this.SimConnect.PlaneIdentity.AtcType},{this.SimConnect.PlaneIdentity.AtcModel},{this.SimConnect.PlaneIdentifierHash},{this.Description}\r\n";
-            this.Csv += csvRecord;
-
-            this.Description = string.Empty;
+            
+            // todo
         }
     }
 }

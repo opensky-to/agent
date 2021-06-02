@@ -146,17 +146,17 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.FlightTrackingCommand = new Command(this.OpenFlightTracking);
             this.TrackingDebugCommand = new Command(this.OpenTrackingDebug);
             this.TestFlightCommand = new Command(this.OpenTestFlight);
-            this.PlaneIdentityCollectorCommand = new Command(this.OpenPlaneIdentityCollector);
+            this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the plane identity collector command.
+        /// Gets the aircraft types command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Command PlaneIdentityCollectorCommand { get; }
+        public Command AircraftTypesCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -426,18 +426,16 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Opens the plane identity collector view.
+        /// Opens the aircraft types view.
         /// </summary>
         /// <remarks>
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void OpenPlaneIdentityCollector()
+        private void OpenAircraftTypes()
         {
-#if DEBUG
-            Debug.WriteLine("Opening plane identity collector view");
-            PlaneIdentityCollector.Open();
-#endif
+            Debug.WriteLine("Opening aircraft types view");
+            AircraftTypes.Open();
         }
 
         /// -------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PlaneIdentityCollector.xaml.cs" company="OpenSky">
+// <copyright file="AircraftTypes.xaml.cs" company="OpenSky">
 // sushi.at for OpenSky 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,17 +11,17 @@ namespace OpenSky.AgentMSFS.Views
     /// Plane identity collector window.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class PlaneIdentityCollector
+    public partial class AircraftTypes
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlaneIdentityCollector"/> class.
+        /// Initializes a new instance of the <see cref="AircraftTypes"/> class.
         /// </summary>
         /// <remarks>
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public PlaneIdentityCollector()
+        public AircraftTypes()
         {
             this.InitializeComponent();
         }
@@ -31,7 +31,7 @@ namespace OpenSky.AgentMSFS.Views
         /// The single instance of this view.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private static PlaneIdentityCollector Instance { get; set; }
+        private static AircraftTypes Instance { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -45,7 +45,7 @@ namespace OpenSky.AgentMSFS.Views
         {
             if (Instance == null)
             {
-                Instance = new PlaneIdentityCollector();
+                Instance = new AircraftTypes();
                 Instance.Closed += (_, _) => Instance = null;
                 Instance.Show();
             }
