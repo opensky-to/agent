@@ -18,13 +18,63 @@
             xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
             xmlns:openSkyApi="clr-namespace:OpenSkyApi"
+            xmlns:system="clr-namespace:System;assembly=mscorlib"
+            xmlns:ui="http://schemas.modernwpf.com/2019"
             mc:Ignorable="d"
-            Title="Aircraft Types" Height="650" Width="1400">
+            Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False">
     <Window.DataContext>
         <models:AircraftTypesViewModel />
     </Window.DataContext>
     <Window.Resources>
         <converters:AircraftTypeEngineInfoConverter x:Key="AircraftTypeEngineInfoConverter" />
+        <converters:NullItemToVisibilityConverter x:Key="NullItemToVisibilityConverter" />
+        <ObjectDataProvider x:Key="CategoryDataProvider" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="openSkyApi:AircraftTypeCategory" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <Style x:Key="DeleteButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ControlTemplate.Resources>
+                            <StreamGeometry x:Key="Cancel">M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z</StreamGeometry>
+                        </ControlTemplate.Resources>
+                        <Border
+                                            x:Name="ButtonLayoutGrid"
+                                            BorderBrush="{DynamicResource TextControlButtonBorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            Background="{DynamicResource TextControlButtonBackground}"
+                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
+                            <ui:FontIconFallback
+                                                x:Name="GlyphElement"
+                                                Foreground="{DynamicResource TextControlButtonForeground}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                FontStyle="Normal"
+                                                FontSize="12"
+                                                Data="{StaticResource Cancel}"
+                                                FontFamily="{DynamicResource SymbolThemeFontFamily}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBackgroundPointerOver}" />
+                                <Setter Property="BorderBrush" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBorderBrushPointerOver}" />
+                                <Setter Property="Foreground" TargetName="GlyphElement" Value="{DynamicResource TextControlButtonForegroundPointerOver}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBackgroundPressed}" />
+                                <Setter Property="BorderBrush" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBorderBrushPressed}" />
+                                <Setter Property="Foreground" TargetName="GlyphElement" Value="{DynamicResource TextControlButtonForegroundPressed}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="ButtonLayoutGrid" Value="0" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -34,42 +84,101 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
+        <FrameworkElement Grid.Column="0" x:Name="ProxyElement" Visibility="Collapsed" />
         <GroupBox Grid.Column="0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Existing Aircraft Types</TextBlock>
             </GroupBox.Header>
-            <DataGrid ItemsSource="{Binding ExistingAircraftTypes}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Header="Category" Binding="{Binding Category}" />
-                    <DataGridTextColumn Header="Engine(s)" Binding="{Binding ., Converter={StaticResource AircraftTypeEngineInfoConverter}}" />
-                </DataGrid.Columns>
-                <DataGrid.RowDetailsTemplate>
-                    <DataTemplate DataType="openSkyApi:AircraftType">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0">ATC Type</TextBlock>
-                            <TextBlock Grid.Row="1" Grid.Column="0">ATC Model</TextBlock>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AtcType}" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AtcModel}" />
-                        </Grid>
-                    </DataTemplate>
-                </DataGrid.RowDetailsTemplate>
-            </DataGrid>
+            <StackPanel Orientation="Vertical">
+                <ui:CommandBar>
+                    <ui:CommandBar.PrimaryCommands>
+                        <ui:AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding RefreshAircraftTypesCommand}" />
+                        <ui:AppBarButton Icon="Accept" Label="Enable" />
+                        <ui:AppBarButton Icon="Clear" Label="Disable" />
+                        <ui:AppBarButton Icon="Edit" Label="Edit" />
+                    </ui:CommandBar.PrimaryCommands>
+                    <ui:CommandBar.SecondaryCommands>
+                        <ui:AppBarButton Icon="Delete" Label="Delete" />
+                    </ui:CommandBar.SecondaryCommands>
+                    <ui:CommandBar.Content>
+                        <TextBox Margin="0,1,0,0" MaxHeight="35" MinHeight="35" ui:ControlHelper.PlaceholderText="Filter" ui:ControlHelper.PlaceholderForeground="#666" MinWidth="100" />
+                    </ui:CommandBar.Content>
+                </ui:CommandBar>
+                <DataGrid ItemsSource="{Binding ExistingAircraftTypes}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow" HorizontalScrollBarVisibility="Visible" MinColumnWidth="100" HeadersVisibility="Column">
+                    <DataGrid.Resources>
+                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                        <converters:AircraftTypeForeignKeyConverter x:Key="AircraftTypeForeignKeyConverter" AircraftTypes="{Binding DataContext.ExistingAircraftTypes, Source={x:Reference ProxyElement}}" />
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Version" Binding="{Binding VersionNumber}" />
+                        <DataGridTextColumn Header="Category" Binding="{Binding Category}" />
+                        <DataGridTextColumn Header="Simulator" Binding="{Binding Simulator}" />
+                        <DataGridCheckBoxColumn Header="Enabled?" Binding="{Binding Enabled}" />
+                        <DataGridTextColumn Header="Next version" Binding="{Binding NextVersion, Converter={StaticResource AircraftTypeForeignKeyConverter}}" />
+                        <DataGridTextColumn Header="Variant of" Binding="{Binding IsVariantOf, Converter={StaticResource AircraftTypeForeignKeyConverter}}" />
+                        <DataGridCheckBoxColumn Header="Vanilla?" Binding="{Binding IsVanilla}" />
+                        <DataGridTextColumn Header="Comments" Binding="{Binding Comments}" Width="*" MinWidth="150" />
+                    </DataGrid.Columns>
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate DataType="openSkyApi:AircraftType">
+                            <Grid Margin="10,5,5,5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,15,0">ATC Type</TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,15,0">ATC Model</TextBlock>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,15,0">Empty weight</TextBlock>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,15,0">Fuel total capacity</TextBlock>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,15,0">Max gross weight</TextBlock>
+                                <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,15,0">Engine(s)</TextBlock>
+                                <TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,15,0">Minimum price</TextBlock>
+                                <TextBlock Grid.Row="7" Grid.Column="0" Margin="0,0,15,0">Maximum price</TextBlock>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Margin="0,0,15,0">Needs co-pilot?</TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AtcType}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AtcModel}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding EmptyWeight}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FuelTotalCapacity}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding MaxGrossWeight}" />
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding ., Converter={StaticResource AircraftTypeEngineInfoConverter}}" />
+                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding MinPrice}" />
+                                <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding MaxPrice}" />
+                                <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding NeedsCoPilot}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
+                </DataGrid>
+            </StackPanel>
         </GroupBox>
-
         <GroupBox Grid.Column="1">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Add aircraft type</TextBlock>
             </GroupBox.Header>
             <Grid>
+                <Grid.Resources >
+                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                </Grid.Resources>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="1*" />
@@ -86,6 +195,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -105,36 +215,39 @@
                 <TextBlock Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" Margin="0,0,5,0">Max Gross Weight</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" Margin="0,0,5,0">Flaps?</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="9" VerticalAlignment="Center" Margin="0,0,5,0">Gear retractable?</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Margin="0,0,5,0">OpenSky name</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Margin="0,0,5,0">Category</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,5,0">Is vanilla?</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="13" VerticalAlignment="Center" Margin="0,0,5,0">Needs co-pilot?</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="14" VerticalAlignment="Center" Margin="0,0,5,0">Is variant of</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="15" VerticalAlignment="Center" Margin="0,0,5,0">Minimum price</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="16" VerticalAlignment="Center" Margin="0,0,5,0">Maximum price</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="17" VerticalAlignment="Center" Margin="0,0,5,0">Comments</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Margin="0,0,5,0">Name</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Margin="0,0,5,0">Version</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,5,0">Category</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="13" VerticalAlignment="Center" Margin="0,0,5,0">Is vanilla?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="14" VerticalAlignment="Center" Margin="0,0,5,0">Needs co-pilot?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="15" VerticalAlignment="Center" Margin="0,0,5,0">Is variant of</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="16" VerticalAlignment="Center" Margin="0,0,5,0">Minimum price</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="17" VerticalAlignment="Center" Margin="0,0,5,0">Maximum price</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="18" VerticalAlignment="Center" Margin="0,0,5,0">Comments</TextBlock>
 
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SimConnect.PlaneIdentity.TypeProperty}" />
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SimConnect.PlaneIdentity.AtcTypeProperty}" />
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SimConnect.PlaneIdentity.AtcModelProperty}" />
-                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding SimConnect.PlaneIdentity.EngineType}" />
-                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding SimConnect.PlaneIdentity.EngineCount}" />
-                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding SimConnect.WeightAndBalance.FuelTotalCapacity}" />
-                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight}" />
-                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight}" />
-                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding SimConnect.PlaneIdentity.FlapsAvailable}" />
-                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding SimConnect.PlaneIdentity.GearRetractable}" />
-                <TextBox Grid.Column="1" Grid.Row="10"></TextBox>
-                <ComboBox Grid.Column="1" Grid.Row="11" HorizontalAlignment="Stretch">
-
-                </ComboBox>
-                <CheckBox Grid.Column="1" Grid.Row="12">Part of the sim or mod?</CheckBox>
-                <CheckBox Grid.Column="1" Grid.Row="13">Needs a co-pilot</CheckBox>
-                <ComboBox Grid.Column="1" Grid.Row="14" HorizontalAlignment="Stretch"></ComboBox>
-                <TextBox Grid.Column="1" Grid.Row="15"></TextBox>
-                <TextBox Grid.Column="1" Grid.Row="16"></TextBox>
-                <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinLines="3" />
-                <Button Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,10,0,0" Command="{Binding AddAircraftTypeCommand}">Add type</Button>
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SimConnect.PlaneIdentity.TypeProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SimConnect.PlaneIdentity.AtcTypeProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SimConnect.PlaneIdentity.AtcModelProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding SimConnect.PlaneIdentity.EngineType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding SimConnect.PlaneIdentity.EngineCount}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding SimConnect.WeightAndBalance.FuelTotalCapacity}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding SimConnect.PlaneIdentity.FlapsAvailable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding SimConnect.PlaneIdentity.GearRetractable}" Margin="5,2" />
+                <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Name of the aircraft" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding VersionNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Version number" ui:ControlHelper.PlaceholderForeground="#666" />
+                <ComboBox Grid.Column="1" Grid.Row="12" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItem="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Column="1" Grid.Row="13" MaxWidth="300" IsChecked="{Binding IsVanilla, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this is a vanilla aircraft, uncheck for mods and add-on aircraft</CheckBox>
+                <CheckBox Grid.Column="1" Grid.Row="14" IsChecked="{Binding NeedsCoPilot, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this aircraft requires a co-pilot</CheckBox>
+                <Grid Grid.Column="1" Grid.Row="15">
+                    <ComboBox x:Name="VariantOfCombo" HorizontalAlignment="Stretch" ItemsSource="{Binding ExistingAircraftTypes}" SelectedItem="{Binding IsVariantOf, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=VariantOfCombo, Converter={StaticResource NullItemToVisibilityConverter} }" Command="{Binding ClearVariantOfCommand}" />
+                </Grid>
+                <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding MinimumPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Minimum price" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding MaximumPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Maximum price" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="18" Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinLines="3" ui:ControlHelper.PlaceholderText="Optional comments here" ui:ControlHelper.PlaceholderForeground="#666" />
+                <Button Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="5,10,5,0" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding AddAircraftTypeCommand}">Add type</Button>
             </Grid>
         </GroupBox>
     </Grid>

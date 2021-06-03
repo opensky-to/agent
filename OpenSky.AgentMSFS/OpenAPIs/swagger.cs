@@ -1604,10 +1604,8 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("engineCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int EngineCount { get; set; }
     
-        /// <summary>Gets or sets the type of the engine (engine type as reported in the sim).</summary>
         [Newtonsoft.Json.JsonProperty("engineType", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string EngineType { get; set; }
+        public EngineType EngineType { get; set; }
     
         /// <summary>Gets or sets a value indicating whether this aircraft has flaps.</summary>
         [Newtonsoft.Json.JsonProperty("flapsAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -1638,6 +1636,10 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("maxGrossWeight", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double MaxGrossWeight { get; set; }
     
+        /// <summary>Gets or sets the version number of this type.</summary>
+        [Newtonsoft.Json.JsonProperty("versionNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int VersionNumber { get; set; }
+    
         /// <summary>Gets or sets the maximum selling price.</summary>
         [Newtonsoft.Json.JsonProperty("maxPrice", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int MaxPrice { get; set; }
@@ -1661,6 +1663,9 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("nextVersion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? NextVersion { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("simulator", Required = Newtonsoft.Json.Required.Always)]
+        public Simulator Simulator { get; set; }
+    
         /// <summary>Gets or sets the identifier of the uploader user.</summary>
         [Newtonsoft.Json.JsonProperty("uploaderID", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
@@ -1670,7 +1675,7 @@ namespace OpenSkyApi
     
     }
     
-    /// <summary>Values that represent aircraft type categories.0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = Jet, 5 = NBAirliner, 6 = WBAirliner</summary>
+    /// <summary>Values that represent aircraft type categories. 0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = Jet, 5 = NBAirliner, 6 = WBAirliner</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public enum AircraftTypeCategory
     {
@@ -1947,6 +1952,24 @@ namespace OpenSkyApi
     
     }
     
+    /// <summary>Engine types (currently exactly matching SimConnect). 0 = Piston, 1 = Jet, 2 = None, 3 = HeloBellTurbine, 4 = Unsupported, 5 = Turboprop</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum EngineType
+    {
+        Piston = 0,
+    
+        Jet = 1,
+    
+        None = 2,
+    
+        HeloBellTurbine = 3,
+    
+        Unsupported = 4,
+    
+        Turboprop = 5,
+    
+    }
+    
     /// <summary>Forgot password model.</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public partial class ForgotPassword 
@@ -2214,6 +2237,14 @@ namespace OpenSkyApi
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Token { get; set; }
     
+    
+    }
+    
+    /// <summary>Simulators. 0 = MSFS</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum Simulator
+    {
+        MSFS = 0,
     
     }
     

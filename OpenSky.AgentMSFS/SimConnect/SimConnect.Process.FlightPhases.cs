@@ -14,6 +14,8 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
 
+    using OpenSkyApi;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// Simconnect client - data processing code.

@@ -13,7 +13,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
     using Microsoft.FlightSimulator.SimConnect;
 
-    using OpenSky.AgentMSFS.SimConnect.Enums;
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
