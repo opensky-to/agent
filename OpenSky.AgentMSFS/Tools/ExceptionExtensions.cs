@@ -49,7 +49,14 @@ namespace OpenSky.AgentMSFS.Tools
         /// -------------------------------------------------------------------------------------------------
         public static void HandleApiCallException(this Exception ex, AsynchronousCommand command, string friendlyErrorMessage, bool alert401 = true)
         {
-            if (ex is ApiException apiException)
+            if (ex is AggregateException aggregateException)
+            {
+                foreach (var innerException in aggregateException.InnerExceptions)
+                {
+                    innerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                }
+            }
+            else if (ex is ApiException apiException)
             {
                 if (apiException.StatusCode == 401)
                 {

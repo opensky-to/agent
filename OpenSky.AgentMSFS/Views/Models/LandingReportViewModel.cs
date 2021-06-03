@@ -18,8 +18,9 @@ namespace OpenSky.AgentMSFS.Views.Models
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -73,7 +74,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Subscribe to changes
             this.SimConnect.LandingReports.CollectionChanged += this.LandingReportsCollectionChanged;
-            
+
             // Create dismiss command and notification timeout thread
             this.DismissLandingReportCommand = new Command(this.DismissLandingReport);
             new Thread(this.NotificationTimeout) { Name = "OpenSky.LandingReportNotificationTimeout" }.Start();

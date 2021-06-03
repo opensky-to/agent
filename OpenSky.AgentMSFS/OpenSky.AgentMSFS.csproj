@@ -111,6 +111,7 @@
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\AircraftTypeEngineInfoConverter.cs" />
+    <Compile Include="Converters\AircraftTypeForeignKeyConverter.cs" />
     <Compile Include="Converters\InvertedBooleanVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="Converters\CanSetWeightAndBalancesConverter.cs" />
@@ -119,9 +120,11 @@
     <Compile Include="Converters\FuelTankCapacityVisibilityConverter.cs" />
     <Compile Include="Converters\IsPausedButtonConverter.cs" />
     <Compile Include="Converters\MapZoomLevelVisibilityConverter.cs" />
+    <Compile Include="Converters\NullItemToVisibilityConverter.cs" />
     <Compile Include="Converters\PayloadStationsVisibilityConverter.cs" />
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
+    <Compile Include="OpenAPIs\ModelExtensions\AircraftType.cs" />
     <Compile Include="OpenAPIs\OpenSkyService.cs" />
     <Compile Include="OpenAPIs\OpenSkyServiceBase.cs" />
     <Compile Include="OpenAPIs\swagger.cs" />
@@ -160,7 +163,6 @@
     <Compile Include="Native\Taskbar.cs" />
     <Compile Include="SimConnect\Enums\ClientEvents.cs" />
     <Compile Include="SimConnect\Enums\CrashSequence.cs" />
-    <Compile Include="SimConnect\Enums\EngineType.cs" />
     <Compile Include="Models\FlightPhase.cs" />
     <Compile Include="SimConnect\Enums\FuelTank.cs" />
     <Compile Include="SimConnect\SimConnect.GroundHandling.cs" />
@@ -378,7 +380,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CTrue.FsConnect">
-      <Version>1.3.2</Version>
+      <Version>1.3.3</Version>
+    </PackageReference>
+    <PackageReference Include="DataGridExtensions">
+      <Version>2.5.2</Version>
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf">
       <Version>1.1.0</Version>
@@ -435,6 +440,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\OSdingdong.wav" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"</PreBuildEvent>

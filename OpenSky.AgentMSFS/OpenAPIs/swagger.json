@@ -838,6 +838,7 @@
           "category",
           "engineType",
           "name",
+          "simulator",
           "uploaderID"
         ],
         "type": "object",
@@ -881,8 +882,7 @@
             "format": "int32"
           },
           "engineType": {
-            "type": "string",
-            "description": "Gets or sets the type of the engine (engine type as reported in the sim)."
+            "$ref": "#/components/schemas/EngineType"
           },
           "flapsAvailable": {
             "type": "boolean",
@@ -917,6 +917,11 @@
             "description": "Gets or sets the maximum gross weight in pounds.",
             "format": "double"
           },
+          "versionNumber": {
+            "type": "integer",
+            "description": "Gets or sets the version number of this type.",
+            "format": "int32"
+          },
           "maxPrice": {
             "type": "integer",
             "description": "Gets or sets the maximum selling price.",
@@ -943,6 +948,9 @@
             "format": "uuid",
             "nullable": true
           },
+          "simulator": {
+            "$ref": "#/components/schemas/Simulator"
+          },
           "uploaderID": {
             "maxLength": 255,
             "minLength": 0,
@@ -964,7 +972,7 @@
           6
         ],
         "type": "integer",
-        "description": "Values that represent aircraft type categories.0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = Jet, 5 = NBAirliner, 6 = WBAirliner",
+        "description": "Values that represent aircraft type categories. 0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = Jet, 5 = NBAirliner, 6 = WBAirliner",
         "format": "int32",
         "x-enumNames": [
           "SEP",
@@ -1294,6 +1302,35 @@
         "additionalProperties": false,
         "description": "API standard response model."
       },
+      "EngineType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "type": "integer",
+        "description": "Engine types (currently exactly matching SimConnect). 0 = Piston, 1 = Jet, 2 = None, 3 = HeloBellTurbine, 4 = Unsupported, 5 = Turboprop",
+        "format": "int32",
+        "x-enumNames": [
+          "Piston",
+          "Jet",
+          "None",
+          "HeloBellTurbine",
+          "Unsupported",
+          "Turboprop"
+        ],
+        "x-enum-varnames": [
+          "Piston",
+          "Jet",
+          "None",
+          "HeloBellTurbine",
+          "Unsupported",
+          "Turboprop"
+        ]
+      },
       "ForgotPassword": {
         "required": [
           "email"
@@ -1607,6 +1644,20 @@
         },
         "additionalProperties": false,
         "description": "Revoke token model."
+      },
+      "Simulator": {
+        "enum": [
+          0
+        ],
+        "type": "integer",
+        "description": "Simulators. 0 = MSFS",
+        "format": "int32",
+        "x-enumNames": [
+          "MSFS"
+        ],
+        "x-enum-varnames": [
+          "MSFS"
+        ]
       },
       "StringApiResponse": {
         "type": "object",

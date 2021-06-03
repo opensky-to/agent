@@ -7,8 +7,9 @@
 namespace OpenSky.AgentMSFS.SimConnect
 {
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -85,6 +86,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             this.landingLightWarningActive = true;
                             this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
                             this.fsConnect.SetText("OpenSky Warning: Landing lights off below 10k feet", 5);
+
                             //todo add some kind of xp reduction
                         }
                     }
@@ -101,6 +103,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.landingLightWarningActive = true;
                         this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
                         this.fsConnect.SetText("OpenSky Warning: Landing lights off below 300 feet AGL", 5);
+
                         //todo add some kind of xp reduction
                     }
                     else

@@ -15,9 +15,10 @@ namespace OpenSky.AgentMSFS.SimConnect
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
