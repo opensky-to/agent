@@ -7,9 +7,6 @@
 // ReSharper disable once CheckNamespace
 namespace OpenSkyApi
 {
-    using System;
-    using System.Collections.Generic;
-
     using OpenSky.AgentMSFS.SimConnect;
 
     /// -------------------------------------------------------------------------------------------------
@@ -117,7 +114,6 @@ namespace OpenSkyApi
         {
             if (SimConnect.Instance.Connected)
             {
-
             }
 
             return false;

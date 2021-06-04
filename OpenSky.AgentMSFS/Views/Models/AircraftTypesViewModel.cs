@@ -59,6 +59,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string loadingText;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The maximum price.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -113,19 +120,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Clears the IsVariantOf property.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 03/06/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private void ClearVariantOf()
-        {
-            this.IsVariantOf = null;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets the add aircraft type command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -151,6 +145,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.NotifyPropertyChanged();
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the clear VariantOf command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ClearVariantOfCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -218,6 +219,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.isVariantOf = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string LoadingText
+        {
+            get => this.loadingText;
+
+            set
+            {
+                if (Equals(this.loadingText, value))
+                {
+                    return;
+                }
+
+                this.loadingText = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -313,13 +335,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand RefreshAircraftTypesCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the clear VariantOf command.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Command ClearVariantOfCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -433,6 +448,19 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Clears the IsVariantOf property.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ClearVariantOf()
+        {
+            this.IsVariantOf = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Refreshes the list of existing aircraft types.
         /// </summary>
         /// <remarks>
@@ -441,6 +469,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void RefreshAircraftTypes()
         {
+            this.LoadingText = "Refreshing aircraft types";
             try
             {
                 var result = OpenSkyService.Instance.GetAllAircraftTypesAsync().Result;
@@ -474,6 +503,10 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 ex.HandleApiCallException(this.RefreshAircraftTypesCommand, "Error refreshing aircraft types");
+            }
+            finally
+            {
+                this.LoadingText = null;
             }
         }
     }
