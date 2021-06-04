@@ -40,6 +40,20 @@ namespace OpenSky.AgentMSFS.Controls
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The loading text property.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static readonly DependencyProperty LoadingTextProperty = DependencyProperty.Register("LoadingText", typeof(string), typeof(OpenSkyWindow), new UIPropertyMetadata(string.Empty, LoadingTextPropertyChangedCallback));
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The show loading property.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static readonly DependencyProperty ShowLoadingProperty = DependencyProperty.Register("ShowLoading", typeof(bool), typeof(OpenSkyWindow), new UIPropertyMetadata(false));
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The show minimize/maximize buttons property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -111,6 +125,31 @@ namespace OpenSky.AgentMSFS.Controls
         {
             get => (bool)this.GetValue(HorizontalScrollBarProperty);
             set => this.SetValue(HorizontalScrollBarProperty, value);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the loading text (setting a non-empty string will trigger the loading overlay to
+        /// be displayed).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [Bindable(true)]
+        public string LoadingText
+        {
+            get => (string)this.GetValue(LoadingTextProperty);
+            set => this.SetValue(LoadingTextProperty, value);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the loading overlay.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [Bindable(true)]
+        public bool ShowLoading
+        {
+            get => (bool)this.GetValue(ShowLoadingProperty);
+            set => this.SetValue(ShowLoadingProperty, value);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -259,6 +298,33 @@ namespace OpenSky.AgentMSFS.Controls
         {
             this.SourceInitialized += this.OnSourceInitialized;
             base.OnInitialized(e);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Callback, called when the loading text property changed.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 04/06/2021.
+        /// </remarks>
+        /// <param name="d">
+        /// A DependencyObject to process.
+        /// </param>
+        /// <param name="e">
+        /// Dependency property changed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private static void LoadingTextPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is string text)
+            {
+                d.SetValue(ShowLoadingProperty, !string.IsNullOrEmpty(text));
+            }
+
+            if (e.NewValue == null)
+            {
+                d.SetValue(ShowLoadingProperty, false);
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -559,6 +625,7 @@ namespace OpenSky.AgentMSFS.Controls
         /// <seealso cref="T:System.Windows.Window"/>
         /// -------------------------------------------------------------------------------------------------
         [StructLayout(LayoutKind.Sequential)]
+
         // ReSharper disable once InconsistentNaming
         public struct MINMAXINFO
         {

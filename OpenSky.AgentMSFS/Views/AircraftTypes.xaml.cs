@@ -6,6 +6,10 @@
 
 namespace OpenSky.AgentMSFS.Views
 {
+    using System.Windows;
+
+    using DataGridExtensions;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Plane identity collector window.
@@ -54,6 +58,25 @@ namespace OpenSky.AgentMSFS.Views
                 Instance.BringIntoView();
                 Instance.Activate();
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Clears all filters on click.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 04/06/2021.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void ClearAllFiltersOnClick(object sender, RoutedEventArgs e)
+        {
+            this.AircraftTypesGrid.GetFilter().Clear();
         }
     }
 }

@@ -20,8 +20,9 @@
             xmlns:openSkyApi="clr-namespace:OpenSkyApi"
             xmlns:system="clr-namespace:System;assembly=mscorlib"
             xmlns:ui="http://schemas.modernwpf.com/2019"
+            xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
             mc:Ignorable="d"
-            Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False">
+            Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False" LoadingText="{Binding LoadingText}">
     <Window.DataContext>
         <models:AircraftTypesViewModel />
     </Window.DataContext>
@@ -33,48 +34,6 @@
                 <x:Type TypeName="openSkyApi:AircraftTypeCategory" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <Style x:Key="DeleteButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <ControlTemplate.Resources>
-                            <StreamGeometry x:Key="Cancel">M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z</StreamGeometry>
-                        </ControlTemplate.Resources>
-                        <Border
-                                            x:Name="ButtonLayoutGrid"
-                                            BorderBrush="{DynamicResource TextControlButtonBorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            Background="{DynamicResource TextControlButtonBackground}"
-                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
-                            <ui:FontIconFallback
-                                                x:Name="GlyphElement"
-                                                Foreground="{DynamicResource TextControlButtonForeground}"
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Center"
-                                                FontStyle="Normal"
-                                                FontSize="12"
-                                                Data="{StaticResource Cancel}"
-                                                FontFamily="{DynamicResource SymbolThemeFontFamily}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBackgroundPointerOver}" />
-                                <Setter Property="BorderBrush" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBorderBrushPointerOver}" />
-                                <Setter Property="Foreground" TargetName="GlyphElement" Value="{DynamicResource TextControlButtonForegroundPointerOver}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBackgroundPressed}" />
-                                <Setter Property="BorderBrush" TargetName="ButtonLayoutGrid" Value="{DynamicResource TextControlButtonBorderBrushPressed}" />
-                                <Setter Property="Foreground" TargetName="GlyphElement" Value="{DynamicResource TextControlButtonForegroundPressed}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Opacity" TargetName="ButtonLayoutGrid" Value="0" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -93,6 +52,7 @@
                 <ui:CommandBar>
                     <ui:CommandBar.PrimaryCommands>
                         <ui:AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding RefreshAircraftTypesCommand}" />
+                        <ui:AppBarButton Icon="Filter" Label="Clear all filters" Click="ClearAllFiltersOnClick" />
                         <ui:AppBarButton Icon="Accept" Label="Enable" />
                         <ui:AppBarButton Icon="Clear" Label="Disable" />
                         <ui:AppBarButton Icon="Edit" Label="Edit" />
@@ -100,11 +60,12 @@
                     <ui:CommandBar.SecondaryCommands>
                         <ui:AppBarButton Icon="Delete" Label="Delete" />
                     </ui:CommandBar.SecondaryCommands>
-                    <ui:CommandBar.Content>
-                        <TextBox Margin="0,1,0,0" MaxHeight="35" MinHeight="35" ui:ControlHelper.PlaceholderText="Filter" ui:ControlHelper.PlaceholderForeground="#666" MinWidth="100" />
-                    </ui:CommandBar.Content>
                 </ui:CommandBar>
-                <DataGrid ItemsSource="{Binding ExistingAircraftTypes}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow" HorizontalScrollBarVisibility="Visible" MinColumnWidth="100" HeadersVisibility="Column">
+                <DataGrid x:Name="AircraftTypesGrid"
+                          ItemsSource="{Binding ExistingAircraftTypes}" 
+                          AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow" 
+                          HorizontalScrollBarVisibility="Visible" MinColumnWidth="100" HeadersVisibility="Column"
+                          dgx:DataGridFilter.IsAutoFilterEnabled="True" ColumnHeaderStyle="{StaticResource FilteredDataGridColumnHeaderStyle}">
                     <DataGrid.Resources>
                         <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                         <converters:AircraftTypeForeignKeyConverter x:Key="AircraftTypeForeignKeyConverter" AircraftTypes="{Binding DataContext.ExistingAircraftTypes, Source={x:Reference ProxyElement}}" />
@@ -113,6 +74,7 @@
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                         <DataGridTextColumn Header="Version" Binding="{Binding VersionNumber}" />
                         <DataGridTextColumn Header="Category" Binding="{Binding Category}" />
+                        <DataGridComboBoxColumn Header="Category" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItemBinding="{Binding Category}" dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" />
                         <DataGridTextColumn Header="Simulator" Binding="{Binding Simulator}" />
                         <DataGridCheckBoxColumn Header="Enabled?" Binding="{Binding Enabled}" />
                         <DataGridTextColumn Header="Next version" Binding="{Binding NextVersion, Converter={StaticResource AircraftTypeForeignKeyConverter}}" />
