@@ -39,7 +39,7 @@ namespace OpenSky.AgentMSFS.Views
         /// sushi.at, 17/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public FlightTracking()
+        private FlightTracking()
         {
             this.InitializeComponent();
         }
@@ -63,6 +63,12 @@ namespace OpenSky.AgentMSFS.Views
         {
             if (Instance == null)
             {
+                if (!UserSessionService.Instance.IsUserLoggedIn)
+                {
+                    LoginNotification.Open();
+                    return;
+                }
+
                 Instance = new FlightTracking();
                 Instance.Closed += (_, _) => Instance = null;
                 Instance.Show();

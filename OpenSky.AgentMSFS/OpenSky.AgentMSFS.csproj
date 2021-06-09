@@ -194,10 +194,12 @@
     <Compile Include="SimConnect\Structs\WeightAndBalance.cs" />
     <Compile Include="Tools\DateTimeTextWriterTraceListener.cs" />
     <Compile Include="Tools\ExceptionExtensions.cs" />
+    <Compile Include="Tools\MultiSelectExtension.cs" />
     <Compile Include="Tools\SleepScheduler.cs" />
     <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
     <Compile Include="Tools\UpdateGUIDelegate.cs" />
+    <Compile Include="Tools\VisibilityAnimation.cs" />
     <Compile Include="Tools\WindowExtensions.cs" />
     <Compile Include="UserSessionService.cs" />
     <Compile Include="Views\FlightTracking.xaml.cs">
@@ -383,7 +385,7 @@
       <Version>1.3.3</Version>
     </PackageReference>
     <PackageReference Include="DataGridExtensions">
-      <Version>2.5.2</Version>
+      <Version>2.5.3</Version>
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf">
       <Version>1.1.0</Version>

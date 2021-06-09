@@ -6,6 +6,56 @@
   },
   "paths": {
     "/AircraftType": {
+      "post": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Adds a new aircraft type.",
+        "description": "sushi.at, 02/06/2021.",
+        "operationId": "AddAircraftType",
+        "requestBody": {
+          "description": "The new aircraft type to add.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "AircraftType"
@@ -35,34 +85,72 @@
             }
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/AircraftType/disable/{typeID}": {
+      "put": {
         "tags": [
           "AircraftType"
         ],
-        "summary": "Adds a new aircraft type.",
-        "description": "sushi.at, 02/06/2021.",
-        "operationId": "AddAircraftType",
-        "requestBody": {
-          "description": "The new aircraft type to add.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AircraftType"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AircraftType"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AircraftType"
+        "summary": "Disables the specified aircraft type.",
+        "description": "sushi.at, 09/06/2021.",
+        "operationId": "DisableAircraftType",
+        "parameters": [
+          {
+            "name": "typeID",
+            "in": "path",
+            "description": "Identifier for the type.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/AircraftType/enable/{typeID}": {
+      "put": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Enables the specified aircraft type.",
+        "description": "sushi.at, 09/06/2021.",
+        "operationId": "EnableAircraftType",
+        "parameters": [
+          {
+            "name": "typeID",
+            "in": "path",
+            "description": "Identifier for the type.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -347,6 +435,38 @@
         }
       }
     },
+    "/Authentication/userRoles": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Gets the roles of the current OpenSky user.",
+        "description": "sushi.at, 04/06/2021.",
+        "operationId": "GetUserRoles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringIEnumerableApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringIEnumerableApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringIEnumerableApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Authentication/login": {
       "post": {
         "tags": [
@@ -391,88 +511,6 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LoginResponseApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Authentication/revokeToken": {
-      "delete": {
-        "tags": [
-          "Authentication"
-        ],
-        "summary": "Revoke specified OpenSky refresh token.",
-        "description": "sushi.at, 31/05/2021.",
-        "requestBody": {
-          "description": "The revoke token model.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeToken"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeToken"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeToken"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Authentication/revokeAllTokens": {
-      "delete": {
-        "tags": [
-          "Authentication"
-        ],
-        "summary": "Revoke all OpenSky refresh tokens.",
-        "description": "sushi.at, 31/05/2021.",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
                 }
               }
             }
@@ -684,6 +722,88 @@
         }
       }
     },
+    "/Authentication/revokeAllTokens": {
+      "delete": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Revoke all OpenSky refresh tokens.",
+        "description": "sushi.at, 31/05/2021.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Authentication/revokeToken": {
+      "delete": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Revoke specified OpenSky refresh token.",
+        "description": "sushi.at, 31/05/2021.",
+        "requestBody": {
+          "description": "The revoke token model.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeToken"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeToken"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Authentication/validateEmail": {
       "post": {
         "tags": [
@@ -735,18 +855,20 @@
         }
       }
     },
-    "/DataImport/status": {
+    "/DataImport/status/{importID}": {
       "get": {
         "tags": [
           "DataImport"
         ],
         "summary": "Get data import status.",
         "description": "sushi.at, 12/05/2021.",
+        "operationId": "GetImportStatus",
         "parameters": [
           {
             "name": "importID",
-            "in": "query",
+            "in": "path",
             "description": "Identifier for the import.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -917,11 +1039,6 @@
             "description": "Gets or sets the maximum gross weight in pounds.",
             "format": "double"
           },
-          "versionNumber": {
-            "type": "integer",
-            "description": "Gets or sets the version number of this type.",
-            "format": "int32"
-          },
           "maxPrice": {
             "type": "integer",
             "description": "Gets or sets the maximum selling price.",
@@ -956,6 +1073,17 @@
             "minLength": 0,
             "type": "string",
             "description": "Gets or sets the identifier of the uploader user."
+          },
+          "uploaderName": {
+            "type": "string",
+            "description": "Gets the name of the uploader.",
+            "nullable": true,
+            "readOnly": true
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "Gets or sets the version number of this type.",
+            "format": "int32"
           }
         },
         "additionalProperties": false,

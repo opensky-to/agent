@@ -28,6 +28,13 @@ namespace OpenSky.AgentMSFS.Views.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The sound last played Date/Time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime soundLastPlayed = DateTime.Now;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="LoginNotificationViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -36,7 +43,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         public LoginNotificationViewModel()
         {
-            this.Timeout = 60 * 1000;
+            this.Timeout = DateTime.Now.AddMilliseconds(60 * 1000);
 
             var assembly = Assembly.GetExecutingAssembly();
             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSdingdong.wav"));
@@ -65,7 +72,27 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// Gets or sets the timeout for the notification.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public int Timeout { get; set; }
+        public DateTime Timeout { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Play sound again.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 04/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public void PlaySoundAgain()
+        {
+            if ((DateTime.Now - this.soundLastPlayed).TotalSeconds > 10)
+            {
+                this.soundLastPlayed = DateTime.Now;
+
+                var assembly = Assembly.GetExecutingAssembly();
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSdingdong.wav"));
+                player.Play();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -91,11 +118,9 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void NotificationTimeout()
         {
-            var waited = 0;
-            while (waited < this.Timeout && !SleepScheduler.IsShutdownInProgress)
+            while (DateTime.Now < this.Timeout && !SleepScheduler.IsShutdownInProgress && !UserSessionService.Instance.IsUserLoggedIn)
             {
-                Thread.Sleep(5000);
-                waited += 5000;
+                Thread.Sleep(2000);
             }
 
             this.CloseWindow?.Invoke(this, EventArgs.Empty);

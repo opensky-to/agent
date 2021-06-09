@@ -30,13 +30,68 @@ namespace OpenSky.AgentMSFS.Views
         /// The timeout for the notification in milliseconds.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public LoginNotification(int timeout = 60 * 1000)
+        private LoginNotification(int timeout = 60 * 1000)
         {
             this.InitializeComponent();
 
             if (this.DataContext is LoginNotificationViewModel viewModel)
             {
-                viewModel.Timeout = timeout;
+                viewModel.Timeout = DateTime.Now.AddMilliseconds(timeout);
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The single instance of this view.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static LoginNotification Instance { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Open new login notification or bring the existing instance into view (+extend timeout, +play
+        /// ding dong again)
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 04/06/2021.
+        /// </remarks>
+        /// <param name="timeout">
+        /// The timeout for the notification in milliseconds.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        public static void Open(int timeout = 60 * 1000)
+        {
+            if (Instance == null)
+            {
+                Instance = new LoginNotification(timeout);
+                Instance.Closed += (_, _) => Instance = null;
+                Instance.Show();
+            }
+            else
+            {
+                Instance.ExtendTimeout(timeout);
+                Instance.BringIntoView();
+                Instance.Activate();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Extend timeout.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 04/06/2021.
+        /// </remarks>
+        /// <param name="timeout">
+        /// The timeout for the notification in milliseconds.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void ExtendTimeout(int timeout)
+        {
+            if (this.DataContext is LoginNotificationViewModel viewModel)
+            {
+                viewModel.Timeout = DateTime.Now.AddMilliseconds(timeout);
+                viewModel.PlaySoundAgain();
             }
         }
 

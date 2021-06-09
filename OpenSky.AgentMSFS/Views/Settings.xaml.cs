@@ -21,7 +21,7 @@ namespace OpenSky.AgentMSFS.Views
         /// sushi.at, 23/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public Settings()
+        private Settings()
         {
             this.InitializeComponent();
         }
