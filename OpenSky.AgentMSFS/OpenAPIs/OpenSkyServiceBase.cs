@@ -11,7 +11,9 @@ namespace OpenSkyApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading;
@@ -107,14 +109,41 @@ namespace OpenSkyApi
             var msg = new HttpRequestMessage();
 
             // Check if the token needs to be refreshed
-            if (UserSessionService.Instance.CheckExpiration())
+            if (UserSessionService.Instance.CheckTokenNeedsRefresh())
             {
                 try
                 {
                     await this.RefreshToken(cancellationToken);
                 }
-                catch
+                catch (HttpRequestException ex)
                 {
+                    if (ex.InnerException is WebException webEx)
+                    {
+                        if (webEx.Status is WebExceptionStatus.ConnectFailure or WebExceptionStatus.NameResolutionFailure or WebExceptionStatus.SendFailure or WebExceptionStatus.ReceiveFailure)
+                        {
+                            // Server not available? Try again later
+                            Debug.WriteLine($"Error refreshing tokens: {ex}");
+                            throw;
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"Error refreshing tokens: {ex}");
+                            UserSessionService.Instance.Logout();
+                            throw;
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Error refreshing tokens: {ex}");
+                        UserSessionService.Instance.Logout();
+                        throw;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // todo check if server is simply not available/internet down/etc.
+
+                    Debug.WriteLine($"Error refreshing tokens: {ex}");
                     UserSessionService.Instance.Logout();
                     throw;
                 }
@@ -270,7 +299,7 @@ namespace OpenSkyApi
 
                     if (!objectResponse.Object.IsError)
                     {
-                        UserSessionService.Instance.RefreshedToken(objectResponse.Object.Data);
+                        UserSessionService.Instance.TokensWereRefreshed(objectResponse.Object.Data);
                     }
                     else
                     {

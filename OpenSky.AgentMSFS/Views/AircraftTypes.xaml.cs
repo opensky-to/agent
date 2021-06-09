@@ -25,7 +25,7 @@ namespace OpenSky.AgentMSFS.Views
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public AircraftTypes()
+        private AircraftTypes()
         {
             this.InitializeComponent();
         }
@@ -49,6 +49,12 @@ namespace OpenSky.AgentMSFS.Views
         {
             if (Instance == null)
             {
+                if (!UserSessionService.Instance.IsUserLoggedIn)
+                {
+                    LoginNotification.Open();
+                    return;
+                }
+
                 Instance = new AircraftTypes();
                 Instance.Closed += (_, _) => Instance = null;
                 Instance.Show();

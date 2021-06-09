@@ -7,8 +7,11 @@
 namespace OpenSky.AgentMSFS
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
 
     using JetBrains.Annotations;
 
@@ -30,13 +33,6 @@ namespace OpenSky.AgentMSFS
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The username (for display purposes only)
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string username;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Is a user currently logged in?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -44,75 +40,24 @@ namespace OpenSky.AgentMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets a value indicating whether there is a user currently logged in.
+        /// The username (for display purposes only)
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool IsUserLoggedIn
-        {
-            get => this.isUserLoggedIn;
-        
-            set
-            {
-                if(Equals(this.isUserLoggedIn, value))
-                {
-                   return;
-                }
-        
-                this.isUserLoggedIn = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        
+        private string username;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the current OpenSky API token, null if no token is available.
+        /// The user roles.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string OpenSkyApiToken { get; private set; }
+        private readonly List<string> userRoles = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the username (for display purposes only).
+        /// Gets the user roles.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string Username
-        {
-            get => this.username;
-
-            set
-            {
-                if (Equals(this.username, value))
-                {
-                    return;
-                }
-
-                this.username = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the refresh token.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string RefreshToken { get; private set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the Date/Time of the expiration of the main JWT OpenSky API token.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public DateTime? Expiration { get; private set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the Date/Time of the refresh token expiration.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public DateTime? RefreshExpiration { get; private set; }
+        public IEnumerable<string> UserRoles => this.userRoles;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -158,22 +103,86 @@ namespace OpenSky.AgentMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Load OpenSky tokens from settings.
+        /// Occurs when a property value changes.
         /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/06/2021.
-        /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void LoadOpenSkyTokens()
-        {
-            Settings.Default.Reload();
-            this.OpenSkyApiToken = Settings.Default.OpenSkyApiToken;
-            this.Expiration = Settings.Default.OpenSkyTokenExpiration;
-            this.RefreshToken = Settings.Default.OpenSkyRefreshToken;
-            this.RefreshExpiration = Settings.Default.OpenSkyRefreshTokenExpiration;
-            this.Username = Settings.Default.OpenSkyUsername;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-            this.CheckExpiration();
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the single static instance.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static UserSessionService Instance { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the Date/Time of the expiration of the main JWT OpenSky API token.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public DateTime? Expiration { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether there is a user currently logged in.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IsUserLoggedIn
+        {
+            get => this.isUserLoggedIn;
+
+            set
+            {
+                if (Equals(this.isUserLoggedIn, value))
+                {
+                    return;
+                }
+
+                this.isUserLoggedIn = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the current OpenSky API token, null if no token is available.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string OpenSkyApiToken { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the Date/Time of the refresh token expiration.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public DateTime? RefreshExpiration { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the refresh token.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string RefreshToken { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the username (for display purposes only).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string Username
+        {
+            get => this.username;
+
+            set
+            {
+                if (Equals(this.username, value))
+                {
+                    return;
+                }
+
+                this.username = value;
+                this.OnPropertyChanged();
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -188,7 +197,7 @@ namespace OpenSky.AgentMSFS
         /// is also expired (will trigger logout!).
         /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public bool CheckExpiration()
+        public bool CheckTokenNeedsRefresh()
         {
             if (!string.IsNullOrEmpty(this.OpenSkyApiToken) && this.Expiration.HasValue && this.Expiration.Value > DateTime.UtcNow)
             {
@@ -208,35 +217,78 @@ namespace OpenSky.AgentMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The tokens were refreshed.
+        /// Force token refresh.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 01/06/2021.
+        /// sushi.at, 04/06/2021.
         /// </remarks>
-        /// <param name="refreshToken">
-        /// The refresh token response model (contains new tokens).
-        /// </param>
+        /// <returns>
+        /// An asynchronous result that yields true if the token refresh worked, false if the token is
+        /// now invalid and the user needs to login again.
+        /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public void RefreshedToken(RefreshTokenResponse refreshToken)
+        public async Task<bool> ForceTokenRefresh()
         {
-            this.OpenSkyApiToken = refreshToken.Token;
-            this.Expiration = refreshToken.Expiration.UtcDateTime;
-            this.RefreshToken = refreshToken.RefreshToken;
-            this.RefreshExpiration = refreshToken.RefreshTokenExpiration.UtcDateTime;
+            this.Expiration = DateTime.MinValue;
 
-            Settings.Default.OpenSkyApiToken = refreshToken.Token;
-            Settings.Default.OpenSkyTokenExpiration = refreshToken.Expiration.UtcDateTime;
-            Settings.Default.OpenSkyRefreshToken = refreshToken.RefreshToken;
-            Settings.Default.OpenSkyRefreshTokenExpiration = refreshToken.RefreshTokenExpiration.UtcDateTime;
-            Settings.Default.Save();
+            try
+            {
+                var result = await OpenSkyService.Instance.GetUserRolesAsync();
+                return !result.IsError;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during force-token refresh, logging user out! {ex}");
+                this.Logout();
+                return false;
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the single static instance.
+        /// Updates the user roles.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 09/06/2021.
+        /// </remarks>
+        /// <returns>
+        /// An asynchronous result that yields true if it succeeds, false if it fails.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public async Task<bool> UpdateUserRoles()
+        {
+            try
+            {
+                var result = await OpenSkyService.Instance.GetUserRolesAsync();
+                if (!result.IsError)
+                {
+                    this.userRoles.Clear();
+                    this.userRoles.AddRange(result.Data);
+                }
+
+                return !result.IsError;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during update user roles! {ex}");
+                this.userRoles.Clear();
+                return false;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether the current user is a moderator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static UserSessionService Instance { get; }
+        public bool IsModerator => this.userRoles.Contains("Moderator") || this.userRoles.Contains("Admin");
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether the current user is an admin.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IsAdmin => this.userRoles.Contains("Admin");
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -264,10 +316,28 @@ namespace OpenSky.AgentMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Occurs when a property value changes.
+        /// The tokens were refreshed.
         /// </summary>
+        /// <remarks>
+        /// sushi.at, 01/06/2021.
+        /// </remarks>
+        /// <param name="refreshToken">
+        /// The refresh token response model (contains new tokens).
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public event PropertyChangedEventHandler PropertyChanged;
+        public void TokensWereRefreshed(RefreshTokenResponse refreshToken)
+        {
+            this.OpenSkyApiToken = refreshToken.Token;
+            this.Expiration = refreshToken.Expiration.UtcDateTime;
+            this.RefreshToken = refreshToken.RefreshToken;
+            this.RefreshExpiration = refreshToken.RefreshTokenExpiration.UtcDateTime;
+
+            Settings.Default.OpenSkyApiToken = refreshToken.Token;
+            Settings.Default.OpenSkyTokenExpiration = refreshToken.Expiration.UtcDateTime;
+            Settings.Default.OpenSkyRefreshToken = refreshToken.RefreshToken;
+            Settings.Default.OpenSkyRefreshTokenExpiration = refreshToken.RefreshTokenExpiration.UtcDateTime;
+            Settings.Default.Save();
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -284,6 +354,26 @@ namespace OpenSky.AgentMSFS
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Load OpenSky tokens from settings.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 01/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void LoadOpenSkyTokens()
+        {
+            Settings.Default.Reload();
+            this.OpenSkyApiToken = Settings.Default.OpenSkyApiToken;
+            this.Expiration = Settings.Default.OpenSkyTokenExpiration;
+            this.RefreshToken = Settings.Default.OpenSkyRefreshToken;
+            this.RefreshExpiration = Settings.Default.OpenSkyRefreshTokenExpiration;
+            this.Username = Settings.Default.OpenSkyUsername;
+
+            this.CheckTokenNeedsRefresh();
         }
     }
 }

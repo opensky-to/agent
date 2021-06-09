@@ -1010,19 +1010,19 @@ namespace OpenSky.AgentMSFS.SimConnect
                         }
                         catch (Exception ex)
                         {
+                            // After the first one ignore, and don't log connection errors, they only fill up the logs
                             if (veryFirstConnectError)
                             {
                                 veryFirstConnectError = false;
                                 Debug.WriteLine("Error connecting to sim: " + ex);
                             }
 
-                            // After the first one ignore, and don't log connection errors, they only fill up the logs
-                            throw;
                         }
                     }
 
                     if (this.fsConnect.Connected)
                     {
+                        veryFirstConnectError = true;
                         this.fsConnect.RequestData(Requests.Primary, Requests.Primary);
 
                         foreach (Requests request in Enum.GetValues(typeof(Requests)))
@@ -1036,9 +1036,14 @@ namespace OpenSky.AgentMSFS.SimConnect
                                 }
                             }
                         }
+
+                        Thread.Sleep(Math.Min(this.SampleRates[Requests.Primary], this.SampleRates[Requests.LandingAnalysis]));
+                    }
+                    else
+                    {
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(this.Flight == null ? 30 : 5));
                     }
 
-                    Thread.Sleep(Math.Min(this.SampleRates[Requests.Primary], this.SampleRates[Requests.LandingAnalysis]));
                 }
                 catch (Exception ex)
                 {

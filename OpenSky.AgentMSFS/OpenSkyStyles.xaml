@@ -967,7 +967,7 @@
                         <DataTrigger Binding="{Binding Path=Filter.Items, RelativeSource={RelativeSource TemplatedParent}}" Value="{x:Null}">
                             <Setter TargetName="IsFilterActiveMarker" Property="Visibility" Value="Hidden" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=ListBox, Path=Items}" Value="1">
+                        <DataTrigger Binding="{Binding ElementName=PART_ListBox, Path=Items}" Value="1">
                             <Setter TargetName="ToggleButton" Property="IsEnabled" Value="False" />
                         </DataTrigger>
                     </ControlTemplate.Triggers>
@@ -1006,4 +1006,32 @@
     <ControlTemplate x:Key="MultipleChoiceFilter">
         <dgx:MultipleChoiceFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
     </ControlTemplate>
+
+    <Style x:Key="FullRowSelectDataGridCellStyle" TargetType="DataGridCell">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource DataGridCellBackgroundBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="MinHeight" Value="{DynamicResource DataGridRowMinHeight}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <ui:DataGridCellPresenter
+                        Background="{TemplateBinding Background}"
+                        CurrencyVisualBrush="{DynamicResource DataGridCurrencyVisualPrimaryBrush}"
+                        CurrencyVisualThickness="0"
+                        FocusVisualPrimaryBrush="{DynamicResource DataGridCellFocusVisualPrimaryBrush}"
+                        FocusVisualPrimaryThickness="0"
+                        FocusVisualSecondaryBrush="{DynamicResource DataGridCellFocusVisualSecondaryBrush}"
+                        FocusVisualSecondaryThickness="0"
+                        IsCurrencyVisualVisible="{TemplateBinding IsSelected}"
+                        IsFocusVisualVisible="{TemplateBinding IsKeyboardFocusWithin}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

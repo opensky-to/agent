@@ -8,12 +8,16 @@ namespace OpenSky.AgentMSFS.Tools
 {
     using System;
     using System.Diagnostics;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Sockets;
     using System.Windows;
 
     using Newtonsoft.Json;
 
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.OpenAPIs;
+    using OpenSky.AgentMSFS.Views;
 
     using OpenSkyApi;
 
@@ -60,7 +64,34 @@ namespace OpenSky.AgentMSFS.Tools
             {
                 if (apiException.StatusCode == 401)
                 {
-                    // todo
+                    Debug.WriteLine("Forcing token refresh due to 401 response from OpenSky API server.");
+                    var result = UserSessionService.Instance.ForceTokenRefresh().Result;
+                    if (result)
+                    {
+                        if (alert401)
+                        {
+                            command.ReportProgress(
+                                () =>
+                                {
+                                    Debug.WriteLine($"{friendlyErrorMessage}: " + ex.Message);
+                                    ModernWpf.MessageBox.Show("Authorization token was expired, please try again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                });
+                        }
+                    }
+                    else
+                    {
+                        if (alert401)
+                        {
+                            command.ReportProgress(
+                                () =>
+                                {
+                                    Debug.WriteLine($"{friendlyErrorMessage}: " + ex.Message);
+                                    ModernWpf.MessageBox.Show("Authorization token is invalid, please login with your OpenSky account again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                }, true);
+                        }
+
+                        command.ReportProgress(() => LoginNotification.Open());
+                    }
                 }
                 else if (!string.IsNullOrEmpty(apiException.Response))
                 {
@@ -99,6 +130,48 @@ namespace OpenSky.AgentMSFS.Tools
                             ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                 }
+            }
+            else if (ex is HttpRequestException httpRequestException)
+            {
+                if (httpRequestException.InnerException != null)
+                {
+                    httpRequestException.InnerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                }
+                else
+                {
+                    command.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine($"{friendlyErrorMessage}: " + httpRequestException.Message);
+                            ModernWpf.MessageBox.Show(httpRequestException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            else if (ex is WebException webException)
+            {
+                Debug.WriteLine(webException.Message);
+                if (webException.InnerException != null)
+                {
+                    webException.InnerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                }
+                else
+                {
+                    command.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine($"{friendlyErrorMessage}: " + webException.Message);
+                            ModernWpf.MessageBox.Show(webException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            else if (ex is SocketException socketException)
+            {
+                command.ReportProgress(
+                    () =>
+                    {
+                        Debug.WriteLine($"{friendlyErrorMessage}: " + socketException.Message);
+                        ModernWpf.MessageBox.Show(socketException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                    });
             }
             else
             {

@@ -138,7 +138,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 if (!UserSessionService.Instance.IsUserLoggedIn)
                 {
-                    new LoginNotification().Show();
+                    LoginNotification.Open();
                 }
             }
 
