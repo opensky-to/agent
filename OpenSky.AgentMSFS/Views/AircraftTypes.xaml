@@ -68,6 +68,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
@@ -107,6 +108,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -131,6 +133,7 @@
                 <Border Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="0,0,0,1" Background="Transparent" BorderBrush="{StaticResource GreyDottedBrush}" />
                 <Border Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="0,0,0,1" Background="Transparent" BorderBrush="{StaticResource GreyDottedBrush}" />
                 <Border Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="0,0,0,1" Background="Transparent" BorderBrush="{StaticResource GreyDottedBrush}" />
+                <Border Grid.Row="20" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="0,0,0,1" Background="Transparent" BorderBrush="{StaticResource GreyDottedBrush}" />
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,10,0">Category</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,5,10,0">Simulator</TextBlock>
@@ -151,7 +154,8 @@
                 <TextBlock Grid.Column="0" Grid.Row="17" Margin="0,5,10,0">Maximum price</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="18" Margin="0,5,10,0">Needs co-pilot?</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="19" Margin="0,5,10,0">Uploaded by</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="20" Margin="0,5,10,0">Comments</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="20" Margin="0,5,10,0">Last edited by</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="21" Margin="0,5,10,0">Comments</TextBlock>
 
                 <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0]}" FontWeight="Bold" />
                 <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].Category}" />
@@ -173,7 +177,8 @@
                 <TextBlock Grid.Column="1" Grid.Row="17" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].MaxPrice}" />
                 <TextBlock Grid.Column="1" Grid.Row="18" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].NeedsCoPilot}" />
                 <TextBlock Grid.Column="1" Grid.Row="19" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].UploaderName}" />
-                <TextBlock Grid.Column="1" Grid.Row="20" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].Comments}" MaxWidth="200" TextWrapping="Wrap" HorizontalAlignment="Left" />
+                <TextBlock Grid.Column="1" Grid.Row="20" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].LastEditedByName}" />
+                <TextBlock Grid.Column="1" Grid.Row="21" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[0].Comments}" MaxWidth="200" TextWrapping="Wrap" HorizontalAlignment="Left" />
 
                 <TextBlock Grid.Column="2" Grid.Row="0" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1]}" FontWeight="Bold" />
                 <TextBlock Grid.Column="2" Grid.Row="1" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].Category}" />
@@ -195,9 +200,10 @@
                 <TextBlock Grid.Column="2" Grid.Row="17" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].MaxPrice}" />
                 <TextBlock Grid.Column="2" Grid.Row="18" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].NeedsCoPilot}" />
                 <TextBlock Grid.Column="2" Grid.Row="19" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].UploaderName}" />
-                <TextBlock Grid.Column="2" Grid.Row="20" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].Comments}" MaxWidth="200" TextWrapping="Wrap" HorizontalAlignment="Left" />
+                <TextBlock Grid.Column="2" Grid.Row="20" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].LastEditedByName}" />
+                <TextBlock Grid.Column="2" Grid.Row="21" Margin="0,5,10,0" Text="{Binding SelectedAircraftTypes[1].Comments}" MaxWidth="200" TextWrapping="Wrap" HorizontalAlignment="Left" />
 
-                <TextBlock Grid.Column="0" Grid.Row="21" Grid.ColumnSpan="3" Margin="0,30,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="11">Tip: Use the CTRL key to select two aircraft types to compare them.</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="22" Grid.ColumnSpan="3" Margin="0,30,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="11">Tip: Use the CTRL key to select two aircraft types to compare them.</TextBlock>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="1">
@@ -213,27 +219,27 @@
                         <ui:AppBarButton Icon="Add" Label="Add" ToolTip="Add a new aircraft type [Ctrl+N]" Command="{Binding StartAddAircraftCommand}" />
                         <ui:AppBarButton Icon="Accept" Label="Enable" ToolTip="Enable the selected aircraft type" Command="{Binding EnableTypeCommand}" />
                         <ui:AppBarButton Icon="Clear" Label="Disable" ToolTip="Disable the selected aircraft type" Command="{Binding DisableTypeCommand}" />
-                        <ui:AppBarButton Icon="Edit" Label="Edit" ToolTip="Edit the selected aircraft type" />
+                        <ui:AppBarButton Icon="Edit" Label="Edit" ToolTip="Edit the selected aircraft type" Command="{Binding StartEditAircraftCommand}" />
                     </ui:CommandBar.PrimaryCommands>
                     <ui:CommandBar.SecondaryCommands>
-                        <ui:AppBarButton Icon="Delete" Label="Delete" ToolTip="Delete the selected aircraft type" />
+                        <ui:AppBarButton Icon="Accept" Label="Enable checks" ToolTip="Enable the selected aircraft type's detailed checks (Only for patch days!)" Command="{Binding EnableDetailedChecksCommand}" />
+                        <ui:AppBarButton Icon="Clear" Label="Disable checks" ToolTip="Disable the selected aircraft type's detailed checks (Only for patch days!)" Command="{Binding DisableDetailedChecksCommand}" />
+                        <ui:AppBarButton Icon="Delete" Label="Delete" ToolTip="Delete the selected aircraft type" Command="{Binding DeleteTypeCommand}" />
                     </ui:CommandBar.SecondaryCommands>
                 </ui:CommandBar>
-                <!--dgx:DataGridFilter.IsAutoFilterEnabled="True"-->
                 <DataGrid x:Name="AircraftTypesGrid"
                           ItemsSource="{Binding ExistingAircraftTypes}" 
                           tools:MultiSelectExtension.SelectedItems="{Binding SelectedAircraftTypes}"
                           SelectedItem="{Binding SelectedAircraftType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow"
                           HorizontalScrollBarVisibility="Visible" MinColumnWidth="120" HeadersVisibility="Column"
-                          ColumnHeaderStyle="{StaticResource FilteredDataGridColumnHeaderStyle}" CellStyle="{StaticResource FullRowSelectDataGridCellStyle}">
+                          ColumnHeaderStyle="{StaticResource FilteredDataGridColumnHeaderStyle}" CellStyle="{StaticResource FullRowSelectDataGridCellStyle}"
+                          dgx:DataGridFilter.IsAutoFilterEnabled="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                         <DataGridTextColumn Header="Version" Binding="{Binding VersionNumber}" />
-                        <!--dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"-->
-                        <DataGridComboBoxColumn Header="Category" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItemBinding="{Binding Category}" />
-                        <!--dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"-->
-                        <DataGridComboBoxColumn Header="Simulator" ItemsSource="{Binding Source={StaticResource SimulationDataProvider}}" SelectedItemBinding="{Binding Simulator}" />
+                        <DataGridComboBoxColumn Header="Category" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItemBinding="{Binding Category}" dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" />
+                        <DataGridComboBoxColumn Header="Simulator" ItemsSource="{Binding Source={StaticResource SimulationDataProvider}}" SelectedItemBinding="{Binding Simulator}" dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" />
                         <DataGridCheckBoxColumn Header="Enabled?" Binding="{Binding Enabled}" />
                         <DataGridCheckBoxColumn Header="No Checks?" Binding="{Binding DetailedChecksDisabled}" />
                         <DataGridTextColumn Header="Next version" Binding="{Binding NextVersion, Converter={StaticResource AircraftTypeForeignKeyConverter}}" />
@@ -244,7 +250,107 @@
                 </DataGrid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Column="2" Width="450" Visibility="{Binding AddAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
+        <GroupBox Grid.Column="2" Width="450" Visibility="{Binding EditAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="15" FontWeight="DemiBold">Edit aircraft type</TextBlock>
+                    <Button Padding="0" MinHeight="20" MaxHeight="20" Margin="5,0,0,0" Command="{Binding CancelEditAircraftCommand}">✖</Button>
+                </StackPanel>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.Resources >
+                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                        <Setter Property="Margin" Value="5,2" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,5,0">ATC Type</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0,0,5,0">ATC Model</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0,0,5,0">Engine Type</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="0,0,5,0">Engine Count</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Margin="0,0,5,0">Total Fuel</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" Margin="0,0,5,0">Empty Weight</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" Margin="0,0,5,0">Max Gross Weight</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" Margin="0,0,5,0">Flaps?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" Margin="0,0,5,0">Gear retractable?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="9" VerticalAlignment="Center" Margin="0,0,5,0">Name</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Margin="0,0,5,0">Version</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Margin="0,0,5,0">Category</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,5,0">Is vanilla?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="13" VerticalAlignment="Center" Margin="0,0,5,0">Needs co-pilot?</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="14" VerticalAlignment="Center" Margin="0,0,5,0">Is variant of</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="15" VerticalAlignment="Center" Margin="0,0,5,0">Next version</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="16" VerticalAlignment="Center" Margin="0,0,5,0">Minimum price</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="17" VerticalAlignment="Center" Margin="0,0,5,0">Maximum price</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="18" VerticalAlignment="Center" Margin="0,0,5,0">Comments</TextBlock>
+
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding EditedAircraftType.AtcType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding EditedAircraftType.AtcModel}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding EditedAircraftType.EngineType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding EditedAircraftType.EngineCount}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding EditedAircraftType.FuelTotalCapacity}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding EditedAircraftType.EmptyWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding EditedAircraftType.MaxGrossWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding EditedAircraftType.FlapsAvailable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding EditedAircraftType.IsGearRetractable}" Margin="5,2" />
+                <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding EditedAircraftType.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Name of the aircraft" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding EditedAircraftType.VersionNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Version number" ui:ControlHelper.PlaceholderForeground="#666" />
+                <ComboBox Grid.Column="1" Grid.Row="11" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItem="{Binding EditedAircraftType.Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Column="1" Grid.Row="12" MaxWidth="300" IsChecked="{Binding EditedAircraftType.IsVanilla, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this is a vanilla aircraft, uncheck for mods and add-on aircraft</CheckBox>
+                <CheckBox Grid.Column="1" Grid.Row="13" IsChecked="{Binding EditedAircraftType.NeedsCoPilot, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this aircraft requires a co-pilot</CheckBox>
+                <Grid Grid.Column="1" Grid.Row="14">
+                    <ComboBox x:Name="EditedVariantOfCombo" HorizontalAlignment="Stretch" ItemsSource="{Binding ExistingAircraftTypes}" SelectedItem="{Binding EditedIsVariantOf, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=EditedVariantOfCombo, Converter={StaticResource NullItemToVisibilityConverter} }" Command="{Binding ClearVariantOfEditedCommand}" />
+                </Grid>
+                <Grid Grid.Column="1" Grid.Row="15">
+                    <ComboBox x:Name="EditedNextVersionCombo" HorizontalAlignment="Stretch" ItemsSource="{Binding ExistingAircraftTypes}" SelectedItem="{Binding EditedNextVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=EditedNextVersionCombo, Converter={StaticResource NullItemToVisibilityConverter} }" Command="{Binding ClearNextVersionOfEditedCommand}" />
+                </Grid>
+                <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding EditedAircraftType.MinPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Minimum price" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding EditedAircraftType.MaxPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Maximum price" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBox Grid.Column="1" Grid.Row="18" Text="{Binding EditedAircraftType.Comments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinLines="3" ui:ControlHelper.PlaceholderText="Optional comments here" ui:ControlHelper.PlaceholderForeground="#666" />
+                <Grid Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" HorizontalAlignment="Stretch" Margin="5,10,5,0" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding SaveEditedAircraftTypeCommand}">Save changes</Button>
+                    <Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,10,5,0" Command="{Binding CancelEditAircraftCommand}">Cancel</Button>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="3" Width="450" Visibility="{Binding AddAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Add aircraft type</TextBlock>
@@ -325,8 +431,8 @@
                 <CheckBox Grid.Column="1" Grid.Row="13" MaxWidth="300" IsChecked="{Binding IsVanilla, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this is a vanilla aircraft, uncheck for mods and add-on aircraft</CheckBox>
                 <CheckBox Grid.Column="1" Grid.Row="14" IsChecked="{Binding NeedsCoPilot, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Check if this aircraft requires a co-pilot</CheckBox>
                 <Grid Grid.Column="1" Grid.Row="15">
-                    <ComboBox x:Name="VariantOfCombo" HorizontalAlignment="Stretch" ItemsSource="{Binding ExistingAircraftTypes}" SelectedItem="{Binding IsVariantOf, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=VariantOfCombo, Converter={StaticResource NullItemToVisibilityConverter} }" Command="{Binding ClearVariantOfCommand}" />
+                    <ComboBox x:Name="NewVariantOfCombo" HorizontalAlignment="Stretch" ItemsSource="{Binding ExistingAircraftTypes}" SelectedItem="{Binding IsVariantOf, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=NewVariantOfCombo, Converter={StaticResource NullItemToVisibilityConverter} }" Command="{Binding ClearVariantOfNewCommand}" />
                 </Grid>
                 <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding MinimumPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Minimum price" ui:ControlHelper.PlaceholderForeground="#666" />
                 <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding MaximumPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Maximum price" ui:ControlHelper.PlaceholderForeground="#666" />

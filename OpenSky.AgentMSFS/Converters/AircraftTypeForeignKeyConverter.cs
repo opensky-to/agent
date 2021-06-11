@@ -115,6 +115,11 @@ namespace OpenSky.AgentMSFS.Converters
         /// -------------------------------------------------------------------------------------------------
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is AircraftType type)
+            {
+                return type.Id;
+            }
+
             return null;
         }
     }

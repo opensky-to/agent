@@ -85,6 +85,100 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Updates an existing aircraft type.",
+        "description": "sushi.at, 11/06/2021.",
+        "operationId": "UpdateAircraftType",
+        "requestBody": {
+          "description": "The aircraft type to update.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AircraftType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/AircraftType/{typeID}": {
+      "delete": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Deletes the specified aircraft type.",
+        "description": "sushi.at, 11/06/2021.",
+        "operationId": "DeleteAircraftType",
+        "parameters": [
+          {
+            "name": "typeID",
+            "in": "path",
+            "description": "Identifier for the type.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/AircraftType/disable/{typeID}": {
@@ -131,6 +225,50 @@
         }
       }
     },
+    "/AircraftType/disableDetailedChecks/{typeID}": {
+      "put": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Disables the specified aircraft type's detailed checks (only to be used on patch days until a new aircraft type version can be created!).",
+        "description": "sushi.at, 09/06/2021.",
+        "operationId": "DisableAircraftTypeDetailedChecks",
+        "parameters": [
+          {
+            "name": "typeID",
+            "in": "path",
+            "description": "Identifier for the type.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/AircraftType/enable/{typeID}": {
       "put": {
         "tags": [
@@ -139,6 +277,50 @@
         "summary": "Enables the specified aircraft type.",
         "description": "sushi.at, 09/06/2021.",
         "operationId": "EnableAircraftType",
+        "parameters": [
+          {
+            "name": "typeID",
+            "in": "path",
+            "description": "Identifier for the type.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/AircraftType/enableDetailedChecks/{typeID}": {
+      "put": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Enables the specified aircraft type's detailed checks (only to be used on patch days until a new aircraft type version can be created!).",
+        "description": "sushi.at, 09/06/2021.",
+        "operationId": "EnableAircraftTypeDetailedChecks",
         "parameters": [
           {
             "name": "typeID",
@@ -1033,6 +1215,19 @@
             "description": "Gets or sets the ID of the aircraft that this one is a variant of.",
             "format": "uuid",
             "nullable": true
+          },
+          "lastEditedByID": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string",
+            "description": "Gets or sets the identifier of the last edited by user.",
+            "nullable": true
+          },
+          "lastEditedByName": {
+            "type": "string",
+            "description": "Gets the name of the last edited by user.",
+            "nullable": true,
+            "readOnly": true
           },
           "maxGrossWeight": {
             "type": "number",

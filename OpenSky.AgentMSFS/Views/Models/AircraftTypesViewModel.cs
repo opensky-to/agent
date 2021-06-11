@@ -9,6 +9,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Windows;
 
     using OpenSky.AgentMSFS.MVVM;
@@ -58,6 +59,20 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The edit aircraft visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private Visibility editAircraftVisibility = Visibility.Collapsed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The aircraft type currently being edited.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private AircraftType editedAircraftType = new();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True if is aircraft type is vanilla, false if not.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -69,6 +84,62 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private AircraftType isVariantOf;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The aircraft type the edited type is a variant of.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private AircraftType editedIsVariantOf;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the aircraft type the edited type is a variant of.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AircraftType EditedIsVariantOf
+        {
+            get => this.editedIsVariantOf;
+
+            set
+            {
+                if (Equals(this.editedIsVariantOf, value))
+                {
+                    return;
+                }
+
+                this.editedIsVariantOf = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The next version of the edited type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private AircraftType editedNextVersion;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the next version of the edited type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AircraftType EditedNextVersion
+        {
+            get => this.editedNextVersion;
+
+            set
+            {
+                if (Equals(this.editedNextVersion, value))
+                {
+                    return;
+                }
+
+                this.editedNextVersion = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -137,13 +208,41 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.AddAircraftTypeCommand = new AsynchronousCommand(this.AddAircraftType);
             this.StartAddAircraftCommand = new Command(this.StartAddAircraft);
             this.CancelAddAircraftCommand = new Command(this.CancelAddAircraft);
-            this.ClearVariantOfCommand = new Command(this.ClearVariantOf);
+            this.ClearVariantOfNewCommand = new Command(this.ClearVariantOfNew);
             this.ClearTypeSelectionCommand = new Command(this.ClearTypeSelection);
             this.EnableTypeCommand = new AsynchronousCommand(this.EnableType, false);
             this.DisableTypeCommand = new AsynchronousCommand(this.DisableType, false);
+            this.EnableDetailedChecksCommand = new AsynchronousCommand(this.EnableDetailedChecks, false);
+            this.DisableDetailedChecksCommand = new AsynchronousCommand(this.DisableDetailedChecks, false);
+            this.DeleteTypeCommand = new AsynchronousCommand(this.DeleteType, false);
+            this.StartEditAircraftCommand = new Command(this.StartEditAircraft, false);
+            this.CancelEditAircraftCommand = new Command(this.CancelEditAircraft, false);
+            this.ClearVariantOfEditedCommand = new Command(this.ClearVariantOfEdited);
+            this.ClearNextVersionOfEditedCommand = new Command(this.ClearNextVersionOfEdited);
+            this.SaveEditedAircraftTypeCommand = new AsynchronousCommand(this.SaveEditedAircraftType, false);
 
             this.GetUserRolesCommand.DoExecute(null);
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Clears the next version of the edited type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 11/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ClearNextVersionOfEdited()
+        {
+            this.EditedNextVersion = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the clear edited next version command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ClearNextVersionOfEditedCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -203,6 +302,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the cancel edit aircraft command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command CancelEditAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the category.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -231,10 +337,17 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the clear VariantOf command.
+        /// Gets the clear VariantOf edited command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Command ClearVariantOfCommand { get; }
+        public Command ClearVariantOfEditedCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the clear VariantOfNew command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ClearVariantOfNewCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -259,10 +372,77 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the delete type command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand DeleteTypeCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the enable detailed checks command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand DisableDetailedChecksCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the disable type command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand DisableTypeCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the edit aircraft visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Visibility EditAircraftVisibility
+        {
+            get => this.editAircraftVisibility;
+
+            set
+            {
+                if (Equals(this.editAircraftVisibility, value))
+                {
+                    return;
+                }
+
+                this.editAircraftVisibility = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the aircraft type currently being edited.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AircraftType EditedAircraftType
+        {
+            get => this.editedAircraftType;
+
+            set
+            {
+                if (Equals(this.editedAircraftType, value))
+                {
+                    return;
+                }
+
+                this.editedAircraftType = value;
+                this.NotifyPropertyChanged();
+
+                this.CancelEditAircraftCommand.CanExecute = value != null;
+                this.SaveEditedAircraftTypeCommand.CanExecute = value != null;
+                this.EditAircraftVisibility = value != null ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the enable detailed checks command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand EnableDetailedChecksCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -441,6 +621,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the save edited aircraft type command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand SaveEditedAircraftTypeCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the the selected aircraft type.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -463,6 +650,14 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     this.EnableTypeCommand.CanExecute = value != null;
                     this.DisableTypeCommand.CanExecute = value != null;
+                    this.EnableDetailedChecksCommand.CanExecute = value != null;
+                    this.DisableDetailedChecksCommand.CanExecute = value != null;
+                    this.StartEditAircraftCommand.CanExecute = value != null;
+                }
+
+                if (UserSessionService.Instance.IsAdmin)
+                {
+                    this.DeleteTypeCommand.CanExecute = value != null;
                 }
             }
         }
@@ -487,6 +682,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command StartAddAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the start edit aircraft command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command StartEditAircraftCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -562,6 +764,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 Comments = this.Comments
             };
 
+            this.LoadingText = "Adding new aircraft type";
             try
             {
                 var result = OpenSkyService.Instance.AddAircraftTypeAsync(newAircraftType).Result;
@@ -572,6 +775,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         {
                             ModernWpf.MessageBox.Show(result.Message, "New aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
                             this.CancelAddAircraft(); // This resets the input form and hides the groupbox
+                            this.RefreshAircraftTypesCommand.DoExecute(null);
                         });
                 }
                 else
@@ -592,6 +796,73 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 ex.HandleApiCallException(this.AddAircraftTypeCommand, "Error adding new aircraft type");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Saves the edited aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void SaveEditedAircraftType()
+        {
+            if (this.EditedAircraftType == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(this.EditedAircraftType.Name) || this.EditedAircraftType.Name.Length < 5)
+            {
+                this.SaveEditedAircraftTypeCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Name not specified or less than 5 characters!", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+                return;
+            }
+
+            this.EditedAircraftType.IsVariantOf = this.EditedIsVariantOf?.Id;
+            this.EditedAircraftType.NextVersion = this.EditedNextVersion?.Id;
+
+            this.LoadingText = "Saving changed aircraft type";
+            try
+            {
+                var result = OpenSkyService.Instance.UpdateAircraftTypeAsync(this.EditedAircraftType).Result;
+                if (!result.IsError)
+                {
+                    this.SaveEditedAircraftTypeCommand.ReportProgress(
+                        () =>
+                        {
+                            ModernWpf.MessageBox.Show(result.Message, "Update aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
+                            this.CancelEditAircraft(); // This resets the input form and hides the groupbox
+                            this.RefreshAircraftTypesCommand.DoExecute(null);
+                        });
+                }
+                else
+                {
+                    this.SaveEditedAircraftTypeCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error saving changed aircraft type: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error saving changed aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.SaveEditedAircraftTypeCommand, "Error saving changed aircraft type");
+            }
+            finally
+            {
+                this.LoadingText = null;
             }
         }
 
@@ -620,6 +891,21 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Cancel edit aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CancelEditAircraft()
+        {
+            this.EditedAircraftType = null;
+            this.EditedIsVariantOf = null;
+            this.EditedNextVersion = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Clears the type selection.
         /// </summary>
         /// <remarks>
@@ -633,15 +919,135 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Clears the IsVariantOf property.
+        /// Clears the VariantOf property of the edited aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ClearVariantOfEdited()
+        {
+            this.EditedIsVariantOf = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Clears the IsVariantOf property of the new type.
         /// </summary>
         /// <remarks>
         /// sushi.at, 03/06/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void ClearVariantOf()
+        private void ClearVariantOfNew()
         {
             this.IsVariantOf = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Deletes the selected aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void DeleteType()
+        {
+            if (this.SelectedAircraftTypes.Count != 1)
+            {
+                this.DeleteTypeCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Please select exactly one aircraft type!", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+                return;
+            }
+
+            MessageBoxResult? confirmResult = MessageBoxResult.None;
+            this.DeleteTypeCommand.ReportProgress(() => confirmResult = ModernWpf.MessageBox.Show($"Are you sure you want to delete the aircraft type: {this.SelectedAircraftType}", "Delete type?", MessageBoxButton.YesNo, MessageBoxImage.Question), true);
+            if (confirmResult != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            this.LoadingText = "Deleting aircraft type";
+            try
+            {
+                var result = OpenSkyService.Instance.DeleteAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
+                if (!result.IsError)
+                {
+                    this.DeleteTypeCommand.ReportProgress(
+                        () => { this.RefreshAircraftTypesCommand.DoExecute(null); });
+                }
+                else
+                {
+                    this.DeleteTypeCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error deleting aircraft type: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error deleting aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.DeleteTypeCommand, "Error deleting aircraft type");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Disables the select aircraft type's detailed checks.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void DisableDetailedChecks()
+        {
+            if (this.SelectedAircraftTypes.Count != 1)
+            {
+                this.DisableDetailedChecksCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Please select exactly one aircraft type!", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+                return;
+            }
+
+            this.LoadingText = "Enabling aircraft type detailed checks";
+            try
+            {
+                var result = OpenSkyService.Instance.DisableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
+                if (!result.IsError)
+                {
+                    this.DisableDetailedChecksCommand.ReportProgress(
+                        () => { this.RefreshAircraftTypesCommand.DoExecute(null); });
+                }
+                else
+                {
+                    this.DisableDetailedChecksCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error disabling aircraft type detailed checks: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error disabling aircraft type detailed checks", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.DisableDetailedChecksCommand, "Error disabling aircraft type detailed checks");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -687,6 +1093,56 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 ex.HandleApiCallException(this.DisableTypeCommand, "Error disabling aircraft type");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Enables the select aircraft type's detailed checks.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void EnableDetailedChecks()
+        {
+            if (this.SelectedAircraftTypes.Count != 1)
+            {
+                this.EnableDetailedChecksCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Please select exactly one aircraft type!", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+                return;
+            }
+
+            this.LoadingText = "Enabling aircraft type detailed checks";
+            try
+            {
+                var result = OpenSkyService.Instance.EnableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
+                if (!result.IsError)
+                {
+                    this.EnableDetailedChecksCommand.ReportProgress(
+                        () => { this.RefreshAircraftTypesCommand.DoExecute(null); });
+                }
+                else
+                {
+                    this.EnableDetailedChecksCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error enabling aircraft type detailed checks: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error enabling aircraft type detailed checks", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.EnableDetailedChecksCommand, "Error enabling aircraft type detailed checks");
             }
             finally
             {
@@ -819,6 +1275,8 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
         }
 
+
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Starts add aircraft.
@@ -830,6 +1288,34 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void StartAddAircraft()
         {
             this.AddAircraftVisibility = Visibility.Visible;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Starts editing the selected aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void StartEditAircraft()
+        {
+            if (this.SelectedAircraftTypes.Count != 1)
+            {
+                ModernWpf.MessageBox.Show("Please select exactly one aircraft type!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            this.EditedAircraftType = new AircraftType(this.SelectedAircraftType);
+            if (this.SelectedAircraftType.IsVariantOf.HasValue)
+            {
+                this.EditedIsVariantOf = this.ExistingAircraftTypes.SingleOrDefault(t => t.Id == this.SelectedAircraftType.IsVariantOf);
+            }
+
+            if (this.SelectedAircraftType.NextVersion.HasValue)
+            {
+                this.EditedNextVersion = this.ExistingAircraftTypes.SingleOrDefault(t => t.Id == this.SelectedAircraftType.NextVersion);
+            }
         }
     }
 }
