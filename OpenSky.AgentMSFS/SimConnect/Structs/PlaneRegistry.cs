@@ -7,6 +7,7 @@
 namespace OpenSky.AgentMSFS.SimConnect.Structs
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
 
     using CTrue.FsConnect;
@@ -22,6 +23,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Uppercase naming for struct variables/mixed with some being properties")]
     public struct PlaneRegistry
     {
         /// -------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("ATC ID", null, SIMCONNECT_DATATYPE.STRING64)
             };

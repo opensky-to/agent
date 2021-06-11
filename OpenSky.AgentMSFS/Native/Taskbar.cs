@@ -89,7 +89,7 @@ namespace OpenSky.AgentMSFS.Native
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        public static Taskbar TaskbarInfo => new Taskbar();
+        public static Taskbar TaskbarInfo => new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

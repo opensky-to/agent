@@ -165,14 +165,14 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// The current map location.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Location MapLocation => new Location(this.Latitude, this.Longitude, this.Altitude);
+        public Location MapLocation => new(this.Latitude, this.Longitude, this.Altitude);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Gets the geo coordinate.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public GeoCoordinate GeoCoordinate => new GeoCoordinate(this.Latitude, this.Longitude, this.Altitude);
+        public GeoCoordinate GeoCoordinate => new(this.Latitude, this.Longitude, this.Altitude);
     }
 
     /// -------------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("PLANE LATITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE LONGITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),

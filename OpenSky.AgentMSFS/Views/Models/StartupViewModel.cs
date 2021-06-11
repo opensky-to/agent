@@ -39,7 +39,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// The flight IDs for which we already displayed notifications.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<int> flightNotificationsDisplayed = new List<int>();
+        private readonly List<int> flightNotificationsDisplayed = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -48,7 +48,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         private readonly BitmapImage greyIcon =
-            new BitmapImage(
+            new(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_grey16.ico",
                     UriKind.RelativeOrAbsolute));
@@ -60,7 +60,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         private readonly BitmapImage openSkyIcon =
-            new BitmapImage(
+            new(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky.ico",
                     UriKind.RelativeOrAbsolute));
@@ -72,7 +72,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         private readonly BitmapImage pauseIcon =
-            new BitmapImage(
+            new(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_pause16.ico",
                     UriKind.RelativeOrAbsolute));
@@ -84,7 +84,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         private readonly BitmapImage redIcon =
-            new BitmapImage(
+            new(
                 new Uri(
                     @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_red16.ico",
                     UriKind.RelativeOrAbsolute));
@@ -135,23 +135,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                 SimConnect.Instance.PropertyChanged += this.SimConnectPropertyChanged;
                 SimConnect.Instance.FlightChanged += this.SimConnectFlightChanged;
                 this.notificationIcon = this.greyIcon;
+
+                if (!UserSessionService.Instance.IsUserLoggedIn)
+                {
+                    LoginNotification.Open();
+                }
             }
 
             // Initialize commands
             this.FlightTrackingCommand = new Command(this.OpenFlightTracking);
             this.TrackingDebugCommand = new Command(this.OpenTrackingDebug);
             this.TestFlightCommand = new Command(this.OpenTestFlight);
-            this.PlaneIdentityCollectorCommand = new Command(this.OpenPlaneIdentityCollector);
+            this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the plane identity collector command.
+        /// Gets the aircraft types command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Command PlaneIdentityCollectorCommand { get; }
+        public Command AircraftTypesCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -216,7 +221,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SimConnectPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SimConnect.Connected) || e.PropertyName == nameof(SimConnect.Instance.TrackingStatus) || e.PropertyName == nameof(SimConnect.Instance.IsPaused))
+            if (e.PropertyName is nameof(SimConnect.Connected) or nameof(SimConnect.Instance.TrackingStatus) or nameof(SimConnect.Instance.IsPaused))
             {
                 if (!SimConnect.Instance.Connected)
                 {
@@ -226,7 +231,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
                 else
                 {
-                    if (SimConnect.Instance.TrackingStatus == TrackingStatus.NotTracking || SimConnect.Instance.TrackingStatus == TrackingStatus.Preparing || SimConnect.Instance.TrackingStatus == TrackingStatus.Resuming)
+                    if (SimConnect.Instance.TrackingStatus is TrackingStatus.NotTracking or TrackingStatus.Preparing or TrackingStatus.Resuming)
                     {
                         this.redFlashing = false;
                         this.NotificationIcon = this.openSkyIcon;
@@ -340,7 +345,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// Gets the version string of the application assembly.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string VersionString => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public string VersionString => $"v{Assembly.GetExecutingAssembly().GetName().Version}";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -421,18 +426,16 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Opens the plane identity collector view.
+        /// Opens the aircraft types view.
         /// </summary>
         /// <remarks>
         /// sushi.at, 28/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void OpenPlaneIdentityCollector()
+        private void OpenAircraftTypes()
         {
-#if DEBUG
-            Debug.WriteLine("Opening plane identity collector view");
-            PlaneIdentityCollector.Open();
-#endif
+            Debug.WriteLine("Opening aircraft types view");
+            AircraftTypes.Open();
         }
 
         /// -------------------------------------------------------------------------------------------------

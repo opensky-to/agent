@@ -220,7 +220,7 @@ namespace OpenSky.AgentMSFS.MVVM
 
             // Run the action on a new thread from the thread pool (this will therefore work in SL and WP7 as well).
             ThreadPool.QueueUserWorkItem(
-                state =>
+                _ =>
                 {
                     // Invoke the action.
                     this.InvokeAction(param);

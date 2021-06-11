@@ -81,7 +81,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Slew activated?
-            if (ppt.New.SlewActive && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+            if (ppt.New.SlewActive && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, slew detected.");
                 var assembly = Assembly.GetExecutingAssembly();
@@ -94,7 +94,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             // Teleport to another position?
             // todo define max knots ground speed allowed per plane?
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 var groundSpeedMetersPerSecond = 600 / 1.944 * ppt.New.SimulationRate;
                 var distanceTraveledInMeters = ppt.Old.GeoCoordinate.GetDistanceTo(ppt.New.GeoCoordinate) * (this.SampleRates[Requests.Primary] / 1000.0);
@@ -149,7 +149,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 }
 
                 // Was the beacon light off when the engine was started?
-                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
@@ -157,7 +157,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 }
 
                 // Was the taxi or landing light on when turning on/off the engine?
-                if ((pst.New.LightTaxi || pst.New.LightLanding) && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+                if ((pst.New.LightTaxi || pst.New.LightLanding) && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
@@ -245,7 +245,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Was the battery master turned off/on?
-            if (pst.Old.ElectricalMasterBattery != pst.New.ElectricalMasterBattery && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+            if (pst.Old.ElectricalMasterBattery != pst.New.ElectricalMasterBattery && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
             {
                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.ElectricalMasterBattery ? "Battery master on" : "Battery master off");
             }
@@ -312,7 +312,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Was the crash detection turned off?
-            if (!pst.New.CrashDetection && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+            if (!pst.New.CrashDetection && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, crash detection turned off!");
                 var assembly = Assembly.GetExecutingAssembly();
@@ -324,7 +324,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Was unlimited fuel turned on?
-            if (pst.New.UnlimitedFuel && (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking))
+            if (pst.New.UnlimitedFuel && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, unlimited fuel turned on!");
                 var assembly = Assembly.GetExecutingAssembly();
@@ -336,7 +336,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Was the time in the sim changed?
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 var timeDelta = pst.New.UtcDateTime - pst.Old.UtcDateTime;
                 if (timeDelta.TotalSeconds < 0)

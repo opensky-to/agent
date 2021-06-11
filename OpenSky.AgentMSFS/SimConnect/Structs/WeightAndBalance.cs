@@ -155,7 +155,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static List<SimVar> Definition =>
-            new List<SimVar>
+            new()
             {
                 new SimVar("EMPTY WEIGHT", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("TOTAL WEIGHT", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
