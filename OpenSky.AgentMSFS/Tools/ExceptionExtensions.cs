@@ -8,6 +8,7 @@ namespace OpenSky.AgentMSFS.Tools
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Net.Sockets;
@@ -73,7 +74,7 @@ namespace OpenSky.AgentMSFS.Tools
                             command.ReportProgress(
                                 () =>
                                 {
-                                    Debug.WriteLine($"{friendlyErrorMessage}: " + ex.Message);
+                                    Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
                                     ModernWpf.MessageBox.Show("Authorization token was expired, please try again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                                 });
                         }
@@ -85,7 +86,7 @@ namespace OpenSky.AgentMSFS.Tools
                             command.ReportProgress(
                                 () =>
                                 {
-                                    Debug.WriteLine($"{friendlyErrorMessage}: " + ex.Message);
+                                    Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
                                     ModernWpf.MessageBox.Show("Authorization token is invalid, please login with your OpenSky account again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                                 }, true);
                         }
@@ -95,29 +96,41 @@ namespace OpenSky.AgentMSFS.Tools
                 }
                 else if (!string.IsNullOrEmpty(apiException.Response))
                 {
-                    var problemDetails = JsonConvert.DeserializeObject<ValidationProblemDetails>(apiException.Response);
-                    if (problemDetails != null)
+                    try
                     {
-                        foreach (var problemDetailsError in problemDetails.Errors)
+                        var problemDetails = JsonConvert.DeserializeObject<ValidationProblemDetails>(apiException.Response);
+                        if (problemDetails != null)
                         {
-                            foreach (var errorMessage in problemDetailsError.Value)
+                            foreach (var problemDetailsError in problemDetails.Errors)
                             {
-                                command.ReportProgress(
-                                    () =>
-                                    {
-                                        Debug.WriteLine($"{friendlyErrorMessage}: " + errorMessage);
-                                        ModernWpf.MessageBox.Show(errorMessage, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
-                                    });
+                                foreach (var errorMessage in problemDetailsError.Value)
+                                {
+                                    command.ReportProgress(
+                                        () =>
+                                        {
+                                            Debug.WriteLine($"{friendlyErrorMessage}: {errorMessage}");
+                                            ModernWpf.MessageBox.Show(errorMessage, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                        });
+                                }
                             }
                         }
+                        else
+                        {
+                            command.ReportProgress(
+                                () =>
+                                {
+                                    Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Message}");
+                                    ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                });
+                        }
                     }
-                    else
+                    catch
                     {
                         command.ReportProgress(
                             () =>
                             {
-                                Debug.WriteLine($"{friendlyErrorMessage}: " + apiException.Message);
-                                ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Response}");
+                                ModernWpf.MessageBox.Show(new string(apiException.Response.Take(500).ToArray()), friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                             });
                     }
                 }
@@ -126,7 +139,7 @@ namespace OpenSky.AgentMSFS.Tools
                     command.ReportProgress(
                         () =>
                         {
-                            Debug.WriteLine($"{friendlyErrorMessage}: " + apiException.Message);
+                            Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Message}");
                             ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                 }
@@ -142,7 +155,7 @@ namespace OpenSky.AgentMSFS.Tools
                     command.ReportProgress(
                         () =>
                         {
-                            Debug.WriteLine($"{friendlyErrorMessage}: " + httpRequestException.Message);
+                            Debug.WriteLine($"{friendlyErrorMessage}: {httpRequestException.Message}");
                             ModernWpf.MessageBox.Show(httpRequestException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                 }
@@ -159,7 +172,7 @@ namespace OpenSky.AgentMSFS.Tools
                     command.ReportProgress(
                         () =>
                         {
-                            Debug.WriteLine($"{friendlyErrorMessage}: " + webException.Message);
+                            Debug.WriteLine($"{friendlyErrorMessage}: {webException.Message}");
                             ModernWpf.MessageBox.Show(webException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                 }
@@ -169,7 +182,7 @@ namespace OpenSky.AgentMSFS.Tools
                 command.ReportProgress(
                     () =>
                     {
-                        Debug.WriteLine($"{friendlyErrorMessage}: " + socketException.Message);
+                        Debug.WriteLine($"{friendlyErrorMessage}: {socketException.Message}");
                         ModernWpf.MessageBox.Show(socketException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                     });
             }
@@ -178,7 +191,7 @@ namespace OpenSky.AgentMSFS.Tools
                 command.ReportProgress(
                     () =>
                     {
-                        Debug.WriteLine($"{friendlyErrorMessage}: " + ex.Message);
+                        Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
                         ModernWpf.MessageBox.Show(ex.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
                     });
             }
