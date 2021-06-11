@@ -5,13 +5,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // ReSharper disable once CheckNamespace
+
 namespace OpenSkyApi
 {
     using System;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-
-    using JetBrains.Annotations;
 
     using OpenSky.AgentMSFS.SimConnect;
 
@@ -28,39 +25,56 @@ namespace OpenSkyApi
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Returns a string that represents the current object.
+        /// Initializes a new instance of the <see cref="AircraftType"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/06/2021.
+        /// sushi.at, 11/06/2021.
         /// </remarks>
-        /// <returns>
-        /// A string that represents the current object.
-        /// </returns>
-        /// <seealso cref="M:System.Object.ToString()"/>
         /// -------------------------------------------------------------------------------------------------
-        public override string ToString()
+        public AircraftType()
         {
-            return $"{this.Name} [v{this.VersionNumber}]";
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Determines whether the specified object is equal to the current object.
+        /// Initializes a new instance of the <see cref="AircraftType"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/06/2021.
+        /// sushi.at, 11/06/2021.
         /// </remarks>
-        /// <param name="other">
-        /// The aircraft type to compare to this object.
+        /// <param name="copyFrom">
+        /// The other type to copy from.
         /// </param>
-        /// <returns>
-        /// <see langword="true" /> if the specified object  is equal to the current object; otherwise,
-        /// <see langword="false" />.
-        /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        protected bool Equals(AircraftType other)
+        public AircraftType(AircraftType copyFrom)
         {
-            return this.Id.Equals(other.Id);
+            this.AtcModel = copyFrom.AtcModel;
+            this.AtcType = copyFrom.AtcType;
+            this.Category = copyFrom.Category;
+            this.Comments = copyFrom.Comments;
+            this.DetailedChecksDisabled = copyFrom.DetailedChecksDisabled;
+            this.EmptyWeight = copyFrom.EmptyWeight;
+            this.Enabled = copyFrom.Enabled;
+            this.EngineCount = copyFrom.EngineCount;
+            this.EngineType = copyFrom.EngineType;
+            this.FlapsAvailable = copyFrom.FlapsAvailable;
+            this.FuelTotalCapacity = copyFrom.FuelTotalCapacity;
+            this.Id = copyFrom.Id;
+            this.IsGearRetractable = copyFrom.IsGearRetractable;
+            this.IsVanilla = copyFrom.IsVanilla;
+            this.IsVariantOf = copyFrom.IsVariantOf;
+            this.LastEditedByID = copyFrom.LastEditedByID;
+            this.LastEditedByName = copyFrom.LastEditedByName;
+            this.MaxGrossWeight = copyFrom.MaxGrossWeight;
+            this.MaxPrice = copyFrom.MaxPrice;
+            this.MinPrice = copyFrom.MinPrice;
+            this.Name = copyFrom.Name;
+            this.NeedsCoPilot = copyFrom.NeedsCoPilot;
+            this.NextVersion = copyFrom.NextVersion;
+            this.Simulator = copyFrom.Simulator;
+            this.UploaderID = copyFrom.UploaderID;
+            this.UploaderName = copyFrom.UploaderName;
+            this.VersionNumber = copyFrom.VersionNumber;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -117,49 +131,112 @@ namespace OpenSkyApi
             return this.Id.GetHashCode();
         }
 
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Checks if this aircraft type matches the aircraft currently loaded in the simulator.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 11/06/2021.
+        /// </remarks>
+        /// <returns>
+        /// True if it matches the aircraft in the simulator, false if not.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
         public bool MatchesAircraftInSimulator()
         {
             if (SimConnect.Instance.Connected)
             {
+                if (!string.Equals(SimConnect.Instance.PlaneIdentity.AtcTypeProperty, this.AtcType, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (!string.Equals(SimConnect.Instance.PlaneIdentity.AtcModelProperty, this.AtcModel, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (SimConnect.Instance.PlaneIdentity.EngineType != this.EngineType)
+                {
+                    return false;
+                }
+
+                if (SimConnect.Instance.PlaneIdentity.EngineCount != this.EngineCount)
+                {
+                    return false;
+                }
+
+                if (SimConnect.Instance.PlaneIdentity.FlapsAvailable != this.FlapsAvailable)
+                {
+                    return false;
+                }
+
+                if (SimConnect.Instance.PlaneIdentity.GearRetractable != this.IsGearRetractable)
+                {
+                    return false;
+                }
+
+                // Skip these checks if detailed checks are TEMPORARILY disabled
+                if (!this.DetailedChecksDisabled)
+                {
+                    if (Math.Abs(SimConnect.Instance.WeightAndBalance.EmptyWeight - this.EmptyWeight) > 0.5)
+                    {
+                        return false;
+                    }
+
+                    if (Math.Abs(SimConnect.Instance.WeightAndBalance.FuelTotalCapacity - this.FuelTotalCapacity) > 0.5)
+                    {
+                        return false;
+                    }
+
+                    if (Math.Abs(SimConnect.Instance.WeightAndBalance.MaxGrossWeight - this.MaxGrossWeight) > 0.5)
+                    {
+                        return false;
+                    }
+                }
+
+                // Passed all checks
+                return true;
             }
 
             return false;
         }
 
-        public AircraftType()
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/06/2021.
+        /// </remarks>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        /// <seealso cref="M:System.Object.ToString()"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override string ToString()
         {
-
+            return $"{this.Name} [v{this.VersionNumber}]";
         }
 
-        public AircraftType(AircraftType copyFrom)
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/06/2021.
+        /// </remarks>
+        /// <param name="other">
+        /// The aircraft type to compare to this object.
+        /// </param>
+        /// <returns>
+        /// <see langword="true" /> if the specified object  is equal to the current object; otherwise,
+        /// <see langword="false" />.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        protected bool Equals(AircraftType other)
         {
-            this.AtcModel = copyFrom.AtcModel;
-            this.AtcType = copyFrom.AtcType;
-            this.Category = copyFrom.Category;
-            this.Comments = copyFrom.Comments;
-            this.DetailedChecksDisabled = copyFrom.DetailedChecksDisabled;
-            this.EmptyWeight = copyFrom.EmptyWeight;
-            this.Enabled = copyFrom.Enabled;
-            this.EngineCount = copyFrom.EngineCount;
-            this.EngineType = copyFrom.EngineType;
-            this.FlapsAvailable = copyFrom.FlapsAvailable;
-            this.FuelTotalCapacity = copyFrom.FuelTotalCapacity;
-            this.Id = copyFrom.Id;
-            this.IsGearRetractable = copyFrom.IsGearRetractable;
-            this.IsVanilla = copyFrom.IsVanilla;
-            this.IsVariantOf = copyFrom.IsVariantOf;
-            this.LastEditedByID = copyFrom.LastEditedByID;
-            this.LastEditedByName = copyFrom.LastEditedByName;
-            this.MaxGrossWeight = copyFrom.MaxGrossWeight;
-            this.MaxPrice = copyFrom.MaxPrice;
-            this.MinPrice = copyFrom.MinPrice;
-            this.Name = copyFrom.Name;
-            this.NeedsCoPilot = copyFrom.NeedsCoPilot;
-            this.NextVersion = copyFrom.NextVersion;
-            this.Simulator = copyFrom.Simulator;
-            this.UploaderID = copyFrom.UploaderID;
-            this.UploaderName = copyFrom.UploaderName;
-            this.VersionNumber = copyFrom.VersionNumber;
+            return this.Id.Equals(other.Id);
         }
     }
 }
