@@ -19,7 +19,7 @@
             xmlns:debug="debug-mode"
             xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
             Title="Startup" Height="400" Width="600" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen"
-            AllowsTransparency="True" Background="#181818" Visibility="Visible">
+            AllowsTransparency="True" Background="#171a1d" Visibility="Visible">
     <Window.Resources>
         <Storyboard x:Key="LogoAnimation">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="LogoGradient" RepeatBehavior="Forever">
@@ -65,15 +65,15 @@
                         <mc:Choice Requires="debug">
                             <MenuItem Header="Tracking debug" Command="{Binding TrackingDebugCommand}" />
                             <MenuItem Header="Test flight" Command="{Binding TestFlightCommand}" />
-                            <MenuItem Header="Plane identity collector" Command="{Binding PlaneIdentityCollectorCommand}" />
                         </mc:Choice>
                     </mc:AlternateContent>
+                    <MenuItem Header="Aircraft types" Command="{Binding AircraftTypesCommand}" />
                     <MenuItem Header="Settings" Command="{Binding SettingsCommand}" />
                     <MenuItem Header="Quit" Command="{Binding QuitCommand}" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-        <Image Grid.Row="0" x:Name="LogoGradient" Source="{StaticResource OpenskyLogoGradientOnly}" Height="220" VerticalAlignment="Top" Margin="0,30,0,0" RenderTransformOrigin="0.5,0.5" >
+        <Image Grid.Row="0" x:Name="LogoGradient" Source="{StaticResource OpenskyLogoGradientOnly}" Height="200" VerticalAlignment="Top" Margin="0,30,0,0" RenderTransformOrigin="0.5,0.5" >
             <Image.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -83,9 +83,9 @@
                 </TransformGroup>
             </Image.RenderTransform>
         </Image>
-        <Image Grid.Row="0" Source="{StaticResource OpenskyLogoPlaneAndTrail}" Height="220" VerticalAlignment="Top" Margin="0,30,0,0" />
-        <TextBlock Margin="0,20,0,0" Grid.Row="1" FontFamily="/Fonts/#Montserrat" FontWeight="Bold" TextAlignment="Center" FontSize="27" TextWrapping="Wrap" Foreground="#eeeeee">OPEN<TextBlock Foreground="{StaticResource OpenSkyTealLightBrush}">SKY</TextBlock> Agent<LineBreak /><TextBlock FontSize="20">for Microsoft Flight Simulator 2020</TextBlock></TextBlock>
-        <TextBlock Grid.Row="1" Foreground="Gray" TextAlignment="Left" VerticalAlignment="Bottom" Margin="5">www.opensky.to</TextBlock>
-        <TextBlock Grid.Row="1" Foreground="Gray" TextAlignment="Right" VerticalAlignment="Bottom" Margin="5" Text="{Binding VersionString}" />
+        <Image Grid.Row="0" Source="{StaticResource OpenskyLogoPlaneAndTrail}" Height="200" VerticalAlignment="Top" Margin="0,30,0,0" />
+        <TextBlock Margin="0,20,0,0" Grid.Row="1" FontFamily="/Fonts/#Montserrat" FontWeight="Bold" TextAlignment="Center" FontSize="45" TextWrapping="Wrap" Foreground="#eeeeee">OPEN<TextBlock Foreground="{StaticResource OpenSkyTealLightBrush}">SKY</TextBlock><LineBreak /><TextBlock FontSize="20" FontWeight="Normal">Agent for Microsoft Flight Simulator 2020</TextBlock></TextBlock>
+        <TextBlock Grid.Row="1" Foreground="Gray" FontFamily="/Fonts/#Montserrat" TextAlignment="Left" VerticalAlignment="Bottom" Margin="5">www.opensky.to</TextBlock>
+        <TextBlock Grid.Row="1" Foreground="Gray" FontFamily="/Fonts/#Montserrat" TextAlignment="Right" VerticalAlignment="Bottom" Margin="5" Text="{Binding VersionString}" />
     </Grid>
 </Window>

@@ -18,8 +18,9 @@ namespace OpenSky.AgentMSFS.Views.Models
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -37,7 +38,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// The landing reports.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<LandingReport> landingReports = new List<LandingReport>();
+        private readonly List<LandingReport> landingReports = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -73,7 +74,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Subscribe to changes
             this.SimConnect.LandingReports.CollectionChanged += this.LandingReportsCollectionChanged;
-            
+
             // Create dismiss command and notification timeout thread
             this.DismissLandingReportCommand = new Command(this.DismissLandingReport);
             new Thread(this.NotificationTimeout) { Name = "OpenSky.LandingReportNotificationTimeout" }.Start();
@@ -206,19 +207,19 @@ namespace OpenSky.AgentMSFS.Views.Models
                     desc = "Crash landing";
                 }
 
-                if (grade == "A+" && (this.MaxBankAngle < -5.0 || this.MaxBankAngle > 5.0))
+                if (grade == "A+" && (this.MaxBankAngle is < -5.0 or > 5.0))
                 {
                     grade = "E";
                     desc = "Dangerous bank angle";
                 }
 
-                if (grade == "A+" && (this.MaxSideSlipAngle < -15.0 || this.MaxSideSlipAngle > 15.0))
+                if (grade == "A+" && (this.MaxSideSlipAngle is < -15.0 or > 15.0))
                 {
                     grade = "E";
                     desc = "Dangerous sideslip angle";
                 }
 
-                if (grade == "A+" && landingRateAbs > 600 && landingRateAbs <= 1000)
+                if (grade == "A+" && landingRateAbs is > 600 and <= 1000)
                 {
                     grade = "D";
                     desc = "Rough landing";
@@ -230,13 +231,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                     desc = "Porpoising landing";
                 }
 
-                if (grade == "A+" && (this.MaxGForce < -2.1 || this.MaxGForce > 2.1))
+                if (grade == "A+" && (this.MaxGForce is < -2.1 or > 2.1))
                 {
                     grade = "C";
                     desc = "Hard landing";
                 }
 
-                if (grade == "A+" && landingRateAbs > 240 && landingRateAbs <= 600)
+                if (grade == "A+" && landingRateAbs is > 240 and <= 600)
                 {
                     grade = "C";
                     desc = "Hard landing";
@@ -248,13 +249,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                     desc = "Bouncy landing";
                 }
 
-                if (grade == "A+" && landingRateAbs > 180 && landingRateAbs <= 240)
+                if (grade == "A+" && landingRateAbs is > 180 and <= 240)
                 {
                     grade = "B";
                     desc = "OK landing";
                 }
 
-                if (grade == "A+" && landingRateAbs > 60 && landingRateAbs <= 180)
+                if (grade == "A+" && landingRateAbs is > 60 and <= 180)
                 {
                     grade = "A";
                     desc = "Good landing";

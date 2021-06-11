@@ -26,21 +26,21 @@ namespace OpenSky.AgentMSFS.Models
         /// After turning the engines off.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly LandingReportNotification AfterTurningEnginesOff = new LandingReportNotification(1, "After turning engines off");
+        public static readonly LandingReportNotification AfterTurningEnginesOff = new(1, "After turning engines off");
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// As soon as possible.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly LandingReportNotification AsSoonAsPossible = new LandingReportNotification(0, "As soon as available");
+        public static readonly LandingReportNotification AsSoonAsPossible = new(0, "As soon as available");
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The notification is disabled.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly LandingReportNotification Disable = new LandingReportNotification(2, "Disable");
+        public static readonly LandingReportNotification Disable = new(2, "Disable");
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -90,7 +90,7 @@ namespace OpenSky.AgentMSFS.Models
         /// -------------------------------------------------------------------------------------------------
         public static List<LandingReportNotification> GetLandingReportNotifications()
         {
-            return new List<LandingReportNotification>
+            return new()
             {
                 AsSoonAsPossible,
                 AfterTurningEnginesOff,

@@ -186,7 +186,7 @@ namespace OpenSky.AgentMSFS.Models.API
         /// -------------------------------------------------------------------------------------------------
         public static Flight CreateDebugJob()
         {
-            return new Flight
+            return new()
             {
                 FlightID = 6681,
                 PlaneIdentifier = "cded57279be863637c6b57c4658862e02eb6acc424fe19d8fe5613e53557a73b",

@@ -4,6 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Globalization;
+
 namespace OpenSky.AgentMSFS.Views.Models
 {
     using System;
@@ -306,35 +308,33 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            using (var client = new WebClient())
+            using var client = new WebClient();
+            try
             {
-                try
+                if (!Equals(this.Flight.AlternateICAO, this.Flight.AlternateICAO.ToUpper(CultureInfo.InvariantCulture)))
                 {
-                    if (!Equals(this.Flight.AlternateICAO, this.Flight.AlternateICAO.ToUpper()))
-                    {
-                        this.Flight.AlternateICAO = this.Flight.AlternateICAO.ToUpper();
-                    }
-
-                    var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.AlternateICAO}");
-                    Debug.WriteLine(json);
-
-                    var geoLocation = JObject.Parse(json);
-                    var error = (string)geoLocation["error"];
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        throw new Exception(error);
-                    }
-
-                    this.Flight.Alternate = (string)geoLocation["name"];
-                    this.Flight.AlternateCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
-                    this.Flight.AlternateCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
-                    this.NotifyPropertyChanged(nameof(this.Flight));
+                    this.Flight.AlternateICAO = this.Flight.AlternateICAO.ToUpper(CultureInfo.InvariantCulture);
                 }
-                catch (Exception ex)
+
+                var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.AlternateICAO}");
+                Debug.WriteLine(json);
+
+                var geoLocation = JObject.Parse(json);
+                var error = (string)geoLocation["error"];
+                if (!string.IsNullOrEmpty(error))
                 {
-                    Debug.WriteLine("Error looking alternate ICAO: " + ex);
-                    this.LookupAlternateCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
+                    throw new Exception(error);
                 }
+
+                this.Flight.Alternate = (string)geoLocation["name"];
+                this.Flight.AlternateCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
+                this.Flight.AlternateCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
+                this.NotifyPropertyChanged(nameof(this.Flight));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error looking alternate ICAO: " + ex);
+                this.LookupAlternateCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
             }
         }
 
@@ -353,35 +353,33 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            using (var client = new WebClient())
+            using var client = new WebClient();
+            try
             {
-                try
+                if (!Equals(this.Flight.DestinationICAO, this.Flight.DestinationICAO.ToUpper(CultureInfo.InvariantCulture)))
                 {
-                    if (!Equals(this.Flight.DestinationICAO, this.Flight.DestinationICAO.ToUpper()))
-                    {
-                        this.Flight.DestinationICAO = this.Flight.DestinationICAO.ToUpper();
-                    }
-
-                    var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.DestinationICAO}");
-                    Debug.WriteLine(json);
-
-                    var geoLocation = JObject.Parse(json);
-                    var error = (string)geoLocation["error"];
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        throw new Exception(error);
-                    }
-
-                    this.Flight.Destination = (string)geoLocation["name"];
-                    this.Flight.DestinationCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
-                    this.Flight.DestinationCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
-                    this.NotifyPropertyChanged(nameof(this.Flight));
+                    this.Flight.DestinationICAO = this.Flight.DestinationICAO.ToUpper(CultureInfo.InvariantCulture);
                 }
-                catch (Exception ex)
+
+                var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.DestinationICAO}");
+                Debug.WriteLine(json);
+
+                var geoLocation = JObject.Parse(json);
+                var error = (string)geoLocation["error"];
+                if (!string.IsNullOrEmpty(error))
                 {
-                    Debug.WriteLine("Error looking destination ICAO: " + ex);
-                    this.LookupDestinationCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
+                    throw new Exception(error);
                 }
+
+                this.Flight.Destination = (string)geoLocation["name"];
+                this.Flight.DestinationCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
+                this.Flight.DestinationCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
+                this.NotifyPropertyChanged(nameof(this.Flight));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error looking destination ICAO: " + ex);
+                this.LookupDestinationCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
             }
         }
 
@@ -400,35 +398,33 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            using (var client = new WebClient())
+            using var client = new WebClient();
+            try
             {
-                try
+                if (!Equals(this.Flight.OriginICAO, this.Flight.OriginICAO.ToUpper(CultureInfo.InvariantCulture)))
                 {
-                    if (!Equals(this.Flight.OriginICAO, this.Flight.OriginICAO.ToUpper()))
-                    {
-                        this.Flight.OriginICAO = this.Flight.OriginICAO.ToUpper();
-                    }
-
-                    var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.OriginICAO}");
-                    Debug.WriteLine(json);
-
-                    var geoLocation = JObject.Parse(json);
-                    var error = (string)geoLocation["error"];
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        throw new Exception(error);
-                    }
-
-                    this.Flight.Origin = (string)geoLocation["name"];
-                    this.Flight.OriginCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
-                    this.Flight.OriginCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
-                    this.NotifyPropertyChanged(nameof(this.Flight));
+                    this.Flight.OriginICAO = this.Flight.OriginICAO.ToUpper(CultureInfo.InvariantCulture);
                 }
-                catch (Exception ex)
+
+                var json = client.DownloadString($"http://iatageo.com/getICAOLatLng/{this.Flight.OriginICAO}");
+                Debug.WriteLine(json);
+
+                var geoLocation = JObject.Parse(json);
+                var error = (string)geoLocation["error"];
+                if (!string.IsNullOrEmpty(error))
                 {
-                    Debug.WriteLine("Error looking origin ICAO: " + ex);
-                    this.LookupOriginCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
+                    throw new Exception(error);
                 }
+
+                this.Flight.Origin = (string)geoLocation["name"];
+                this.Flight.OriginCoordinates.Latitude = double.Parse((string)geoLocation["latitude"] ?? "0");
+                this.Flight.OriginCoordinates.Longitude = double.Parse((string)geoLocation["longitude"] ?? "0");
+                this.NotifyPropertyChanged(nameof(this.Flight));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error looking origin ICAO: " + ex);
+                this.LookupOriginCommand.ReportProgress(() => { ModernWpf.MessageBox.Show(ex.Message, "Error fetching geo location for ICAO code", MessageBoxButton.OK, MessageBoxImage.Error); });
             }
         }
 
@@ -468,7 +464,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            this.Flight.PlaneIdentifier = SimConnect.SimConnect.Instance.PlaneIdentifierHash;
+            //this.Flight.PlaneIdentifier = SimConnect.SimConnect.Instance.PlaneIdentifierHash;
             this.Flight.AtcType = SimConnect.SimConnect.Instance.PlaneIdentity.AtcType;
             this.Flight.AtcModel = SimConnect.SimConnect.Instance.PlaneIdentity.AtcModel;
             this.Flight.PlaneName = SimConnect.SimConnect.Instance.PlaneIdentity.Type;

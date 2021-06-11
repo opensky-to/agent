@@ -35,7 +35,7 @@ namespace OpenSky.AgentMSFS.MVVM
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         private readonly ConcurrentDictionary<string, List<string>> errors =
-            new ConcurrentDictionary<string, List<string>>();
+            new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -43,7 +43,7 @@ namespace OpenSky.AgentMSFS.MVVM
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private readonly object validationLock = new object();
+        private readonly object validationLock = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -72,7 +72,7 @@ namespace OpenSky.AgentMSFS.MVVM
         {
             get
             {
-                return this.errors.Any(kv => kv.Value != null && kv.Value.Count > 0);
+                return this.errors.Any(kv => kv.Value is { Count: > 0 });
             }
         }
 

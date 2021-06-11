@@ -8,6 +8,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Speech.Synthesis;
     using System.Windows;
@@ -16,6 +17,9 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
+    using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -24,7 +28,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 23/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class SettingsViewModel : ViewModel
     {
@@ -34,13 +38,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private string bingMapsKey;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The OpenSky API token.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string openSkyApiToken;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -55,6 +52,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private LandingReportNotification selectedLandingReportNotification;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The selected text to speech voice.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string selectedTextToSpeechVoice;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -77,41 +81,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private uint simulatorPort;
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The selected text to speech voice.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string selectedTextToSpeechVoice;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the selected text to speech voice.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string SelectedTextToSpeechVoice
-        {
-            get => this.selectedTextToSpeechVoice;
-        
-            set
-            {
-                if(Equals(this.selectedTextToSpeechVoice, value))
-                {
-                   return;
-                }
-        
-                this.selectedTextToSpeechVoice = value;
-                this.NotifyPropertyChanged();
-                this.IsDirty = true;
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the available text to speech voices.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public List<string> TextToSpeechVoices { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -121,12 +90,15 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// sushi.at, 23/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1304:Specify CultureInfo", Justification = "This is ok here as we want the voices for all cultures")]
         public SettingsViewModel()
         {
             // Create command first so that IsDirty can set the CanExecute property
             this.SaveSettingsCommand = new Command(this.SaveSettings, false);
             this.RestoreDefaultsCommand = new Command(this.RestoreDefaults);
             this.TestTextToSpeechVoiceCommand = new Command(this.TestTextToSpeechVoice);
+            this.LoginOpenSkyUserCommand = new Command(this.LoginOpenSkyUser, !this.UserSession.IsUserLoggedIn);
+            this.LogoutOpenSkyUserCommand = new AsynchronousCommand(this.LogoutOpenSkyUser, this.UserSession.IsUserLoggedIn);
 
             // Fetch available text to speech voices
             var speech = new SpeechSynthesizer();
@@ -140,7 +112,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.SelectedTextToSpeechVoice = speech.Voice.Name;
 
             // Load settings
-            this.OpenSkyApiToken = Properties.Settings.Default.OpenSkyApiToken;
+            Properties.Settings.Default.Reload();
             this.BingMapsKey = Properties.Settings.Default.BingMapsKey;
             this.SimulatorHostName = Properties.Settings.Default.SimulatorHostName;
             this.SimulatorPort = Properties.Settings.Default.SimulatorPort;
@@ -151,42 +123,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.SelectedTextToSpeechVoice = Properties.Settings.Default.TextToSpeechVoice;
             }
 
+            // Make sure we are notified if the UserSession service changes user logged in status
+            this.UserSession.PropertyChanged += this.UserSessionPropertyChanged;
+
             // No changes, just us loading
             this.IsDirty = false;
         }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Tests text to speech voice.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 02/04/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private void TestTextToSpeechVoice()
-        {
-            if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))
-            {
-                try
-                {
-                    var speech = new SpeechSynthesizer();
-                    speech.SelectVoice(this.SelectedTextToSpeechVoice);
-                    speech.SpeakAsync("OpenSky flight number 81 is now ready for boarding.");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Error testing text to speech voice: " + ex);
-                    ModernWpf.MessageBox.Show(ex.Message, "Error testing voice", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the test text to speech voice command.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Command TestTextToSpeechVoiceCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -205,28 +147,6 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.bingMapsKey = value;
-                this.NotifyPropertyChanged();
-                this.IsDirty = true;
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the OpenSky API token.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string OpenSkyApiToken
-        {
-            get => this.openSkyApiToken;
-
-            set
-            {
-                if (Equals(this.openSkyApiToken, value))
-                {
-                    return;
-                }
-
-                this.openSkyApiToken = value;
                 this.NotifyPropertyChanged();
                 this.IsDirty = true;
             }
@@ -263,6 +183,20 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the login OpenSky user command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command LoginOpenSkyUserCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the logout OpenSky user command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand LogoutOpenSkyUserCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the restore defaults command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -294,6 +228,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.selectedLandingReportNotification = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the selected text to speech voice.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string SelectedTextToSpeechVoice
+        {
+            get => this.selectedTextToSpeechVoice;
+
+            set
+            {
+                if (Equals(this.selectedTextToSpeechVoice, value))
+                {
+                    return;
+                }
+
+                this.selectedTextToSpeechVoice = value;
                 this.NotifyPropertyChanged();
                 this.IsDirty = true;
             }
@@ -367,6 +323,76 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the test text to speech voice command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command TestTextToSpeechVoiceCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the available text to speech voices.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public List<string> TextToSpeechVoices { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the user session.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public UserSessionService UserSession => UserSessionService.Instance;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Login OpenSky user.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 01/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void LoginOpenSkyUser()
+        {
+            Process.Start(Properties.Settings.Default.OpenSkyTokenUrl);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Logout OpenSky user.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 01/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void LogoutOpenSkyUser()
+        {
+            try
+            {
+                var result = OpenSkyService.Instance.RevokeTokenAsync(new RevokeToken { Token = this.UserSession.RefreshToken }).Result;
+                if (result.IsError)
+                {
+                    this.LogoutOpenSkyUserCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error revoking application token: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.LogoutOpenSkyUserCommand, "Error revoking application token", false);
+            }
+
+            this.UserSession.Logout();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Restore default settings (except keys and users).
         /// </summary>
         /// <remarks>
@@ -397,7 +423,6 @@ namespace OpenSky.AgentMSFS.Views.Models
             Debug.WriteLine("Saving user settings...");
             try
             {
-                Properties.Settings.Default.OpenSkyApiToken = this.OpenSkyApiToken;
                 Properties.Settings.Default.BingMapsKey = this.BingMapsKey;
                 Properties.Settings.Default.SimulatorHostName = this.SimulatorHostName;
                 Properties.Settings.Default.SimulatorPort = this.SimulatorPort;
@@ -416,6 +441,59 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 Debug.WriteLine("Error saving settings: " + ex);
                 ModernWpf.MessageBox.Show(ex.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Tests text to speech voice.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 02/04/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void TestTextToSpeechVoice()
+        {
+            if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))
+            {
+                try
+                {
+                    var speech = new SpeechSynthesizer();
+                    speech.SelectVoice(this.SelectedTextToSpeechVoice);
+                    speech.SpeakAsync("OpenSky flight number 81 is now ready for boarding.");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error testing text to speech voice: " + ex);
+                    ModernWpf.MessageBox.Show(ex.Message, "Error testing voice", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// User session property changed.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 01/06/2021.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Property changed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void UserSessionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(this.UserSession.IsUserLoggedIn))
+            {
+                UpdateGUIDelegate updateCommands = () =>
+                {
+                    this.LoginOpenSkyUserCommand.CanExecute = !this.UserSession.IsUserLoggedIn;
+                    this.LogoutOpenSkyUserCommand.CanExecute = this.UserSession.IsUserLoggedIn;
+                };
+                Application.Current.Dispatcher.BeginInvoke(updateCommands);
             }
         }
     }

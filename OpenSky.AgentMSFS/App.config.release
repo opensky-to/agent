@@ -4,6 +4,9 @@
         <sectionGroup name="userSettings" type="System.Configuration.UserSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
             <section name="OpenSky.AgentMSFS.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" allowExeDefinition="MachineToLocalUser" requirePermission="false" />
         </sectionGroup>
+        <sectionGroup name="applicationSettings" type="System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
+            <section name="OpenSky.AgentMSFS.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+        </sectionGroup>
     </configSections>
     <startup> 
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
@@ -34,6 +37,28 @@
             <setting name="TextToSpeechVoice" serializeAs="String">
                 <value />
             </setting>
+            <setting name="OpenSkyRefreshToken" serializeAs="String">
+                <value />
+            </setting>
+            <setting name="OpenSkyUsername" serializeAs="String">
+                <value />
+            </setting>
+            <setting name="OpenSkyTokenExpiration" serializeAs="String">
+                <value />
+            </setting>
+            <setting name="OpenSkyRefreshTokenExpiration" serializeAs="String">
+                <value />
+            </setting>
         </OpenSky.AgentMSFS.Properties.Settings>
     </userSettings>
+    <applicationSettings>
+        <OpenSky.AgentMSFS.Properties.Settings>
+            <setting name="OpenSkyTokenUrl" serializeAs="String">
+                <value>https://www.opensky.to/apptoken/755CC379-E8FE-43C5-B75F-6CD09772D7A7</value>
+            </setting>
+            <setting name="OpenSkyAPIUrl" serializeAs="String">
+                <value>https://api.opensky.to</value>
+            </setting>
+        </OpenSky.AgentMSFS.Properties.Settings>
+    </applicationSettings>
 </configuration>

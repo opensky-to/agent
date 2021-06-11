@@ -15,9 +15,10 @@ namespace OpenSky.AgentMSFS.SimConnect
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -138,7 +139,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                var radioHeight = this.PlaneIdentity.EngineType == EngineType.Jet || this.PlaneIdentity.EngineType == EngineType.Turboprop ? 2500 : 1000;
+                var radioHeight = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
                 if (primary.RadioHeight < radioHeight)
                 {
                     if (this.IsTurning)

@@ -14,9 +14,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using System.Security.Cryptography;
     using System.Speech.Synthesis;
-    using System.Text;
     using System.Threading;
     using System.Windows;
 
@@ -333,31 +331,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the SHA-256 OpenSky plane identifier hash.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string PlaneIdentifierHash
-        {
-            get
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    var planeHash = sha256.ComputeHash(
-                        Encoding.UTF8.GetBytes(
-                            $"{this.PlaneIdentity.EngineType}{this.PlaneIdentity.EngineCount}{this.WeightAndBalance.FuelTotalCapacity}{this.WeightAndBalance.EmptyWeight}{this.WeightAndBalance.MaxGrossWeight}{this.PlaneIdentity.FlapsAvailable}{this.PlaneIdentity.GearRetractable}"));
-                    var sBuilder = new StringBuilder();
-                    foreach (var b in planeHash)
-                    {
-                        sBuilder.Append(b.ToString("x2"));
-                    }
-
-                    return sBuilder.ToString();
-                }
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets the latest plane identity info.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -486,7 +459,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         public void Close()
         {
             Debug.WriteLine("SimConnect closing down...");
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 this.StopTracking(false);
             }
@@ -843,7 +816,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// </param>
         /// -------------------------------------------------------------------------------------------------
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] [CanBeNull] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName][CanBeNull] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -867,7 +840,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             Debug.WriteLine($"SimConnect fsConnect connection status changed: {e}");
             this.Connected = this.fsConnect.Connected;
 
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("Lost connection to sim, saving flight and stopping tracking session...");
                 this.Speech.SpeakAsync("Lost connection to sim, saving flight and stopping tracking session.");
@@ -894,7 +867,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             this.OnPropertyChanged(nameof(this.IsPaused));
 
             Debug.WriteLine($"SimConnect fsConnect pause state changed: {e.Paused}");
-            if (this.TrackingStatus == TrackingStatus.GroundOperations || this.TrackingStatus == TrackingStatus.Tracking)
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 if (e.Paused)
                 {
@@ -970,7 +943,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     new Thread(
                             () => { this.ProcessWeightAndBalance(this.WeightAndBalance, isWeightAndBalance); })
-                        { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
+                    { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
                     this.WeightAndBalance = isWeightAndBalance;
                     this.LastReceivedTimes[Requests.WeightAndBalance] = DateTime.UtcNow;
                 }
@@ -1002,7 +975,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         private void ReadFromSimconnect()
         {
-            bool veryFirstConnectError = true;
+            var veryFirstConnectError = true;
             while (!this.close)
             {
                 try
@@ -1037,18 +1010,19 @@ namespace OpenSky.AgentMSFS.SimConnect
                         }
                         catch (Exception ex)
                         {
+                            // After the first one ignore, and don't log connection errors, they only fill up the logs
                             if (veryFirstConnectError)
                             {
                                 veryFirstConnectError = false;
                                 Debug.WriteLine("Error connecting to sim: " + ex);
                             }
 
-                            // After the first one ignore, and don't log connection errors, they only fill up the logs
                         }
                     }
 
                     if (this.fsConnect.Connected)
                     {
+                        veryFirstConnectError = true;
                         this.fsConnect.RequestData(Requests.Primary, Requests.Primary);
 
                         foreach (Requests request in Enum.GetValues(typeof(Requests)))
@@ -1062,9 +1036,14 @@ namespace OpenSky.AgentMSFS.SimConnect
                                 }
                             }
                         }
+
+                        Thread.Sleep(Math.Min(this.SampleRates[Requests.Primary], this.SampleRates[Requests.LandingAnalysis]));
+                    }
+                    else
+                    {
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(this.Flight == null ? 30 : 5));
                     }
 
-                    Thread.Sleep(Math.Min(this.SampleRates[Requests.Primary], this.SampleRates[Requests.LandingAnalysis]));
                 }
                 catch (Exception ex)
                 {
