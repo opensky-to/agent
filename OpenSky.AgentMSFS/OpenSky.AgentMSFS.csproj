@@ -361,7 +361,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <AdditionalFiles Include="stylecop.json" />
     <Compile Include="SimConnect\SimConnect.Process.cs" />
   </ItemGroup>
   <ItemGroup>
