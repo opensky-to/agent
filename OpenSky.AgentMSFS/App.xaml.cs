@@ -97,9 +97,9 @@ namespace OpenSky.AgentMSFS
             var updatedToken = false;
             foreach (var arg in e.Args)
             {
-                if (arg.StartsWith("opensky-agent-msfs://"))
+                if (arg.StartsWith("opensky-agent-msfs://") || arg.StartsWith("opensky-agent-msfs-debug://"))
                 {
-                    var appTokenUri = arg.Replace("opensky-agent-msfs://", string.Empty).TrimEnd('/');
+                    var appTokenUri = arg.Replace("opensky-agent-msfs://", string.Empty).Replace("opensky-agent-msfs-debug://", string.Empty).TrimEnd('/');
                     var parameters = appTokenUri.Split('&');
 
                     string token = null;

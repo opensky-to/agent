@@ -12,7 +12,7 @@ namespace OpenSky.AgentMSFS.Views
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Startup windows (maybe splash screen in the future?)
+    /// Startup window
     /// </content>
     /// -------------------------------------------------------------------------------------------------
     public partial class Startup

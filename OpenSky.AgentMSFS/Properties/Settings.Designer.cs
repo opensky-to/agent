@@ -12,7 +12,7 @@ namespace OpenSky.AgentMSFS.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -143,24 +143,6 @@ namespace OpenSky.AgentMSFS.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5001/apptoken/755CC379-E8FE-43C5-B75F-6CD09772D7A7")]
-        public string OpenSkyTokenUrl {
-            get {
-                return ((string)(this["OpenSkyTokenUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5000")]
-        public string OpenSkyAPIUrl {
-            get {
-                return ((string)(this["OpenSkyAPIUrl"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.DateTime OpenSkyTokenExpiration {
@@ -180,6 +162,24 @@ namespace OpenSky.AgentMSFS.Properties {
             }
             set {
                 this["OpenSkyRefreshTokenExpiration"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5001/apptoken/0932018B-FB9C-4B59-B898-C4244EAC6D0B")]
+        public string OpenSkyTokenUrl {
+            get {
+                return ((string)(this["OpenSkyTokenUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5000")]
+        public string OpenSkyAPIUrl {
+            get {
+                return ((string)(this["OpenSkyAPIUrl"]));
             }
         }
     }

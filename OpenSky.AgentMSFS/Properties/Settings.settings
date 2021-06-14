@@ -32,17 +32,17 @@
     <Setting Name="OpenSkyUsername" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="OpenSkyTokenUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:5001/apptoken/755CC379-E8FE-43C5-B75F-6CD09772D7A7</Value>
-    </Setting>
-    <Setting Name="OpenSkyAPIUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:5000</Value>
-    </Setting>
     <Setting Name="OpenSkyTokenExpiration" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="OpenSkyRefreshTokenExpiration" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="OpenSkyTokenUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:5001/apptoken/0932018B-FB9C-4B59-B898-C4244EAC6D0B</Value>
+    </Setting>
+    <Setting Name="OpenSkyAPIUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:5000</Value>
     </Setting>
   </Settings>
 </SettingsFile>
