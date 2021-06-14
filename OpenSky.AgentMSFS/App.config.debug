@@ -54,7 +54,7 @@
     <applicationSettings>
         <OpenSky.AgentMSFS.Properties.Settings>
             <setting name="OpenSkyTokenUrl" serializeAs="String">
-                <value>http://localhost:5001/apptoken/755CC379-E8FE-43C5-B75F-6CD09772D7A7</value>
+                <value>http://localhost:5001/apptoken/0932018B-FB9C-4B59-B898-C4244EAC6D0B</value>
             </setting>
             <setting name="OpenSkyAPIUrl" serializeAs="String">
                 <value>http://localhost:5000</value>

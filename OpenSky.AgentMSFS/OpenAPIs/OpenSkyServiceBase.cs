@@ -4,8 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 // ReSharper disable once CheckNamespace
 namespace OpenSkyApi
 {
@@ -125,24 +123,18 @@ namespace OpenSkyApi
                             Debug.WriteLine($"Error refreshing tokens: {ex}");
                             throw;
                         }
-                        else
-                        {
-                            Debug.WriteLine($"Error refreshing tokens: {ex}");
-                            UserSessionService.Instance.Logout();
-                            throw;
-                        }
-                    }
-                    else
-                    {
+
                         Debug.WriteLine($"Error refreshing tokens: {ex}");
                         UserSessionService.Instance.Logout();
                         throw;
                     }
+
+                    Debug.WriteLine($"Error refreshing tokens: {ex}");
+                    UserSessionService.Instance.Logout();
+                    throw;
                 }
                 catch (Exception ex)
                 {
-                    // todo check if server is simply not available/internet down/etc.
-
                     Debug.WriteLine($"Error refreshing tokens: {ex}");
                     UserSessionService.Instance.Logout();
                     throw;

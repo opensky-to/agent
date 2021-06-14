@@ -57,6 +57,15 @@
                     <util:PermissionEx User="Users" GenericAll="yes" />
                 </File>
             </Component>
+            <Component Id="RegistryEntries" Guid="{044C023F-9639-4370-866F-EE5AD4E30A86}" Win64="yes">
+                <RegistryKey Root="HKCR" Key="opensky-agent-msfs" Action="createAndRemoveOnUninstall">
+                    <RegistryValue Type="string" Value="URL:opensky-agent-msfs" />
+                    <RegistryValue Type="string" Name="URL Protocol" Value="" />
+                    <RegistryKey Key="shell\open\command">
+                        <RegistryValue Type="string" Value="&quot;[#OpenSkyAgentExeFile]&quot; &quot;%1&quot;" />
+                    </RegistryKey>
+                </RegistryKey>
+            </Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

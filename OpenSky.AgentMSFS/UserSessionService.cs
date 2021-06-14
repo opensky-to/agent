@@ -368,9 +368,21 @@ namespace OpenSky.AgentMSFS
         {
             Settings.Default.Reload();
             this.OpenSkyApiToken = Settings.Default.OpenSkyApiToken;
-            this.Expiration = Settings.Default.OpenSkyTokenExpiration;
+            try
+            {
+                this.Expiration = Settings.Default.OpenSkyTokenExpiration;
+            }
+            catch (NullReferenceException)
+            {
+            }
             this.RefreshToken = Settings.Default.OpenSkyRefreshToken;
-            this.RefreshExpiration = Settings.Default.OpenSkyRefreshTokenExpiration;
+            try
+            {
+                this.RefreshExpiration = Settings.Default.OpenSkyRefreshTokenExpiration;
+            }
+            catch (NullReferenceException)
+            {
+            }
             this.Username = Settings.Default.OpenSkyUsername;
 
             this.CheckTokenNeedsRefresh();

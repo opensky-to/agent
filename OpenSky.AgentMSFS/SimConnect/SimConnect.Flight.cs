@@ -663,7 +663,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 var saveFile = this.GenerateSaveFile();
 
-                // todo gzip the xml string
                 if (saveFile != null && this.Flight != null)
                 {
                     var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
