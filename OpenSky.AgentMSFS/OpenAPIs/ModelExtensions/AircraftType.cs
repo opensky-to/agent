@@ -62,10 +62,12 @@ namespace OpenSkyApi
             this.Id = copyFrom.Id;
             this.IsGearRetractable = copyFrom.IsGearRetractable;
             this.IsVanilla = copyFrom.IsVanilla;
+            this.IncludeInWorldPopulation = copyFrom.IncludeInWorldPopulation;
             this.IsVariantOf = copyFrom.IsVariantOf;
             this.LastEditedByID = copyFrom.LastEditedByID;
             this.LastEditedByName = copyFrom.LastEditedByName;
             this.MaxGrossWeight = copyFrom.MaxGrossWeight;
+            this.MinimumRunwayLength = copyFrom.MinimumRunwayLength;
             this.MaxPrice = copyFrom.MaxPrice;
             this.MinPrice = copyFrom.MinPrice;
             this.Name = copyFrom.Name;
