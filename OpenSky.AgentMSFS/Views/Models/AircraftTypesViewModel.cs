@@ -150,6 +150,63 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True to include, false to exclude the type in the world population.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool includeInWorldPopulation;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether to include or exclude the type from the world
+        /// population.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IncludeInWorldPopulation
+        {
+            get => this.includeInWorldPopulation;
+        
+            set
+            {
+                if(Equals(this.includeInWorldPopulation, value))
+                {
+                   return;
+                }
+        
+                this.includeInWorldPopulation = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The minimum length of the runway required by the type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int minimumRunwayLength;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the minimum runway length required by the type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int MinimumRunwayLength
+        {
+            get => this.minimumRunwayLength;
+        
+            set
+            {
+                if(Equals(this.minimumRunwayLength, value))
+                {
+                   return;
+                }
+        
+                this.minimumRunwayLength = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="AircraftTypesViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -744,8 +801,10 @@ namespace OpenSky.AgentMSFS.Views.Models
                 VersionNumber = this.VersionNumber,
                 Category = this.Category,
                 IsVanilla = this.IsVanilla,
+                IncludeInWorldPopulation = this.IncludeInWorldPopulation,
                 NeedsCoPilot = this.NeedsCoPilot,
                 IsVariantOf = this.IsVariantOf?.Id,
+                MinimumRunwayLength = this.MinimumRunwayLength,
                 MinPrice = this.MinimumPrice,
                 MaxPrice = this.MaximumPrice,
                 Comments = this.Comments
@@ -806,10 +865,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.VersionNumber = 1;
             this.Category = AircraftTypeCategory.SEP;
             this.IsVanilla = false;
+            this.IncludeInWorldPopulation = false;
             this.NeedsCoPilot = false;
             this.IsVariantOf = null;
             this.MinimumPrice = 0;
             this.MaximumPrice = 0;
+            this.MinimumRunwayLength = 0;
             this.Comments = null;
         }
 
