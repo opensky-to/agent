@@ -59,6 +59,7 @@ namespace OpenSkyApi
             this.EngineType = copyFrom.EngineType;
             this.FlapsAvailable = copyFrom.FlapsAvailable;
             this.FuelTotalCapacity = copyFrom.FuelTotalCapacity;
+            this.FuelWeightPerGallon = copyFrom.FuelWeightPerGallon;
             this.Id = copyFrom.Id;
             this.IsGearRetractable = copyFrom.IsGearRetractable;
             this.IsVanilla = copyFrom.IsVanilla;
@@ -71,6 +72,7 @@ namespace OpenSkyApi
             this.MaxPrice = copyFrom.MaxPrice;
             this.MinPrice = copyFrom.MinPrice;
             this.Name = copyFrom.Name;
+            this.Manufacturer = copyFrom.Manufacturer;
             this.NeedsCoPilot = copyFrom.NeedsCoPilot;
             this.NextVersion = copyFrom.NextVersion;
             this.Simulator = copyFrom.Simulator;
