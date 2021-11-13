@@ -19,6 +19,8 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using JetBrains.Annotations;
 
+    using Microsoft.Maps.MapControl.WPF;
+
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
@@ -191,8 +193,8 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                         this.WarpInfo = "No [*]";
                         this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F2}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}"; 
-                        this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = value.Aircraft.Type.Name;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}";
+                        this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
 
                         // Add airport markers to map
                         UpdateGUIDelegate addAirports = () =>
@@ -211,6 +213,26 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
                         };
                         Application.Current.Dispatcher.BeginInvoke(addAirports);
+
+                        // Add simbrief navlog to map
+                        UpdateGUIDelegate addNavlog = () =>
+                        {
+                            if (value.NavlogFixes.Count > 0)
+                            {
+                                this.SimbriefOfpLoaded = true;
+                                foreach (var flightNavlogFix in value.NavlogFixes)
+                                {
+                                    this.SimbriefRouteLocations.Add(new Location(flightNavlogFix.Latitude, flightNavlogFix.Longitude));
+                                    if (flightNavlogFix.Type != "apt")
+                                    {
+                                        var newMarker = new SimbriefWaypointMarker(flightNavlogFix.Latitude, flightNavlogFix.Longitude, flightNavlogFix.Ident, flightNavlogFix.Type);
+                                        this.simbriefWaypointMarkers.Add(newMarker);
+                                        this.SimbriefWaypointMarkerAdded?.Invoke(this, newMarker);
+                                    }
+                                }
+                            }
+                        };
+                        Application.Current.Dispatcher.BeginInvoke(addNavlog);
                     }
                     else
                     {

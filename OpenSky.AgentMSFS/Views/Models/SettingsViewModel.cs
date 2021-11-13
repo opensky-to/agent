@@ -34,13 +34,6 @@ namespace OpenSky.AgentMSFS.Views.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The bing maps key.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string bingMapsKey;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Are there changes to the settings to be saved?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -59,13 +52,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private string selectedTextToSpeechVoice;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The SimBrief user name.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string simBriefUserName;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -113,10 +99,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Load settings
             Properties.Settings.Default.Reload();
-            this.BingMapsKey = Properties.Settings.Default.BingMapsKey;
             this.SimulatorHostName = Properties.Settings.Default.SimulatorHostName;
             this.SimulatorPort = Properties.Settings.Default.SimulatorPort;
-            this.SimBriefUserName = Properties.Settings.Default.SimBriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Properties.Settings.Default.LandingReportNotification);
             if (!string.IsNullOrEmpty(Properties.Settings.Default.TextToSpeechVoice))
             {
@@ -130,27 +114,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.IsDirty = false;
         }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the bing maps key.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string BingMapsKey
-        {
-            get => this.bingMapsKey;
-
-            set
-            {
-                if (Equals(this.bingMapsKey, value))
-                {
-                    return;
-                }
-
-                this.bingMapsKey = value;
-                this.NotifyPropertyChanged();
-                this.IsDirty = true;
-            }
-        }
+        
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -255,27 +219,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets SimBrief user name.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string SimBriefUserName
-        {
-            get => this.simBriefUserName;
-
-            set
-            {
-                if (Equals(this.simBriefUserName, value))
-                {
-                    return;
-                }
-
-                this.simBriefUserName = value;
-                this.NotifyPropertyChanged();
-                this.IsDirty = true;
-            }
-        }
+        
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -423,10 +367,8 @@ namespace OpenSky.AgentMSFS.Views.Models
             Debug.WriteLine("Saving user settings...");
             try
             {
-                Properties.Settings.Default.BingMapsKey = this.BingMapsKey;
                 Properties.Settings.Default.SimulatorHostName = this.SimulatorHostName;
                 Properties.Settings.Default.SimulatorPort = this.SimulatorPort;
-                Properties.Settings.Default.SimBriefUsername = this.SimBriefUserName;
                 Properties.Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
                 Properties.Settings.Default.TextToSpeechVoice = this.SelectedTextToSpeechVoice;
                 if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))
@@ -494,6 +436,21 @@ namespace OpenSky.AgentMSFS.Views.Models
                     this.LogoutOpenSkyUserCommand.CanExecute = this.UserSession.IsUserLoggedIn;
                 };
                 Application.Current.Dispatcher.BeginInvoke(updateCommands);
+
+                if (this.UserSession.IsUserLoggedIn)
+                {
+                    try
+                    {
+                        _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+
+                        this.NotifyPropertyChanged(nameof(this.UserSession));
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                    
+                }
             }
         }
     }

@@ -149,6 +149,43 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
+
+            // Check for new flight from API
+            new Thread(
+                () =>
+                {
+                    if (UserSessionService.Instance.IsUserLoggedIn)
+                    {
+                        _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                    }
+
+                    while (!SleepScheduler.IsShutdownInProgress)
+                    {
+                        if (UserSessionService.Instance.IsUserLoggedIn && SimConnect.Instance.Flight == null)
+                        {
+                            try
+                            {
+                                var result = OpenSkyService.Instance.GetFlightAsync().Result;
+                                if (!result.IsError)
+                                {
+                                    SimConnect.Instance.Flight = result.Data;
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Error checking for new flight: " + result.Message + "\r\n" + result.ErrorDetails);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Error checking for new flight: " + ex);
+                            }
+                        }
+
+
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(30));
+                    }
+                })
+            { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------

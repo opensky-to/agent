@@ -90,15 +90,15 @@
                 <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Alternate:</TextBlock>
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
                     <Button Content="{Binding SimConnect.Flight.Origin.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Origin, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Origin, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Origin.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
                     <Button Content="{Binding SimConnect.Flight.Destination.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Destination, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Destination, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Destination.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
                     <Button Content="{Binding SimConnect.Flight.Alternate.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Alternate, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Alternate, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Alternate.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" HorizontalAlignment="Stretch" Style="{StaticResource OpenSkyButtonStyle}" Foreground="White" FontSize="14" FontWeight="SemiBold" Command="{Binding ImportSimbriefCommand}" Visibility="{Binding ImportSimbriefVisibility}">Import waypoints from Simbrief flight plan</Button>
             </Grid>
@@ -443,7 +443,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Fuel (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.FuelGallons, FallbackValue=??}" Margin="0,0,3,0"/>
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.FuelGallons, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0"/>
                                 <TextBlock FontSize="15" FontWeight="DemiBold">gallons)</TextBlock>
                             </StackPanel>
                         </Expander.Header>
@@ -466,7 +466,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Payload (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.PayloadPounds, FallbackValue=??}" Margin="0,0,3,0" />
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.PayloadPounds, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0" />
                                 <TextBlock FontSize="15" FontWeight="DemiBold">lbs)</TextBlock>
                             </StackPanel>
                         </Expander.Header>

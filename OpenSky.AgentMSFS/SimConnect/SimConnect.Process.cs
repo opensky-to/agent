@@ -202,8 +202,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].Current =
-                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Latitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Latitude ?? 0)) < 5000;
+                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) < 5000;
                 }
 
                 if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -267,7 +267,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             try
             {
                 // Make sure the player didn't use the dev mode to switch the plane
-                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)) //&& this.PlaneIdentifierHash != this.Flight.PlaneIdentifier) // todo replace this with aircraft type check
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && !Flight.Aircraft.Type.MatchesAircraftInSimulator())
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
@@ -397,7 +397,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
 
                     // Is the payload weight different from the flight?
-                    if (Math.Abs(newWB.PayloadWeight - 2) > 1) // todo this.Flight?.PayloadPounds ?? 2
+                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 2) > 1)
                     {
                         Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
                         var assembly = Assembly.GetExecutingAssembly();
