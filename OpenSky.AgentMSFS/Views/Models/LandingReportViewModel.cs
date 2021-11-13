@@ -64,7 +64,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         public LandingReportViewModel()
         {
-            this.FlightNumberHeader = $"Flight #{this.SimConnect.Flight?.FlightID}\r\nLanding Report";
+            this.FlightNumberHeader = $"Flight #{this.SimConnect.Flight?.Id}\r\nLanding Report";
 
             // Fetch the initial already existing landing report(s)
             foreach (var item in this.SimConnect.LandingReports)

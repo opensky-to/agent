@@ -18,11 +18,12 @@ namespace OpenSky.AgentMSFS.Views.Models
     using JetBrains.Annotations;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.Models.API;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -672,7 +673,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     }
 
                     // Set the plane registration
-                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.PlaneRegistry);
+                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.Aircraft.Registry);
 
                     // Wait a bit to make sure all structs have updated, especially time in sim
                     Thread.Sleep(this.SimConnect.SampleRates[Requests.Secondary] + 1000);
@@ -763,7 +764,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     this.SimConnect.SetFuelAndPayloadFromSave();
 
                     // Set the plane registration
-                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.PlaneRegistry);
+                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.Aircraft.Registry);
 
                     // Start five second countdown?
                     if (this.SimConnect.PrimaryTracking.SlewActive)

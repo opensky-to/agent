@@ -131,8 +131,7 @@
     <Compile Include="OpenAPIs\ValidationProblemDetails.cs" />
     <Compile Include="OpenSkyColors.cs" />
     <Compile Include="Models\AircraftTrailLocation.cs" />
-    <Compile Include="Models\API\Flight.cs" />
-    <Compile Include="Models\API\FlightExtensions.cs" />
+    <Compile Include="OpenAPIs\ModelExtensions\Flight.cs" />
     <Compile Include="Models\FlightLoadingTempStructs.cs" />
     <Compile Include="Models\LandingReport.cs" />
     <Compile Include="Models\LandingReportNotification.cs" />
@@ -163,7 +162,6 @@
     <Compile Include="Native\Taskbar.cs" />
     <Compile Include="SimConnect\Enums\ClientEvents.cs" />
     <Compile Include="SimConnect\Enums\CrashSequence.cs" />
-    <Compile Include="Models\FlightPhase.cs" />
     <Compile Include="SimConnect\Enums\FuelTank.cs" />
     <Compile Include="SimConnect\SimConnect.GroundHandling.cs" />
     <Compile Include="SimConnect\SimConnect.Process.Landing.cs" />
@@ -221,7 +219,6 @@
     <Compile Include="Views\Models\AircraftTypesViewModel.cs" />
     <Compile Include="Views\Models\SettingsViewModel.cs" />
     <Compile Include="Views\Models\StartupViewModel.cs" />
-    <Compile Include="Views\Models\TestFlightViewModel.cs" />
     <Compile Include="Views\Models\TrackingDebugViewModel.cs" />
     <Compile Include="Views\NewFlightNotification.xaml.cs">
       <DependentUpon>NewFlightNotification.xaml</DependentUpon>
@@ -275,10 +272,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TestFlight.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\TrackingDebug.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -286,9 +279,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Views\TestFlight.xaml.cs">
-      <DependentUpon>TestFlight.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TrackingDebug.xaml.cs">
       <DependentUpon>TrackingDebug.xaml</DependentUpon>
@@ -411,6 +401,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="TomsToolbox.Wpf">
+      <Version>2.7.3</Version>
     </PackageReference>
     <PackageReference Include="XDMessaging.Lite">
       <Version>5.0.6</Version>

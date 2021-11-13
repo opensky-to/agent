@@ -24,6 +24,8 @@ namespace OpenSky.AgentMSFS.Views.Models
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
 
+    using OpenSkyApi;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// The view model for the flight tracking view - map code.
@@ -257,12 +259,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                     var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
                     var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
 
-                    if (!this.SimConnect.Flight.OriginICAO.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    if (!this.SimConnect.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         throw new Exception("Departure airport doesn't match!");
                     }
 
-                    if (!this.SimConnect.Flight.DestinationICAO.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    if (!this.SimConnect.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         throw new Exception("Destination airport doesn't match!");
                     }
@@ -324,6 +326,11 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void MoveMapToCoordinate(object commandParameter)
         {
+            if (commandParameter is Airport airport)
+            {
+                this.MapPositionUpdated?.Invoke(this, new MapPositionUpdate(new Location(airport.Latitude, airport.Longitude, airport.Altitude), true));
+            }
+
             if (commandParameter is GeoCoordinate geoCoordinate)
             {
                 this.MapPositionUpdated?.Invoke(this, new MapPositionUpdate(new Location(geoCoordinate.Latitude, geoCoordinate.Longitude, geoCoordinate.Altitude), true));
