@@ -50,8 +50,8 @@ namespace OpenSky.AgentMSFS.Views.Models
         public NewFlightNotificationViewModel()
         {
             this.Timeout = 60 * 1000;
-            this.FlightNumber = $"{SimConnect.SimConnect.Instance.Flight?.FlightID ?? -1}";
-            this.Airports = $"{SimConnect.SimConnect.Instance.Flight?.OriginICAO} - {SimConnect.SimConnect.Instance.Flight?.DestinationICAO}";
+            this.FlightNumber = $"{SimConnect.SimConnect.Instance.Flight?.FullFlightNumber}";
+            this.Airports = $"{SimConnect.SimConnect.Instance.Flight?.Origin.Icao} - {SimConnect.SimConnect.Instance.Flight?.Destination.Icao}";
 
             var assembly = Assembly.GetExecutingAssembly();
             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSannouncement.wav"));

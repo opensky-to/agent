@@ -779,8 +779,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.SetSlew(true);
                     }
 
-                    slewTo.Latitude = this.Flight.OriginCoordinates.Latitude;
-                    slewTo.Longitude = this.Flight.OriginCoordinates.Longitude;
+                    slewTo.Latitude = this.Flight.Origin.Latitude;
+                    slewTo.Longitude = this.Flight.Origin.Longitude;
                     this.fsConnect.UpdateData(Requests.SlewPlaneIntoPosition, slewTo);
                 }
                 else

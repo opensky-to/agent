@@ -16,9 +16,10 @@ namespace OpenSky.AgentMSFS.SimConnect
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.Models.API;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -148,7 +149,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 var simbriefWaypoints = save.EnsureChildElement("SimbriefWaypoints");
                 this.SimbriefRouteLocations.Clear();
                 this.simbriefWaypointMarkers.Clear();
-                this.SimbriefRouteLocations.Add(new Location(this.Flight.OriginCoordinates.Latitude, this.Flight.OriginCoordinates.Longitude));
+                this.SimbriefRouteLocations.Add(new Location(this.Flight.Origin.Latitude, this.Flight.Origin.Longitude));
                 foreach (var waypoint in simbriefWaypoints.Elements("Waypoint"))
                 {
                     var waypointMarker = new SimbriefWaypointMarker(waypoint);
@@ -156,7 +157,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.SimbriefRouteLocations.Add(new Location(waypointMarker.GeoCoordinate.Latitude, waypointMarker.GeoCoordinate.Longitude));
                 }
 
-                this.SimbriefRouteLocations.Add(new Location(this.Flight.DestinationCoordinates.Latitude, this.Flight.DestinationCoordinates.Longitude));
+                this.SimbriefRouteLocations.Add(new Location(this.Flight.Destination.Latitude, this.Flight.Destination.Longitude));
             };
             Application.Current.Dispatcher.BeginInvoke(restoreSimbrief);
 

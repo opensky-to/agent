@@ -182,7 +182,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.TrackingConditions[(int)Models.TrackingConditions.DateTime].ConditionMet =
                     this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - pst.New.UtcDateTime).TotalMinutes) < 1;
-                //this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.PlaneIdentifierHash.Equals(this.Flight?.PlaneIdentifier, StringComparison.InvariantCultureIgnoreCase); // todo replace this with aircraft type check
+                this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.Flight?.Aircraft.Type.MatchesAircraftInSimulator() ?? false;
 
                 if (this.TrackingStatus == TrackingStatus.Preparing)
                 {
@@ -202,8 +202,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].Current =
-                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.Flight?.OriginCoordinates ?? new GeoCoordinate(0, 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.Flight?.OriginCoordinates ?? new GeoCoordinate(0, 0)) < 5000;
+                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Latitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Latitude ?? 0)) < 5000;
                 }
 
                 if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -397,7 +397,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
 
                     // Is the payload weight different from the flight?
-                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 2) > 1)
+                    if (Math.Abs(newWB.PayloadWeight - 2) > 1) // todo this.Flight?.PayloadPounds ?? 2
                     {
                         Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
                         var assembly = Assembly.GetExecutingAssembly();

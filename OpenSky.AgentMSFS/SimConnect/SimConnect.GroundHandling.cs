@@ -201,8 +201,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             try
             {
-                // todo poll this from the OpenSky api
-
                 // No flight? No go! (should not happen but just in case)
                 if (this.Flight == null)
                 {

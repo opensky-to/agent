@@ -8,6 +8,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 {
     using System;
     using System.Collections.Generic;
+    using System.Device.Location;
     using System.Diagnostics;
     using System.IO;
     using System.IO.Compression;
@@ -19,10 +20,11 @@ namespace OpenSky.AgentMSFS.SimConnect
     using JetBrains.Annotations;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.Models.API;
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -189,21 +191,21 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                         this.WarpInfo = "No [*]";
                         this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F2}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = value.PlaneName;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}"; 
+                        this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = value.Aircraft.Type.Name;
 
                         // Add airport markers to map
                         UpdateGUIDelegate addAirports = () =>
                         {
                             lock (this.trackingEventMarkers)
                             {
-                                var originMarker = new TrackingEventMarker(value.OriginCoordinates, value.OriginICAO, OpenSkyColors.OpenSkyTeal, Colors.White);
+                                var originMarker = new TrackingEventMarker(new GeoCoordinate(value.Origin.Latitude, value.Origin.Longitude), value.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                                 this.trackingEventMarkers.Add(originMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
-                                var alternateMarker = new TrackingEventMarker(value.AlternateCoordinates, value.AlternateICAO, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                                var alternateMarker = new TrackingEventMarker(new GeoCoordinate(value.Alternate.Latitude, value.Alternate.Longitude), value.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
                                 this.trackingEventMarkers.Add(alternateMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
-                                var destinationMarker = new TrackingEventMarker(value.DestinationCoordinates, value.DestinationICAO, OpenSkyColors.OpenSkyTeal, Colors.White);
+                                var destinationMarker = new TrackingEventMarker(new GeoCoordinate(value.Destination.Latitude, value.Destination.Longitude), value.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                                 this.trackingEventMarkers.Add(destinationMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
                             }
@@ -397,11 +399,6 @@ namespace OpenSky.AgentMSFS.SimConnect
         public void StopTracking(bool resumeLater)
         {
             Debug.WriteLine($"SimConnect asked to stop tracking...resume: {resumeLater}");
-            if (this.Flight != null)
-            {
-                this.Flight.Resume = resumeLater;
-                this.FlightChanged?.Invoke(this, this.Flight);
-            }
 
             this.TrackingStatus = this.Flight != null ? (this.Flight.Resume ? TrackingStatus.Resuming : TrackingStatus.Preparing) : TrackingStatus.NotTracking;
 
@@ -455,13 +452,13 @@ namespace OpenSky.AgentMSFS.SimConnect
                         lock (this.trackingEventMarkers)
                         {
                             // Add airport markers to map
-                            var originMarker = new TrackingEventMarker(this.Flight.OriginCoordinates, this.Flight.OriginICAO, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            var originMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Origin.Latitude, this.Flight.Origin.Longitude), this.Flight.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                             this.trackingEventMarkers.Add(originMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
-                            var alternateMarker = new TrackingEventMarker(this.Flight.AlternateCoordinates, this.Flight.AlternateICAO, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                            var alternateMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Alternate.Latitude, this.Flight.Alternate.Longitude), this.Flight.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
                             this.trackingEventMarkers.Add(alternateMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
-                            var destinationMarker = new TrackingEventMarker(this.Flight.DestinationCoordinates, this.Flight.DestinationICAO, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            var destinationMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Destination.Latitude, this.Flight.Destination.Longitude), this.Flight.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                             this.trackingEventMarkers.Add(destinationMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
                         }
@@ -514,7 +511,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
                 flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
-                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.FlightID}.save";
+                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
 
                 if (!File.Exists(saveFileName))
                 {
@@ -574,7 +571,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             try
             {
-                Debug.WriteLine($"Loading flight {this.Flight?.FlightID}");
+                Debug.WriteLine($"Loading flight {this.Flight?.Id}");
                 if (this.Flight == null)
                 {
                     throw new Exception("No flight loaded that could be restored!");
@@ -587,7 +584,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
                 flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
-                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.FlightID}.save";
+                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
 
                 if (!File.Exists(saveFileName))
                 {
@@ -653,7 +650,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.RefreshStructNow(Requests.PayloadStations);
                 Thread.Sleep(500);
 
-                Debug.WriteLine($"Saving flight {this.Flight?.FlightID}");
+                Debug.WriteLine($"Saving flight {this.Flight?.Id}");
                 var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
                 flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
                 if (!Directory.Exists(flightSaveDirectory))
@@ -666,7 +663,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (saveFile != null && this.Flight != null)
                 {
                     var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
-                    using (var fileStream = File.Create($"{flightSaveDirectory}\\opensky-flight-{this.Flight.FlightID}.save"))
+                    using (var fileStream = File.Create($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save"))
                     {
                         using (var gzip = new GZipStream(fileStream, CompressionMode.Compress))
                         {
@@ -675,7 +672,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
 
                     // todo remove this after testing
-                    File.WriteAllText($"{flightSaveDirectory}\\opensky-flight-{this.Flight.FlightID}.xml", $"{saveFile}");
+                    File.WriteAllText($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.xml", $"{saveFile}");
 
                     this.lastFlightLogAutoSave = DateTime.UtcNow;
                 }

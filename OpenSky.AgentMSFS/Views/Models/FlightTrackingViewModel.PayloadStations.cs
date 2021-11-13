@@ -124,7 +124,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void SuggestPayload()
         {
             Debug.WriteLine("Calculating suggested payload distribution");
-            var payloadToLoad = this.SimConnect.Flight?.PayloadPounds ?? 0.0;
+            var payloadToLoad = 0; // todo this.SimConnect.Flight?.PayloadPounds ?? 0.0;
 
             // Check for pilot/copilot first
             var nonPilotStations = 0;
@@ -143,13 +143,21 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
 
             // Distribute the rest evenly
-            var payloadShare = payloadToLoad / nonPilotStations;
-            for (var i = 0; i < this.SimConnect.PayloadStations.Count; i++)
+            if (nonPilotStations == 0)
             {
-                if (!this.SimConnect.PayloadStations.Names[i].Contains("PILOT"))
+                nonPilotStations = this.SimConnect.PayloadStations.Count;
+            }
+
+            if (nonPilotStations > 0)
+            {
+                var payloadShare = payloadToLoad / nonPilotStations;
+                for (var i = 0; i < this.SimConnect.PayloadStations.Count; i++)
                 {
-                    this.PayloadStationWeights[i] = payloadShare;
-                    payloadToLoad -= payloadShare;
+                    if (!this.SimConnect.PayloadStations.Names[i].Contains("PILOT"))
+                    {
+                        this.PayloadStationWeights[i] = payloadShare;
+                        payloadToLoad -= payloadShare;
+                    }
                 }
             }
 

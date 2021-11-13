@@ -4,13 +4,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Models.API
+// ReSharper disable once CheckNamespace
+namespace OpenSkyApi
 {
     using System;
     using System.Diagnostics;
     using System.Xml.Linq;
 
     using JetBrains.Annotations;
+
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -20,7 +22,60 @@ namespace OpenSky.AgentMSFS.Models.API
     /// sushi.at, 01/04/2021.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public static class FlightExtensions
+    public partial class Flight
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether the flight can resume (all necessary parameters are present).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool Resume
+        {
+            get
+            {
+                // Fuel tanks have values?
+                if (!this.FuelTankCenterQuantity.HasValue || !this.FuelTankCenter2Quantity.HasValue || !this.FuelTankCenter3Quantity.HasValue || !this.FuelTankLeftMainQuantity.HasValue || !this.FuelTankLeftAuxQuantity.HasValue ||
+                    !this.FuelTankLeftTipQuantity.HasValue || !this.FuelTankRightMainQuantity.HasValue || !this.FuelTankRightTipQuantity.HasValue || !this.FuelTankExternal1Quantity.HasValue || !this.FuelTankExternal2Quantity.HasValue)
+                {
+                    return false;
+                }
+
+                // todo check payload stations
+
+                if (!this.Latitude.HasValue || !this.Longitude.HasValue || !this.RadioHeight.HasValue || !this.Heading.HasValue || !this.AirspeedTrue.HasValue)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the total payload pounds.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double PayloadPounds
+        {
+            get
+            {
+                // todo sum up the total payloads to be transported
+
+                return 0;
+            }
+        }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Flight extension methods.
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 13/11/2021.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class FlightExtensionMethods
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -42,10 +97,10 @@ namespace OpenSky.AgentMSFS.Models.API
         public static void CheckSaveMatchesFlight(this Flight flight, XElement flightFromSave)
         {
             var flightID = flightFromSave.EnsureChildElement("ID");
-            var planeIdentifier = flightFromSave.EnsureChildElement("PlaneIdentifierHash");
+            var planeRegistry = flightFromSave.EnsureChildElement("PlaneRegistry");
             var atcType = flightFromSave.EnsureChildElement("AtcType");
             var atcModel = flightFromSave.EnsureChildElement("AtcModel");
-            if (flight.FlightID != int.Parse(flightID.Value) || !flight.PlaneIdentifier.Equals(planeIdentifier.Value) || !flight.AtcType.Equals(atcType.Value) || !flight.AtcModel.Equals(atcModel.Value))
+            if (flight.Id != Guid.Parse(flightID.Value) || !flight.Aircraft.Registry.Equals(planeRegistry.Value) || !flight.Aircraft.Type.AtcType.Equals(atcType.Value) || !flight.Aircraft.Type.AtcModel.Equals(atcModel.Value))
             {
                 Debug.WriteLine("Flight basics mismatch");
 
@@ -55,8 +110,8 @@ namespace OpenSky.AgentMSFS.Models.API
 
             // Origin check
             var origin = flightFromSave.EnsureChildElement("Origin");
-            if (!flight.OriginICAO.Equals(origin.Attribute("ICAO")?.Value) || Math.Abs(flight.OriginCoordinates.Latitude - double.Parse(origin.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
-                Math.Abs(flight.OriginCoordinates.Longitude - double.Parse(origin.Attribute("Lon")?.Value ?? "-1")) > 0.01)
+            if (!flight.Origin.Icao.Equals(origin.Attribute("ICAO")?.Value) || Math.Abs(flight.Origin.Latitude - double.Parse(origin.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
+                Math.Abs(flight.Origin.Longitude - double.Parse(origin.Attribute("Lon")?.Value ?? "-1")) > 0.01)
             {
                 Debug.WriteLine("Origin mismatch");
 
@@ -66,8 +121,8 @@ namespace OpenSky.AgentMSFS.Models.API
 
             // Destination check
             var destination = flightFromSave.EnsureChildElement("Destination");
-            if (!flight.DestinationICAO.Equals(destination.Attribute("ICAO")?.Value) || Math.Abs(flight.DestinationCoordinates.Latitude - double.Parse(destination.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
-                Math.Abs(flight.DestinationCoordinates.Longitude - double.Parse(destination.Attribute("Lon")?.Value ?? "-1")) > 0.01)
+            if (!flight.Destination.Icao.Equals(destination.Attribute("ICAO")?.Value) || Math.Abs(flight.Destination.Latitude - double.Parse(destination.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
+                Math.Abs(flight.Destination.Longitude - double.Parse(destination.Attribute("Lon")?.Value ?? "-1")) > 0.01)
             {
                 Debug.WriteLine("Destination mismatch");
 
@@ -77,8 +132,8 @@ namespace OpenSky.AgentMSFS.Models.API
 
             // Alternate check
             var alternate = flightFromSave.EnsureChildElement("Alternate");
-            if (!flight.AlternateICAO.Equals(alternate.Attribute("ICAO")?.Value) || Math.Abs(flight.AlternateCoordinates.Latitude - double.Parse(alternate.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
-                Math.Abs(flight.AlternateCoordinates.Longitude - double.Parse(alternate.Attribute("Lon")?.Value ?? "-1")) > 0.01)
+            if (!flight.Alternate.Icao.Equals(alternate.Attribute("ICAO")?.Value) || Math.Abs(flight.Alternate.Latitude - double.Parse(alternate.Attribute("Lat")?.Value ?? "-1")) > 0.01 ||
+                Math.Abs(flight.Alternate.Longitude - double.Parse(alternate.Attribute("Lon")?.Value ?? "-1")) > 0.01)
             {
                 Debug.WriteLine("Alternate mismatch");
 
@@ -89,7 +144,7 @@ namespace OpenSky.AgentMSFS.Models.API
             // Payload/fuel check
             var payload = flightFromSave.EnsureChildElement("PayloadPounds");
             var fuelGallons = flightFromSave.EnsureChildElement("FuelGallons");
-            if (Math.Abs(flight.PayloadPounds - double.Parse(payload.Value)) > 0.01 || Math.Abs(flight.FuelGallons - double.Parse(fuelGallons.Value)) > 0.01)
+            if (Math.Abs(flight.PayloadPounds - double.Parse(payload.Value)) > 0.01 || Math.Abs(flight.FuelGallons ?? 0 - double.Parse(fuelGallons.Value)) > 0.01)
             {
                 Debug.WriteLine("Starting fuel/payload mismatch");
 
@@ -148,37 +203,36 @@ namespace OpenSky.AgentMSFS.Models.API
         public static XElement GenerateFlightForSave(this Flight flight)
         {
             var flightElement = new XElement("Flight");
-            flightElement.Add(new XElement("ID", $"{flight.FlightID}"));
-            flightElement.Add(new XElement("PlaneName", $"{flight.PlaneName}"));
-            flightElement.Add(new XElement("PlaneIdentifierHash", $"{flight.PlaneIdentifier}"));
-            flightElement.Add(new XElement("AtcType", $"{flight.AtcType}"));
-            flightElement.Add(new XElement("AtcModel", $"{flight.AtcModel}"));
+            flightElement.Add(new XElement("ID", $"{flight.Id}"));
+            flightElement.Add(new XElement("PlaneRegistry", $"{flight.Aircraft.Registry}"));
+            flightElement.Add(new XElement("AtcType", $"{flight.Aircraft.Type.AtcType}"));
+            flightElement.Add(new XElement("AtcModel", $"{flight.Aircraft.Type.AtcModel}"));
             flightElement.Add(new XElement("UtcOffset", $"{flight.UtcOffset:F1}"));
 
             var origin = new XElement("Origin");
             flightElement.Add(origin);
-            origin.SetAttributeValue("ICAO", $"{flight.OriginICAO}");
-            origin.SetAttributeValue("Name", $"{flight.Origin}");
-            origin.SetAttributeValue("Lat", $"{flight.OriginCoordinates.Latitude}");
-            origin.SetAttributeValue("Lon", $"{flight.OriginCoordinates.Longitude}");
+            origin.SetAttributeValue("ICAO", $"{flight.Origin.Icao}");
+            origin.SetAttributeValue("Name", $"{flight.Origin.Name}");
+            origin.SetAttributeValue("Lat", $"{flight.Origin.Latitude}");
+            origin.SetAttributeValue("Lon", $"{flight.Origin.Longitude}");
 
             var destination = new XElement("Destination");
             flightElement.Add(destination);
-            destination.SetAttributeValue("ICAO", $"{flight.DestinationICAO}");
-            destination.SetAttributeValue("Name", $"{flight.Destination}");
-            destination.SetAttributeValue("Lat", $"{flight.DestinationCoordinates.Latitude}");
-            destination.SetAttributeValue("Lon", $"{flight.DestinationCoordinates.Longitude}");
+            destination.SetAttributeValue("ICAO", $"{flight.Destination.Icao}");
+            destination.SetAttributeValue("Name", $"{flight.Destination.Name}");
+            destination.SetAttributeValue("Lat", $"{flight.Destination.Latitude}");
+            destination.SetAttributeValue("Lon", $"{flight.Destination.Longitude}");
 
             var alternate = new XElement("Alternate");
             flightElement.Add(alternate);
-            alternate.SetAttributeValue("ICAO", $"{flight.AlternateICAO}");
-            alternate.SetAttributeValue("Name", $"{flight.Alternate}");
-            alternate.SetAttributeValue("Lat", $"{flight.AlternateCoordinates.Latitude}");
-            alternate.SetAttributeValue("Lon", $"{flight.AlternateCoordinates.Longitude}");
+            alternate.SetAttributeValue("ICAO", $"{flight.Alternate.Icao}");
+            alternate.SetAttributeValue("Name", $"{flight.Alternate.Name}");
+            alternate.SetAttributeValue("Lat", $"{flight.Alternate.Latitude}");
+            alternate.SetAttributeValue("Lon", $"{flight.Alternate.Longitude}");
 
             flightElement.Add(new XElement("FuelGallons", $"{flight.FuelGallons:F2}"));
-            flightElement.Add(new XElement("Payload", $"{flight.Payload}"));
-            flightElement.Add(new XElement("PayloadPounds", $"{flight.PayloadPounds}"));
+            flightElement.Add(new XElement("Payload", "None")); // todo add payload once we have it
+            flightElement.Add(new XElement("PayloadPounds", $"{flight.PayloadPounds:F2}"));
 
             return flightElement;
         }
