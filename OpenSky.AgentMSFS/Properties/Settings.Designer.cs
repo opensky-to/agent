@@ -37,30 +37,6 @@ namespace OpenSky.AgentMSFS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string BingMapsKey {
-            get {
-                return ((string)(this["BingMapsKey"]));
-            }
-            set {
-                this["BingMapsKey"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SimBriefUsername {
-            get {
-                return ((string)(this["SimBriefUsername"]));
-            }
-            set {
-                this["SimBriefUsername"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
         public string SimulatorHostName {
             get {

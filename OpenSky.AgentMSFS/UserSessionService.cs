@@ -387,5 +387,43 @@ namespace OpenSky.AgentMSFS
 
             this.CheckTokenNeedsRefresh();
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the linked accounts.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public LinkedAccounts LinkedAccounts { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Refresh linked accounts.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/11/2021.
+        /// </remarks>
+        /// <returns>
+        /// An asynchronous result that yields true if it succeeds, false if it fails.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public async Task<bool> RefreshLinkedAccounts()
+        {
+            try
+            {
+                var result = await OpenSkyService.Instance.GetLinkedAccountsAsync();
+                if (!result.IsError)
+                {
+                    this.LinkedAccounts = result.Data;
+                }
+
+                return !result.IsError;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error refreshing linked accounts! {ex}");
+                this.LinkedAccounts = null;
+                return false;
+            }
+        }
     }
 }

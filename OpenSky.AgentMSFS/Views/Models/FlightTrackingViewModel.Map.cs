@@ -16,8 +16,6 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Windows.Controls;
     using System.Xml.Linq;
 
-    using OpenSky.AgentMSFS.Properties;
-
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.AgentMSFS.Models;
@@ -243,9 +241,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                 try
                 {
                     Debug.WriteLine("Importing sim brief flight plan waypoints");
-                    if (string.IsNullOrWhiteSpace(Settings.Default.SimBriefUsername))
+                    if (string.IsNullOrEmpty(UserSessionService.Instance.LinkedAccounts?.SimbriefUsername))
                     {
-                        throw new Exception("No Simbrief user name configured!");
+                        throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
                     }
 
                     if (this.SimConnect.Flight == null)
@@ -253,7 +251,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         throw new Exception("No flight loaded!");
                     }
 
-                    var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={Settings.Default.SimBriefUsername}");
+                    var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={UserSessionService.Instance.LinkedAccounts?.SimbriefUsername}");
 
                     var ofp = XElement.Parse(xml);
                     var originICAO = (string)ofp.Element("origin")?.Element("icao_code");

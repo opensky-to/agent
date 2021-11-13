@@ -156,7 +156,7 @@ namespace OpenSky.AgentMSFS.Views
         private void FlightTrackingLoaded(object sender, RoutedEventArgs e)
         {
             // Configure map view
-            this.MapView.CredentialsProvider = new ApplicationIdCredentialsProvider(Properties.Settings.Default.BingMapsKey);
+            this.MapView.CredentialsProvider = new ApplicationIdCredentialsProvider(UserSessionService.Instance.LinkedAccounts?.BingMapsKey);
             this.AddAircraftAndTrailsToMap();
 
             // Add fuel tank controls
