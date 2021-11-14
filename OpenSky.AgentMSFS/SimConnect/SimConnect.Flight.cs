@@ -274,6 +274,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         Debug.WriteLine("Preparing to track resumed flight");
                         this.TrackingStatus = TrackingStatus.Resuming;
+                        this.CheckCloudSave();
                         this.LoadFlight();
                     }
                 }
@@ -487,8 +488,22 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.lastAutoSaveUpload = DateTime.MinValue;
 
                 this.DeleteSaveFile();
-
-                // todo delete any cloud saves?
+                if (this.Flight != null)
+                {
+                    // Abort flight
+                    try
+                    {
+                        var result = OpenSkyService.Instance.AbortFlightAsync(this.Flight.Id).Result;
+                        if (result.IsError)
+                        {
+                            Debug.WriteLine("Error aborting flight on OpenSky: " + result.Message + "\r\n" + result.ErrorDetails);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error aborting flight on OpenSky: " + ex);
+                    }
+                }
 
                 UpdateGUIDelegate resetMarkersAndEvents = () =>
                 {
@@ -530,10 +545,8 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 this.SaveFlight();
                 this.Speech.SpeakAsync("Flight saved.");
-
-                // todo make sure we update the last know location on the api
-
-                // todo cloud save
+                this.UploadPositionReport();
+                this.UploadAutoSave();
 
                 this.flightLoadingTempStructs = new FlightLoadingTempStructs
                 {
@@ -618,6 +631,89 @@ namespace OpenSky.AgentMSFS.SimConnect
             Thread.Sleep(10 * 1000);
 
             this.Flight = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Check if there is a (newer) cloud save for this flight.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CheckCloudSave()
+        {
+            Debug.WriteLine($"Checking if cloud-save for flight {this.Flight?.Id} is more recent than local save...");
+            try
+            {
+                if (this.Flight == null)
+                {
+                    throw new Exception("No flight loaded that could be restored!");
+                }
+
+                if (!this.Flight.HasAutoSaveLog || !this.Flight.LastAutoSave.HasValue)
+                {
+                    // Flight has no cloud-save
+                    return;
+                }
+
+                if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                {
+                    throw new Exception("Timeout waiting for save flight mutex.");
+                }
+
+                var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
+                flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
+                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
+
+                var downloadCloudSave = false;
+                if (!File.Exists(saveFileName))
+                {
+                    downloadCloudSave = true;
+                }
+                else
+                {
+                    var localSaveTime = File.GetLastWriteTimeUtc(saveFileName);
+                    if (this.Flight.LastAutoSave.Value.UtcDateTime > localSaveTime)
+                    {
+                        downloadCloudSave = true;
+                    }
+                }
+
+                if (downloadCloudSave)
+                {
+                    var result = OpenSkyService.Instance.DownloadFlightAutoSaveAsync(this.Flight.Id).Result;
+                    if (!result.IsError)
+                    {
+                        var base64 = result.Data;
+                        if (base64 != null)
+                        {
+                            var binary = Convert.FromBase64String(base64);
+                            File.WriteAllBytes(saveFileName, binary);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Error downloading cloud save: " + result.Message + "\r\n" + result.ErrorDetails);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error downloading cloud save: " + ex);
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    this.flightSaveMutex.ReleaseMutex();
+                }
+                catch
+                {
+                    // Ignore
+                }
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -773,7 +869,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.SaveFlight" }.Start();
+            { Name = "SimConnect.Flight.SaveFlight" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -890,7 +986,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             var bytes = File.ReadAllBytes(saveFileName);
                             var base64String = Convert.ToBase64String(bytes);
 
-                            var result = OpenSkyService.Instance.AutoSaveAsync(this.Flight.Id, base64String).Result;
+                            var result = OpenSkyService.Instance.UploadFlightAutoSaveAsync(this.Flight.Id, base64String).Result;
                             if (!result.IsError)
                             {
                                 this.lastAutoSaveUpload = DateTime.UtcNow;
@@ -925,7 +1021,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
+            { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1010,7 +1106,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
+            { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
         }
     }
 }

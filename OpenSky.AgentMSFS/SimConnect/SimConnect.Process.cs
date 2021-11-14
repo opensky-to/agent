@@ -384,13 +384,20 @@ namespace OpenSky.AgentMSFS.SimConnect
                     // Did the fuel go up?
                     if (newWB.FuelTotalQuantity > oldWB.FuelTotalQuantity)
                     {
-                        Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                        player.Play();
-                        this.Speech.SpeakAsync("Tracking aborted, fuel increased.");
-                        this.StopTracking(false);
-                        this.fsConnect.SetText("OpenSky Warning: Tracking aborted, fuel increased.", 5);
+                        if (newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity > 1.0)
+                        {
+                            Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
+                            var assembly = Assembly.GetExecutingAssembly();
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            player.Play();
+                            this.Speech.SpeakAsync("Tracking aborted, fuel increased.");
+                            this.StopTracking(false);
+                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, fuel increased.", 5);
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"Small fuel jump detected: {(newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity)} gallons");
+                        }
                     }
 
                     // Is the payload weight different from the flight?

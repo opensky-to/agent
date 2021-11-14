@@ -45,10 +45,24 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string loadingText;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The no flight visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private Visibility noFlightVisibility = Visibility.Collapsed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The ofp visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private Visibility ofpVisibility = Visibility.Collapsed;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -63,6 +77,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private string showHideAdvancedWeightAndBalanceButtonText = "Show advanced";
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The show hide ofp button text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string showHideOFPButtonText = "Show OFP";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -148,6 +169,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.ImportSimbriefCommand = new AsynchronousCommand(this.ImportSimbrief, false);
             this.MoveMapToCoordinateCommand = new Command(this.MoveMapToCoordinate);
             this.SlewIntoPositionCommand = new AsynchronousCommand(this.SlewIntoPosition);
+            this.ToggleOfpCommand = new Command(this.ToggleOfp);
 
             // Are we already preparing/resuming/tracking?
             this.SimConnectTrackingStatusChanged(this, this.SimConnect.TrackingStatus);
@@ -216,6 +238,27 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string LoadingText
+        {
+            get => this.loadingText;
+
+            set
+            {
+                if (Equals(this.loadingText, value))
+                {
+                    return;
+                }
+
+                this.loadingText = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the no flight visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -232,6 +275,28 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 this.noFlightVisibility = value;
                 this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the ofp visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Visibility OfpVisibility
+        {
+            get => this.ofpVisibility;
+
+            set
+            {
+                if (Equals(this.ofpVisibility, value))
+                {
+                    return;
+                }
+
+                this.ofpVisibility = value;
+                this.NotifyPropertyChanged();
+                this.ShowHideOFPButtonText = value == Visibility.Collapsed ? "Show OFP" : "Hide OFP";
             }
         }
 
@@ -280,6 +345,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.showHideAdvancedWeightAndBalanceButtonText = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the show hide ofp button text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string ShowHideOFPButtonText
+        {
+            get => this.showHideOFPButtonText;
+
+            set
+            {
+                if (Equals(this.showHideOFPButtonText, value))
+                {
+                    return;
+                }
+
+                this.showHideOFPButtonText = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -347,6 +433,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command ToggleFlightPauseCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the toggle ofp command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ToggleOfpCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -435,36 +528,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The loading text.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string loadingText;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the loading text.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string LoadingText
-        {
-            get => this.loadingText;
-
-            set
-            {
-                if (Equals(this.loadingText, value))
-                {
-                    return;
-                }
-
-                this.loadingText = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Abort the current flight.
         /// </summary>
         /// <remarks>
@@ -488,7 +551,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                         "Cancel flight?",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
-                }, true);
+                },
+                true);
 
             if (answer == MessageBoxResult.Yes)
             {
@@ -527,7 +591,6 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     this.LoadingText = null;
                 }
-
             }
         }
 
@@ -948,6 +1011,20 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             Debug.WriteLine("Toggling simconnect flight pause");
             this.SimConnect.Pause(!this.SimConnect.IsPaused);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Toggle OFP visibility.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ToggleOfp()
+        {
+            Debug.WriteLine("OFP toggled");
+            this.OfpVisibility = this.OfpVisibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

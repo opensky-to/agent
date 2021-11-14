@@ -2062,6 +2062,112 @@
         }
       }
     },
+    "/Flight/autoSave/{flightID}": {
+      "get": {
+        "tags": [
+          "Flight"
+        ],
+        "summary": "Download flight auto-save.",
+        "description": "sushi.at, 14/11/2021.",
+        "operationId": "DownloadFlightAutoSave",
+        "parameters": [
+          {
+            "name": "flightID",
+            "in": "path",
+            "description": "Identifier for the flight (plan).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Flight"
+        ],
+        "summary": "Upload auto-save flight log for the specified flight.",
+        "description": "sushi.at, 13/11/2021.",
+        "operationId": "UploadFlightAutoSave",
+        "parameters": [
+          {
+            "name": "flightID",
+            "in": "path",
+            "description": "Identifier for the flight.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The auto-save (base64 encoded).",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Flight": {
       "get": {
         "tags": [
@@ -2370,69 +2476,6 @@
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Flight/autoSave/{flightID}": {
-      "post": {
-        "tags": [
-          "Flight"
-        ],
-        "summary": "Upload auto-save flight log for the specified flight.",
-        "description": "sushi.at, 13/11/2021.",
-        "parameters": [
-          {
-            "name": "flightID",
-            "in": "path",
-            "description": "Identifier for the flight.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "The auto-save (base64 encoded).",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "string"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "string"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
