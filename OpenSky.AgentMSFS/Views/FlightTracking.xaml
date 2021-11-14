@@ -299,6 +299,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -319,6 +320,15 @@
                 <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding SimConnect.PayloadLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
                     <Rectangle Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="1.5" RadiusY="1.5" />
                     <TextBlock Foreground="#404040" Margin="5">Payload loading complete</TextBlock>
+                </Grid>
+
+                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,1" Visibility="{Binding SkipGroundHandlingVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,3,0" Command="{Binding SpeedUpGroundHandlingCommand}">Skip half</Button>
+                    <Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,0,0,0" Command="{Binding SkipGroundHandlingCommand}">Skip</Button>
                 </Grid>
             </Grid>
         </GroupBox>

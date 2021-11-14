@@ -7,10 +7,12 @@
 namespace OpenSky.AgentMSFS.SimConnect
 {
     using System;
+    using System.Device.Location;
     using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
     using System.Windows;
+    using System.Windows.Media;
     using System.Xml.Linq;
 
     using Microsoft.Maps.MapControl.WPF;
@@ -94,6 +96,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             this.trackingStarted = DateTime.ParseExact(save.EnsureChildElement("TrackingStarted").Value, "O", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
             this.WasAirborne = bool.Parse(save.EnsureChildElement("WasAirborne").Value);
             this.timeSavedBecauseOfSimRate = TimeSpan.Parse(save.EnsureChildElement("WarpTimeSaved").Value);
+            this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
             this.totalPaused = TimeSpan.Parse(save.EnsureChildElement("TotalPaused").Value);
 
             // Restore aircraft trail locations
@@ -115,6 +118,23 @@ namespace OpenSky.AgentMSFS.SimConnect
                 lock (this.trackingEventMarkers)
                 {
                     this.trackingEventMarkers.Clear();
+
+                    // Add airport markers to map
+                    var origin = flightFromSave.EnsureChildElement("Origin");
+                    var originMarker = new TrackingEventMarker(new GeoCoordinate(double.Parse(origin.Attribute("Lat")?.Value ?? "0"), double.Parse(origin.Attribute("Lon")?.Value ?? "0")), origin.Attribute("ICAO")?.Value, OpenSkyColors.OpenSkyTeal, Colors.White);
+                    this.trackingEventMarkers.Add(originMarker);
+                    this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
+
+                    var alternate = flightFromSave.EnsureChildElement("Alternate");
+                    var alternateMarker = new TrackingEventMarker(new GeoCoordinate(double.Parse(alternate.Attribute("Lat")?.Value ?? "0"), double.Parse(alternate.Attribute("Lon")?.Value ?? "0")), alternate.Attribute("ICAO")?.Value, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                    this.trackingEventMarkers.Add(alternateMarker);
+                    this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
+
+                    var destination = flightFromSave.EnsureChildElement("Destination");
+                    var destinationMarker = new TrackingEventMarker(new GeoCoordinate(double.Parse(destination.Attribute("Lat")?.Value ?? "0"), double.Parse(destination.Attribute("Lon")?.Value ?? "0")), destination.Attribute("ICAO")?.Value, OpenSkyColors.OpenSkyTeal, Colors.White);
+                    this.trackingEventMarkers.Add(destinationMarker);
+                    this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
+
                     foreach (var marker in eventMapMarkers.Elements("Marker"))
                     {
                         this.trackingEventMarkers.Add(new TrackingEventMarker(marker));

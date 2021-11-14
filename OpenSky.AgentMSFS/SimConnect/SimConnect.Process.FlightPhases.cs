@@ -408,7 +408,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
             {
-                // todo save pre-crash flight phase to submit as part of crash report?
+                // todo save pre-crash flight phase to submit as part of crash report? implement this in the systems section?
 
                 if (unknownFlightPhase)
                 {
