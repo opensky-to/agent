@@ -2018,6 +2018,58 @@
         }
       }
     },
+    "/Flight/complete": {
+      "post": {
+        "tags": [
+          "Flight"
+        ],
+        "summary": "Upload final save and complete flight.",
+        "description": "sushi.at, 14/11/2021.",
+        "operationId": "CompleteFlight",
+        "requestBody": {
+          "description": "The final report.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinalReport"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinalReport"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinalReport"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Flight/flightPlan/{flightID}": {
       "delete": {
         "tags": [
@@ -4469,6 +4521,21 @@
           "Unsupported",
           "Turboprop"
         ]
+      },
+      "FinalReport": {
+        "type": "object",
+        "properties": {
+          "finalPositionReport": {
+            "$ref": "#/components/schemas/PositionReport"
+          },
+          "flightLog": {
+            "type": "string",
+            "description": "Gets or sets the flight log (final save).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Flight final report model."
       },
       "Flight": {
         "required": [

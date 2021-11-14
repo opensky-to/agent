@@ -622,15 +622,99 @@ namespace OpenSky.AgentMSFS.SimConnect
         private void FinishUpFlightTracking()
         {
             Debug.WriteLine("SimConnect finishing up flight tracking started");
-            this.UploadPositionReport();
             this.SaveFlight();
 
-            // todo submit final save file
+            if (this.Flight != null)
+            {
+                try
+                {
+                    var positionReport = new PositionReport
+                    {
+                        Id = this.Flight.Id,
+                        AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
+                        Altitude = this.PrimaryTracking.Altitude,
+                        BankAngle = this.PrimaryTracking.BankAngle,
+                        FlightPhase = this.FlightPhase,
+                        GroundSpeed = this.PrimaryTracking.GroundSpeed,
+                        Heading = this.PrimaryTracking.Heading,
+                        Latitude = this.PrimaryTracking.Latitude,
+                        Longitude = this.PrimaryTracking.Longitude,
+                        OnGround = this.PrimaryTracking.OnGround,
+                        PitchAngle = this.PrimaryTracking.PitchAngle,
+                        RadioHeight = this.PrimaryTracking.RadioHeight,
+                        VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
+                        TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
 
-            // Sleep 10 seconds for now to simulate backend upload and processing
-            Thread.Sleep(10 * 1000);
+                        FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
+                        FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
+                        FuelTankCenter3Quantity = this.FuelTanks.FuelTankCenter3Quantity,
+                        FuelTankLeftMainQuantity = this.FuelTanks.FuelTankLeftMainQuantity,
+                        FuelTankLeftAuxQuantity = this.FuelTanks.FuelTankLeftAuxQuantity,
+                        FuelTankLeftTipQuantity = this.FuelTanks.FuelTankLeftTipQuantity,
+                        FuelTankRightMainQuantity = this.FuelTanks.FuelTankRightMainQuantity,
+                        FuelTankRightAuxQuantity = this.FuelTanks.FuelTankRightAuxQuantity,
+                        FuelTankRightTipQuantity = this.FuelTanks.FuelTankRightTipQuantity,
+                        FuelTankExternal1Quantity = this.FuelTanks.FuelTankExternal1Quantity,
+                        FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
+                    };
+
+                    if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                    {
+                        throw new Exception("Timeout waiting for save flight mutex.");
+                    }
+
+                    var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
+                    flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
+                    var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
+
+                    if (!File.Exists(saveFileName))
+                    {
+                        throw new Exception("Unable find save file: " + saveFileName);
+                    }
+
+                    var bytes = File.ReadAllBytes(saveFileName);
+                    var base64String = Convert.ToBase64String(bytes);
+
+                    var finalReport = new FinalReport
+                    {
+                        FinalPositionReport = positionReport,
+                        FlightLog = base64String
+                    };
+
+                    var result = OpenSkyService.Instance.CompleteFlightAsync(finalReport).Result;
+                    if (result.IsError)
+                    {
+                        Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
+                    }
+                }
+                catch (AbandonedMutexException)
+                {
+                    // Ignore
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error submitting final flight report: " + ex);
+                }
+                finally
+                {
+                    try
+                    {
+                        this.flightSaveMutex.ReleaseMutex();
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("CRITICAL: Unable to finish up flight tracking and submitting final log because SimConnect.Flight is NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+
 
             this.Flight = null;
+            this.StopTracking(false);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -762,7 +846,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.RestoreSaveFile(saveFile);
 
                 this.lastFlightLogAutoSave = DateTime.UtcNow;
-                this.lastAutoSaveUpload = DateTime.UtcNow; // todo only reset if we restored a cloud save, if it was a local one let it upload
             }
             catch (Exception ex)
             {
@@ -843,6 +926,10 @@ namespace OpenSky.AgentMSFS.SimConnect
                                 this.lastFlightLogAutoSave = DateTime.UtcNow;
                             }
                         }
+                        catch (AbandonedMutexException)
+                        {
+                            // Ignore
+                        }
                         catch (Exception ex)
                         {
                             Debug.WriteLine("Error saving flight: " + ex);
@@ -900,7 +987,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (Math.Abs(ppt.Old.SimulationRate - ppt.New.SimulationRate) > 0)
                 {
                     Debug.WriteLine($"SimRate changed to {ppt.New.SimulationRate}");
-                    this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
                     this.AddTrackingEvent(ppt.New, this.SecondaryTracking, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
 
                     // Was there an active simrate above 1?
@@ -917,6 +1003,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.lastActiveSimRate = ppt.New.SimulationRate;
                         this.lastActiveSimRateActivated = DateTime.UtcNow;
                     }
+
+                    this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
                 }
 
                 // todo Check if user has paused the sim (but didn't use the pause button we provide) ... check if lat/lon isn't changing while in flight
@@ -995,6 +1083,10 @@ namespace OpenSky.AgentMSFS.SimConnect
                             {
                                 Debug.WriteLine("Error uploading auto-save: " + result.Message + "\r\n" + result.ErrorDetails);
                             }
+                        }
+                        catch (AbandonedMutexException)
+                        {
+                            // Ignore
                         }
                         catch (Exception ex)
                         {
@@ -1089,6 +1181,10 @@ namespace OpenSky.AgentMSFS.SimConnect
                             {
                                 Debug.WriteLine("Error uploading position report: " + result.Message + "\r\n" + result.ErrorDetails);
                             }
+                        }
+                        catch (AbandonedMutexException)
+                        {
+                            // Ignore
                         }
                         catch (Exception ex)
                         {

@@ -384,7 +384,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     // Did the fuel go up?
                     if (newWB.FuelTotalQuantity > oldWB.FuelTotalQuantity)
                     {
-                        if (newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity > 1.0)
+                        if (newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity > 0.5)
                         {
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
                             var assembly = Assembly.GetExecutingAssembly();
@@ -396,20 +396,27 @@ namespace OpenSky.AgentMSFS.SimConnect
                         }
                         else
                         {
-                            Debug.WriteLine($"Small fuel jump detected: {(newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity)} gallons");
+                            Debug.WriteLine($"Small fuel jump detected: {newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity} gallons");
                         }
                     }
 
                     // Is the payload weight different from the flight?
-                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 2) > 1)
+                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) > 1)
                     {
-                        Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                        player.Play();
-                        this.Speech.SpeakAsync("Tracking aborted, payload changed.");
-                        this.StopTracking(false);
-                        this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                        if (newWB.PayloadWeight > (this.Flight?.PayloadPounds ?? 0) && Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) < 100)
+                        {
+                            Debug.WriteLine($"Small payload jump detected: {newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0} lbs");
+                        }
+                        else
+                        {
+                            Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
+                            var assembly = Assembly.GetExecutingAssembly();
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            player.Play();
+                            this.Speech.SpeakAsync("Tracking aborted, payload changed.");
+                            this.StopTracking(false);
+                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                        }
                     }
                 }
             }
