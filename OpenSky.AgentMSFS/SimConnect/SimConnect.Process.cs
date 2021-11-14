@@ -237,8 +237,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             while (!this.close)
             {
-                ProcessLandingAnalysis pla;
-                while (this.landingAnalysisProcessingQueue.TryDequeue(out pla))
+                while (this.landingAnalysisProcessingQueue.TryDequeue(out var pla))
                 {
                     try
                     {
@@ -297,8 +296,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             while (!this.close)
             {
                 Location newLocation = null;
-                ProcessPrimaryTracking ppt;
-                while (this.primaryTrackingProcessingQueue.TryDequeue(out ppt))
+                while (this.primaryTrackingProcessingQueue.TryDequeue(out var ppt))
                 {
                     try
                     {
@@ -344,8 +342,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             while (!this.close)
             {
-                ProcessSecondaryTracking pst;
-                while (this.secondaryTrackingProcessingQueue.TryDequeue(out pst))
+                while (this.secondaryTrackingProcessingQueue.TryDequeue(out var pst))
                 {
                     try
                     {

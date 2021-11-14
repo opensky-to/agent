@@ -40,10 +40,32 @@ namespace OpenSky.AgentMSFS.SimConnect
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The auto-save upload mutex.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly Mutex autoSaveUploadMutex = new(false);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The flight auto-save primary tracking mutex (to prevent multiple threads saving if it takes
+        /// longer than 50ms), to prevent holding up the primary tracking queue processing.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly Mutex flightAutoSaveTrackFlightMutex = new(false);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The flight save mutex.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private readonly Mutex flightSaveMutex = new(false);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The position report upload mutex.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly Mutex positionReportUploadMutex = new(false);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -69,10 +91,24 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// When was the last auto-save uploaded successfully?
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastAutoSaveUpload = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// When did we auto-save the flight log the last time?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private DateTime lastFlightLogAutoSave = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// When was the last position report uploaded successfully?
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastPositionReportUpload = DateTime.MinValue;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -217,7 +253,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         // Add simbrief navlog to map
                         UpdateGUIDelegate addNavlog = () =>
                         {
-                            if (value.NavlogFixes.Count > 0)
+                            if (value.NavlogFixes?.Count > 0)
                             {
                                 this.SimbriefOfpLoaded = true;
                                 foreach (var flightNavlogFix in value.NavlogFixes)
@@ -447,6 +483,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.PauseInfo = string.Empty;
                 this.totalPaused = TimeSpan.Zero;
                 this.lastFlightLogAutoSave = DateTime.MinValue;
+                this.lastPositionReportUpload = DateTime.MinValue;
+                this.lastAutoSaveUpload = DateTime.MinValue;
 
                 this.DeleteSaveFile();
 
@@ -571,6 +609,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         private void FinishUpFlightTracking()
         {
             Debug.WriteLine("SimConnect finishing up flight tracking started");
+            this.UploadPositionReport();
             this.SaveFlight();
 
             // todo submit final save file
@@ -627,6 +666,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.RestoreSaveFile(saveFile);
 
                 this.lastFlightLogAutoSave = DateTime.UtcNow;
+                this.lastAutoSaveUpload = DateTime.UtcNow; // todo only reset if we restored a cloud save, if it was a local one let it upload
             }
             catch (Exception ex)
             {
@@ -656,65 +696,84 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         private void SaveFlight()
         {
-            try
+            if (this.Flight == null)
             {
-                if (this.Flight == null)
-                {
-                    throw new Exception("No flight loaded that could be saved.");
-                }
+                throw new Exception("No flight loaded that could be saved.");
+            }
 
-                if (!this.flightSaveMutex.WaitOne(30 * 1000))
-                {
-                    throw new Exception("Timeout waiting for save flight mutex.");
-                }
-
-                this.RefreshStructNow(Requests.FuelTanks);
-                this.RefreshStructNow(Requests.PayloadStations);
-                Thread.Sleep(500);
-
-                Debug.WriteLine($"Saving flight {this.Flight?.Id}");
-                var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
-                flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
-                if (!Directory.Exists(flightSaveDirectory))
-                {
-                    Directory.CreateDirectory(flightSaveDirectory);
-                }
-
-                var saveFile = this.GenerateSaveFile();
-
-                if (saveFile != null && this.Flight != null)
-                {
-                    var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
-                    using (var fileStream = File.Create($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save"))
+            new Thread(
+                    () =>
                     {
-                        using (var gzip = new GZipStream(fileStream, CompressionMode.Compress))
+                        try
                         {
-                            xmlStream.CopyTo(gzip);
+                            if (!this.flightAutoSaveTrackFlightMutex.WaitOne(50))
+                            {
+                                return;
+                            }
+
+                            if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                            {
+                                throw new Exception("Timeout waiting for save flight mutex.");
+                            }
+
+                            this.RefreshStructNow(Requests.FuelTanks);
+                            this.RefreshStructNow(Requests.PayloadStations);
+                            Thread.Sleep(500);
+
+                            Debug.WriteLine($"Saving flight {this.Flight?.Id}");
+                            var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
+                            flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
+                            if (!Directory.Exists(flightSaveDirectory))
+                            {
+                                Directory.CreateDirectory(flightSaveDirectory);
+                            }
+
+                            var saveFile = this.GenerateSaveFile();
+
+                            if (saveFile != null && this.Flight != null)
+                            {
+                                var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
+                                using (var fileStream = File.Create($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save"))
+                                {
+                                    using (var gzip = new GZipStream(fileStream, CompressionMode.Compress))
+                                    {
+                                        xmlStream.CopyTo(gzip);
+                                    }
+                                }
+
+                                // todo remove this after testing
+                                File.WriteAllText($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.xml", $"{saveFile}");
+
+                                this.lastFlightLogAutoSave = DateTime.UtcNow;
+                            }
                         }
-                    }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error saving flight: " + ex);
+                            throw;
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                this.flightAutoSaveTrackFlightMutex.ReleaseMutex();
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
 
-                    // todo remove this after testing
-                    File.WriteAllText($"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.xml", $"{saveFile}");
-
-                    this.lastFlightLogAutoSave = DateTime.UtcNow;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error saving flight: " + ex);
-                throw;
-            }
-            finally
-            {
-                try
-                {
-                    this.flightSaveMutex.ReleaseMutex();
-                }
-                catch
-                {
-                    // Ignore
-                }
-            }
+                            try
+                            {
+                                this.flightSaveMutex.ReleaseMutex();
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                    })
+                { Name = "SimConnect.Flight.SaveFlight" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -772,7 +831,186 @@ namespace OpenSky.AgentMSFS.SimConnect
                     Debug.WriteLine("Auto-saving flight");
                     this.SaveFlight();
                 }
+
+                // Do a position report?
+                if ((DateTime.UtcNow - this.lastPositionReportUpload).TotalSeconds > 30)
+                {
+                    this.UploadPositionReport();
+                }
+
+                // Upload auto-save?
+                if ((DateTime.UtcNow - this.lastAutoSaveUpload).TotalMinutes > 10)
+                {
+                    this.UploadAutoSave();
+                }
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Upload auto-save to OpenSky.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void UploadAutoSave()
+        {
+            if (this.Flight == null)
+            {
+                throw new Exception("No flight loaded that could be cloud saved.");
+            }
+
+            new Thread(
+                    () =>
+                    {
+                        try
+                        {
+                            if (!this.autoSaveUploadMutex.WaitOne(50))
+                            {
+                                return;
+                            }
+
+                            if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                            {
+                                throw new Exception("Timeout waiting for save flight mutex.");
+                            }
+
+                            var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
+                            flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
+                            var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
+
+                            if (!File.Exists(saveFileName))
+                            {
+                                // Wait one minute before trying this again
+                                this.lastAutoSaveUpload = DateTime.UtcNow.AddMinutes(-9);
+                                return;
+                            }
+
+                            var bytes = File.ReadAllBytes(saveFileName);
+                            var base64String = Convert.ToBase64String(bytes);
+
+                            var result = OpenSkyService.Instance.AutoSaveAsync(this.Flight.Id, base64String).Result;
+                            if (!result.IsError)
+                            {
+                                this.lastAutoSaveUpload = DateTime.UtcNow;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Error uploading auto-save: " + result.Message + "\r\n" + result.ErrorDetails);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error uploading auto-save: " + ex);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                this.flightAutoSaveTrackFlightMutex.ReleaseMutex();
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+
+                            try
+                            {
+                                this.flightSaveMutex.ReleaseMutex();
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                    })
+                { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Upload flight position report to OpenSky.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void UploadPositionReport()
+        {
+            if (this.Flight == null)
+            {
+                throw new Exception("No flight loaded that could be position reported.");
+            }
+
+            new Thread(
+                    () =>
+                    {
+                        try
+                        {
+                            if (!this.positionReportUploadMutex.WaitOne(50))
+                            {
+                                return;
+                            }
+
+                            var positionReport = new PositionReport
+                            {
+                                Id = this.Flight.Id,
+                                AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
+                                Altitude = this.PrimaryTracking.Altitude,
+                                BankAngle = this.PrimaryTracking.BankAngle,
+                                FlightPhase = this.FlightPhase,
+                                GroundSpeed = this.PrimaryTracking.GroundSpeed,
+                                Heading = this.PrimaryTracking.Heading,
+                                Latitude = this.PrimaryTracking.Latitude,
+                                Longitude = this.PrimaryTracking.Longitude,
+                                OnGround = this.PrimaryTracking.OnGround,
+                                PitchAngle = this.PrimaryTracking.PitchAngle,
+                                RadioHeight = this.PrimaryTracking.RadioHeight,
+                                VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
+                                TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
+
+                                FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
+                                FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
+                                FuelTankCenter3Quantity = this.FuelTanks.FuelTankCenter3Quantity,
+                                FuelTankLeftMainQuantity = this.FuelTanks.FuelTankLeftMainQuantity,
+                                FuelTankLeftAuxQuantity = this.FuelTanks.FuelTankLeftAuxQuantity,
+                                FuelTankLeftTipQuantity = this.FuelTanks.FuelTankLeftTipQuantity,
+                                FuelTankRightMainQuantity = this.FuelTanks.FuelTankRightMainQuantity,
+                                FuelTankRightAuxQuantity = this.FuelTanks.FuelTankRightAuxQuantity,
+                                FuelTankRightTipQuantity = this.FuelTanks.FuelTankRightTipQuantity,
+                                FuelTankExternal1Quantity = this.FuelTanks.FuelTankExternal1Quantity,
+                                FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
+                            };
+
+                            var result = OpenSkyService.Instance.PositionReportAsync(positionReport).Result;
+
+                            if (!result.IsError)
+                            {
+                                this.lastPositionReportUpload = DateTime.UtcNow;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Error uploading position report: " + result.Message + "\r\n" + result.ErrorDetails);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error uploading position report: " + ex);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                this.positionReportUploadMutex.ReleaseMutex();
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                    })
+                { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
         }
     }
 }
