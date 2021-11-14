@@ -168,7 +168,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 var result = OpenSkyService.Instance.GetFlightAsync().Result;
                                 if (!result.IsError)
                                 {
-                                    SimConnect.Instance.Flight = result.Data;
+                                    if (result.Data.Id != Guid.Empty)
+                                    {
+                                        SimConnect.Instance.Flight = result.Data;
+                                    }
+
+                                    // todo test what happens if we set the flight to NULL in simconnect?
                                 }
                                 else
                                 {

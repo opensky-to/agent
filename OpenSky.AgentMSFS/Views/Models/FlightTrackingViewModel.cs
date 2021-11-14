@@ -142,7 +142,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.SuggestPayloadCommand = new Command(this.SuggestPayload);
             this.SetPayloadStationsCommand = new Command(this.SetPayloadStations);
             this.StartTrackingCommand = new AsynchronousCommand(this.StartTracking, false);
-            this.AbortFlightCommand = new Command(this.AbortFlight, false);
+            this.AbortFlightCommand = new AsynchronousCommand(this.AbortFlight, false);
             this.ToggleFlightPauseCommand = new Command(this.ToggleFlightPause, false);
             this.StopTrackingCommand = new AsynchronousCommand(this.StopTracking, false);
             this.ImportSimbriefCommand = new AsynchronousCommand(this.ImportSimbrief, false);
@@ -170,7 +170,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// Gets the abort flight command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Command AbortFlightCommand { get; }
+        public AsynchronousCommand AbortFlightCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -435,6 +435,36 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string loadingText;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string LoadingText
+        {
+            get => this.loadingText;
+
+            set
+            {
+                if (Equals(this.loadingText, value))
+                {
+                    return;
+                }
+
+                this.loadingText = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Abort the current flight.
         /// </summary>
         /// <remarks>
@@ -444,21 +474,60 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void AbortFlight()
         {
             Debug.WriteLine("User clicked on abort flight, confirming...");
-            var result = ModernWpf.MessageBox.Show(
-                "Are you sure you want to cancel the currently planned flight?\r\n\r\nYou will loose any saved progress and have to return the OpenSky client to plan another flight.",
-                "Cancel flight?",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            if (this.SimConnect.Flight == null)
             {
-                // todo report to the api that we want to cancel this flight
+                return;
+            }
 
-                this.SimConnect.Flight = null;
-                this.IsFuelExpanded = false;
-                this.IsPayloadExpanded = false;
-                this.WeightAndBalancesVisibility = Visibility.Visible;
-                this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
+            MessageBoxResult? answer = MessageBoxResult.None;
+            this.AbortFlightCommand.ReportProgress(
+                () =>
+                {
+                    answer = ModernWpf.MessageBox.Show(
+                        "Are you sure you want to cancel the current flight?\r\n\r\nYou will loose any saved progress and have to return the OpenSky client to start another flight.",
+                        "Cancel flight?",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+                }, true);
+
+            if (answer == MessageBoxResult.Yes)
+            {
+                this.LoadingText = "Aborting flight...";
+                try
+                {
+                    var result = OpenSkyService.Instance.AbortFlightAsync(this.SimConnect.Flight.Id).Result;
+                    if (!result.IsError)
+                    {
+                        this.SimConnect.Flight = null;
+                        this.IsFuelExpanded = false;
+                        this.IsPayloadExpanded = false;
+                        this.WeightAndBalancesVisibility = Visibility.Visible;
+                        this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        this.AbortFlightCommand.ReportProgress(
+                            () =>
+                            {
+                                Debug.WriteLine("Error aborting flight: " + result.Message);
+                                if (!string.IsNullOrEmpty(result.ErrorDetails))
+                                {
+                                    Debug.WriteLine(result.ErrorDetails);
+                                }
+
+                                ModernWpf.MessageBox.Show(result.Message, "Error aborting flight", MessageBoxButton.OK, MessageBoxImage.Error);
+                            });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleApiCallException(this.AbortFlightCommand, "Error aborting flight");
+                }
+                finally
+                {
+                    this.LoadingText = null;
+                }
+
             }
         }
 
@@ -790,7 +859,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         // Wait a bit to make sure all structs have updated, especially time in sim
                         Thread.Sleep(this.SimConnect.SampleRates[Requests.Secondary] + 1000);
                     }
-                   
+
                     this.SimConnect.StartTracking();
                     this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                 }
