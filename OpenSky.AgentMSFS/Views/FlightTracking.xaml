@@ -69,6 +69,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="1*"  />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Grid.Column="0">
             <GroupBox.Header>
@@ -488,12 +489,34 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <Grid Grid.Column="3" Grid.Row="0" Grid.RowSpan="7">
+        <GroupBox Grid.Row="0" Grid.RowSpan="7" Grid.Column="3" Visibility="{Binding OfpVisibility}">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="15" FontWeight="DemiBold">OFP</TextBlock>
+                    <Button Padding="5,0" FontSize="11" Margin="5,-2,0,0" Command="{Binding ToggleOfpCommand}">hide</Button>
+                </StackPanel>
+            </GroupBox.Header>
+            <TextBox Text="{Binding SimConnect.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
+        </GroupBox>
+        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="7">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0">
+                <GroupBox.Header>
+                    <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="10">Route</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <TextBlock FontSize="10" Margin="0,10,0,0">Alternate route</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <Button Style="{StaticResource OpenSkyButtonStyle}" Margin="0,10,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Flight events</TextBlock>
                 </GroupBox.Header>
@@ -509,7 +532,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </GroupBox>
-            <GroupBox Grid.Row="1" Grid.Column="0">
+            <GroupBox Grid.Row="2" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Graphs</TextBlock>
                 </GroupBox.Header>
@@ -559,7 +582,7 @@
                 </StackPanel>
             </Grid>
         </GroupBox>
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Grid.ColumnSpan="4" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
+        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
                 <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please assign a new flight from the OpenSky client or if you have the Alpha debugging client, create one using the "Test Flight" option from the main menu.</TextBlock>

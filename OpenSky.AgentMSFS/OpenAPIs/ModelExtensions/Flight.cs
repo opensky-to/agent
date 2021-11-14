@@ -144,7 +144,7 @@ namespace OpenSkyApi
             // Payload/fuel check
             var payload = flightFromSave.EnsureChildElement("PayloadPounds");
             var fuelGallons = flightFromSave.EnsureChildElement("FuelGallons");
-            if (Math.Abs(flight.PayloadPounds - double.Parse(payload.Value)) > 0.01 || Math.Abs(flight.FuelGallons ?? 0 - double.Parse(fuelGallons.Value)) > 0.01)
+            if (Math.Abs(flight.PayloadPounds - double.Parse(payload.Value)) > 0.01 || Math.Abs((flight.FuelGallons ?? 0) - double.Parse(fuelGallons.Value)) > 1.0)
             {
                 Debug.WriteLine("Starting fuel/payload mismatch");
 
