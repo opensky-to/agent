@@ -7028,8 +7028,8 @@ namespace OpenSkyApi
         public double FuelTankLeftAuxQuantity { get; set; }
     
         /// <summary>Gets or sets the fuel tank left main quantity.</summary>
-        [Newtonsoft.Json.JsonProperty("fuelTankLeftMainQuantity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? FuelTankLeftMainQuantity { get; set; }
+        [Newtonsoft.Json.JsonProperty("fuelTankLeftMainQuantity", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double FuelTankLeftMainQuantity { get; set; }
     
         /// <summary>Gets or sets the fuel tank left tip quantity.</summary>
         [Newtonsoft.Json.JsonProperty("fuelTankLeftTipQuantity", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
