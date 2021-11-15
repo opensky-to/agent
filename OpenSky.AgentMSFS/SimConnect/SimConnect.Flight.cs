@@ -545,9 +545,10 @@ namespace OpenSky.AgentMSFS.SimConnect
             else
             {
                 this.SaveFlight();
-                this.Speech.SpeakAsync("Flight saved.");
+                this.Speech.SpeakAsync("Flight saved and paused.");
                 this.UploadPositionReport();
                 this.UploadAutoSave();
+                this.PauseFlight();
 
                 this.flightLoadingTempStructs = new FlightLoadingTempStructs
                 {
@@ -1036,6 +1037,47 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.UploadAutoSave();
                 }
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Pause the current flight on OpenSky.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 15/11/2021.
+        /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
+        /// -------------------------------------------------------------------------------------------------
+        private void PauseFlight()
+        {
+            if (this.Flight == null)
+            {
+                throw new Exception("No flight loaded that could be paused.");
+            }
+
+            new Thread(
+                () =>
+                {
+                    try
+                    {
+                        var result = OpenSkyService.Instance.PauseFlightAsync(this.Flight.Id).Result;
+                        if (result.IsError)
+                        {
+                            Debug.WriteLine("Error pausing flight: " + result.Message + "\r\n" + result.ErrorDetails);
+                        }
+                        else
+                        {
+                            this.Flight = null;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error pausing flight: " + ex);
+                    }
+                })
+            { Name = "SimConnect.Flight.Pause" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
