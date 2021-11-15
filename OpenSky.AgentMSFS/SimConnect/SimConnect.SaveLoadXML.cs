@@ -225,7 +225,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 // Add some basic info about this save
                 save.Add(new XElement("Agent", AgentIdentifier));
                 save.Add(new XElement("AgentVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                save.Add(new XElement("OpenSkyUser", "sushi.at")); // todo where do we get that from?
+                save.Add(new XElement("OpenSkyUser", UserSessionService.Instance.Username));
                 save.Add(new XElement("LocalTimeZone", $"{TimeZoneInfo.Local.BaseUtcOffset.TotalHours}"));
                 save.Add(new XElement("TrackingStarted", $"{this.trackingStarted:O}"));
                 save.Add(new XElement("TrackingStopped", $"{DateTime.UtcNow:O}"));
