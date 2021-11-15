@@ -785,7 +785,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SkipGroundHandling()
         {
-            if (this.SimConnect.SkipGroundHandling())
+            if (this.SimConnect.SkipGroundHandling(false))
             {
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
             }
@@ -932,6 +932,22 @@ namespace OpenSky.AgentMSFS.Views.Models
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
                         }
+                    }
+
+                    if (!this.SimConnect.GroundHandlingComplete)
+                    {
+                        Debug.WriteLine("Ground handling not complete, ask the user about skipping...");
+                        MessageBoxResult? answer = MessageBoxResult.None;
+                        this.StartTrackingCommand.ReportProgress(
+                            () => answer = ModernWpf.MessageBox.Show("Ground handling not yet completed, do you want to skip it?", "Ground handling", MessageBoxButton.YesNo, MessageBoxImage.Warning),
+                            true);
+                        if (answer != MessageBoxResult.Yes)
+                        {
+                            this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
+                            return;
+                        }
+
+                        this.SimConnect.SkipGroundHandling(true);
                     }
 
                     this.SimConnect.StartTracking();

@@ -422,6 +422,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
+                // todo debug this when using the start tracking -> skip ground handling shortcut
                 if (this.TrackingStatus != TrackingStatus.Tracking)
                 {
                     if (this.TrackingStatus == TrackingStatus.Preparing)
@@ -634,7 +635,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
                         Altitude = this.PrimaryTracking.Altitude,
                         BankAngle = this.PrimaryTracking.BankAngle,
-                        FlightPhase = this.FlightPhase,
+                        FlightPhase = this.PrimaryTracking.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
                         GroundSpeed = this.PrimaryTracking.GroundSpeed,
                         Heading = this.PrimaryTracking.Heading,
                         Latitude = this.PrimaryTracking.Latitude,
@@ -1009,6 +1010,13 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 // todo Check if user has paused the sim (but didn't use the pause button we provide) ... check if lat/lon isn't changing while in flight
 
+                if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
+                {
+                    // Plane crashed
+                    // todo play some ELT sound? to be proper annoying :)
+                    this.FinishUpFlightTracking();
+                }
+
                 // Auto-save flight log?
                 if ((DateTime.UtcNow - this.lastFlightLogAutoSave).TotalMinutes > 2)
                 {
@@ -1147,7 +1155,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                                 AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
                                 Altitude = this.PrimaryTracking.Altitude,
                                 BankAngle = this.PrimaryTracking.BankAngle,
-                                FlightPhase = this.FlightPhase,
+                                FlightPhase = this.PrimaryTracking.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
                                 GroundSpeed = this.PrimaryTracking.GroundSpeed,
                                 Heading = this.PrimaryTracking.Heading,
                                 Latitude = this.PrimaryTracking.Latitude,

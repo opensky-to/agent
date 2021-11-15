@@ -194,18 +194,25 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// True if it succeeds, false if it fails.
         /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public bool SkipGroundHandling()
+        public bool SkipGroundHandling(bool startTracking)
         {
-            if (this.Flight != null && !this.GroundHandlingComplete && this.TrackingStatus == TrackingStatus.GroundOperations)
+            if (this.Flight != null && !this.GroundHandlingComplete && (this.TrackingStatus == TrackingStatus.GroundOperations || startTracking))
             {
                 var fuelSecondsLeft = ((this.Flight?.FuelLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
                 var payloadSecondsLeft = ((this.Flight?.PayloadLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
                 var secondsToSkip = Math.Max(fuelSecondsLeft, payloadSecondsLeft);
+                this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow;
+                this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow;
+
+                if (startTracking)
+                {
+                    this.GroundHandlingComplete = true;
+                    this.TrackingStatus = TrackingStatus.Preparing;
+                    this.StartTracking();
+                }
 
                 this.timeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate.AddSeconds(secondsToSkip);
                 this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
-                this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow;
-                this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow;
                 this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyWarningOrange, "Skipped ground handling");
                 return true;
             }
