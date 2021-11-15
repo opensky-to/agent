@@ -427,6 +427,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     if (this.TrackingStatus == TrackingStatus.Preparing)
                     {
+                        this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking starting...");
                         this.Speech.SpeakAsync("Flight tracking started.");
                         this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
@@ -434,12 +435,12 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                     if (this.TrackingStatus == TrackingStatus.Resuming)
                     {
+                        this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking resuming...");
                         this.Speech.SpeakAsync("Flight tracking resumed");
                         this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
                     }
 
-                    this.TrackingStatus = TrackingStatus.Tracking;
                     this.trackingStarted = DateTime.UtcNow;
                 }
             }

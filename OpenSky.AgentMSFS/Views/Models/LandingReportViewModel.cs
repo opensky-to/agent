@@ -64,7 +64,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         public LandingReportViewModel()
         {
-            this.FlightNumberHeader = $"Flight #{this.SimConnect.Flight?.Id}\r\nLanding Report";
+            this.FlightNumberHeader = $"Flight #{this.SimConnect.Flight?.FullFlightNumber}\r\nLanding Report";
 
             // Fetch the initial already existing landing report(s)
             foreach (var item in this.SimConnect.LandingReports)
@@ -163,6 +163,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 // Landing rate (absolute)
                 // ----------------------------------------------------
                 // A+ Butter <=60 (PISTON,TURBO)
+                // A+ Perfect >60 <=130 (JET)
                 // A- Too soft <=60 (JET)
                 // A  Good >60 <=180
                 // B  OK >180 <=240
@@ -182,9 +183,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                 // D  Porpoising >2
 
                 // ----------------------------------------------------
-                // Wind
+                // Wind todo add wind ratings
                 // ----------------------------------------------------
-                // E  Dangerous Cross >30 (JET) >15 (PISTON,TURBO)
+                // E  Dangerous Cross >40 (JET) >20 (PISTON,TURBO)
                 // E  Dangerous Tail >15 (JET) >5 (PISTON,TURBO)
 
                 // ----------------------------------------------------
@@ -259,6 +260,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     grade = "A";
                     desc = "Good landing";
+
+                    if (landingRateAbs <= 130 && this.SimConnect.PlaneIdentity.EngineType == EngineType.Jet)
+                    {
+                        grade = "A+";
+                        desc = "Perfect landing";
+                    }
                 }
 
                 if (grade == "A+" && this.SimConnect.PlaneIdentity.EngineType == EngineType.Jet)

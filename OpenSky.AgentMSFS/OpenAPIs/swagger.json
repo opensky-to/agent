@@ -5387,8 +5387,7 @@
           "fuelTankLeftMainQuantity": {
             "type": "number",
             "description": "Gets or sets the fuel tank left main quantity.",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "fuelTankLeftTipQuantity": {
             "type": "number",
