@@ -17,6 +17,8 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.Tools;
 
+    using OpenSkyApi;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Simconnect client - landing analysis code.
@@ -67,7 +69,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (this.LandingReports.Count == 1)
                 {
                     // First landing for this flight
-                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTeal, "Touchdown");
+                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
 
                     // Show landing report notification now?
                     if (LandingReportNotification.AsSoonAsPossible.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))

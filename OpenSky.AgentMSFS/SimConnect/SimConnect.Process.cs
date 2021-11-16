@@ -28,6 +28,8 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
 
+    using OpenSkyApi;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// Simconnect client - data processing code.
@@ -124,6 +126,9 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <param name="secondary">
         /// The secondary Simconnect tracking data.
         /// </param>
+        /// <param name="type">
+        /// The flight tracking event type.
+        /// </param>
         /// <param name="color">
         /// The color to use for the marker.
         /// </param>
@@ -131,7 +136,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The event text (what happened?).
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, Color color, string text)
+        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, FlightTrackingEventType type, Color color, string text)
         {
             if (this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations)
             {
@@ -156,7 +161,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.lastNonPositionReportMarker.AddEventToMarker(DateTime.UtcNow, text);
                 }
 
-                this.TrackingEventLogEntries.Add(new TrackingEventLogEntry(DateTime.UtcNow, color, text, primary.MapLocation));
+                this.TrackingEventLogEntries.Add(new TrackingEventLogEntry(type, DateTime.UtcNow, color, text, primary.MapLocation));
             };
             Application.Current.Dispatcher.BeginInvoke(addTrackingEvent);
         }
