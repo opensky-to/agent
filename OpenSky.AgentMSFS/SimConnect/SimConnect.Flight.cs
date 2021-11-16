@@ -417,7 +417,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.TrackingStatus = TrackingStatus.GroundOperations;
                 this.trackingStarted = DateTime.UtcNow;
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                 this.Speech.SpeakAsync("Tracking started. But ground handling is still in progress. You can set up your plane but don't turn on the engines or start pushing back.");
             }
             else
@@ -430,7 +430,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking starting...");
                         this.Speech.SpeakAsync("Flight tracking started.");
-                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                     }
 
                     if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -438,7 +438,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking resuming...");
                         this.Speech.SpeakAsync("Flight tracking resumed");
-                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
+                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
                     }
 
                     this.trackingStarted = DateTime.UtcNow;
@@ -545,6 +545,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
                 this.SaveFlight();
                 this.Speech.SpeakAsync("Flight saved and paused.");
                 this.UploadPositionReport();
@@ -990,7 +991,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (Math.Abs(ppt.Old.SimulationRate - ppt.New.SimulationRate) > 0)
                 {
                     Debug.WriteLine($"SimRate changed to {ppt.New.SimulationRate}");
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.SimRateChanged, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
 
                     // Was there an active simrate above 1?
                     if (this.lastActiveSimRate.HasValue && this.lastActiveSimRateActivated.HasValue)
@@ -1015,6 +1016,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
                 {
                     // Plane crashed
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Crashed, Colors.DarkRed, "Aircraft crashed");
+
                     // todo play some ELT sound? to be proper annoying :)
                     this.FinishUpFlightTracking();
                 }

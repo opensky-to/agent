@@ -184,11 +184,11 @@ namespace OpenSky.AgentMSFS.SimConnect
             var distanceToDepartureAirport = new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
             var distanceToDestinationAirport = new GeoCoordinate(this.Flight?.Destination.Latitude ?? 0, this.Flight?.Destination.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
             var distanceToAlternateAirport = new GeoCoordinate(this.Flight?.Alternate.Latitude ?? 0, this.Flight?.Alternate.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
-            
+
             if (!this.WasAirborne && this.PrimaryTracking.RadioHeight >= 50)
             {
                 this.WasAirborne = true;
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTeal, "Airborne");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Airborne, OpenSkyColors.OpenSkyTeal, "Airborne");
             }
 
             // InMenu

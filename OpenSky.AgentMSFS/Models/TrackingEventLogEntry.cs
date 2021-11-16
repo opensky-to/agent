@@ -15,6 +15,8 @@ namespace OpenSky.AgentMSFS.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSkyApi;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// OpenSky tracking event.
@@ -32,6 +34,9 @@ namespace OpenSky.AgentMSFS.Models
         /// <remarks>
         /// sushi.at, 16/03/2021.
         /// </remarks>
+        /// <param name="type">
+        /// The tracking event type.
+        /// </param>
         /// <param name="eventTime">
         /// Gets the date/time of the event.
         /// </param>
@@ -45,8 +50,9 @@ namespace OpenSky.AgentMSFS.Models
         /// Gets the location of the event.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public TrackingEventLogEntry(DateTime eventTime, Color eventColor, string logMessage, Location location)
+        public TrackingEventLogEntry(FlightTrackingEventType type, DateTime eventTime, Color eventColor, string logMessage, Location location)
         {
+            this.EventType = type;
             this.EventTime = eventTime;
             this.Location = location;
             this.EventColor = eventColor;
@@ -67,6 +73,7 @@ namespace OpenSky.AgentMSFS.Models
         /// -------------------------------------------------------------------------------------------------
         public TrackingEventLogEntry(XElement entryFromSave)
         {
+            this.EventType = (FlightTrackingEventType)int.Parse(entryFromSave.Attribute("Type")?.Value ?? "0");
             this.EventTime = DateTime.ParseExact(entryFromSave.Attribute("Time")?.Value, "O", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
             var lat = double.Parse(entryFromSave.Attribute("Lat")?.Value ?? "missing");
             var lon = double.Parse(entryFromSave.Attribute("Lon")?.Value ?? "missing");
@@ -77,6 +84,13 @@ namespace OpenSky.AgentMSFS.Models
             this.EventColorBrush = new SolidColorBrush(color);
             this.LogMessage = entryFromSave.Attribute("Message")?.Value ?? "missing";
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the type of the event.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public FlightTrackingEventType EventType { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -129,6 +143,7 @@ namespace OpenSky.AgentMSFS.Models
         public XElement GetLogEntryForSave()
         {
             var entryElement = new XElement("LogEntry");
+            entryElement.SetAttributeValue("Type", $"{(int)this.EventType}");
             entryElement.SetAttributeValue("Time", $"{this.EventTime:O}");
             entryElement.SetAttributeValue("Lat", $"{this.Location.Latitude}");
             entryElement.SetAttributeValue("Lon", $"{this.Location.Longitude}");
@@ -137,7 +152,5 @@ namespace OpenSky.AgentMSFS.Models
             entryElement.SetAttributeValue("Message", $"{this.LogMessage}");
             return entryElement;
         }
-
-        // todo define some kind of event ID enum that we share with the API, so that these events make sense there too (no log message parsing!)
     }
 }
