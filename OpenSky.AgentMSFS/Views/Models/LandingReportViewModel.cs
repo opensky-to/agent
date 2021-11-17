@@ -15,10 +15,10 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
-    using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
@@ -38,7 +38,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// The landing reports.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<LandingReport> landingReports = new();
+        private readonly List<TouchDown> landingReports = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -432,7 +432,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 foreach (var item in e.NewItems)
                 {
-                    if (item is LandingReport report)
+                    if (item is TouchDown report)
                     {
                         this.landingReports.Add(report);
                     }

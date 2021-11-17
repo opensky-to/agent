@@ -8,6 +8,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 {
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 

@@ -18,8 +18,9 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
 
-    using OpenSkyApi;
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

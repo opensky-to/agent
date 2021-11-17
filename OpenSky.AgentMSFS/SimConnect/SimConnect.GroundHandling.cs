@@ -12,8 +12,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.Tools;
-
-    using OpenSkyApi;
+    using OpenSky.FlightLogXML;
 
     using TomsToolbox.Essentials;
 

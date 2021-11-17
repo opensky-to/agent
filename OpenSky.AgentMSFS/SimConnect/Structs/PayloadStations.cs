@@ -9,7 +9,6 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
-    using System.Xml.Linq;
 
     using CTrue.FsConnect;
 
@@ -339,89 +338,5 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("PAYLOAD STATION WEIGHT:14", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PAYLOAD STATION WEIGHT:15", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
             };
-    }
-
-    /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Payload stations save/restore helper class.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 01/04/2021.
-    /// </remarks>
-    /// -------------------------------------------------------------------------------------------------
-    public static class PayloadStationsSaver
-    {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets payload stations for saving to a file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="stations">
-        /// The stations.
-        /// </param>
-        /// <returns>
-        /// The payload stations for saving.
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static XElement GetPayloadStationsForSave(PayloadStations stations)
-        {
-            var payLoadStations = new XElement("PayloadStations");
-            payLoadStations.Add(new XElement("Weight1", stations.Weight1));
-            payLoadStations.Add(new XElement("Weight2", stations.Weight2));
-            payLoadStations.Add(new XElement("Weight3", stations.Weight3));
-            payLoadStations.Add(new XElement("Weight4", stations.Weight4));
-            payLoadStations.Add(new XElement("Weight5", stations.Weight5));
-            payLoadStations.Add(new XElement("Weight6", stations.Weight6));
-            payLoadStations.Add(new XElement("Weight7", stations.Weight7));
-            payLoadStations.Add(new XElement("Weight8", stations.Weight8));
-            payLoadStations.Add(new XElement("Weight9", stations.Weight9));
-            payLoadStations.Add(new XElement("Weight10", stations.Weight10));
-            payLoadStations.Add(new XElement("Weight11", stations.Weight11));
-            payLoadStations.Add(new XElement("Weight12", stations.Weight12));
-            payLoadStations.Add(new XElement("Weight13", stations.Weight13));
-            payLoadStations.Add(new XElement("Weight14", stations.Weight14));
-            payLoadStations.Add(new XElement("Weight15", stations.Weight15));
-            return payLoadStations;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Restore payload stations from save file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="stationsFromSave">
-        /// The stations from save file.
-        /// </param>
-        /// <returns>
-        /// The PayloadStations struct restored (only weights, not names or count!).
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static PayloadStations RestorePayloadStationsFromSave(XElement stationsFromSave)
-        {
-            var payloadStations = new PayloadStations
-            {
-                Weight1 = double.Parse(stationsFromSave.Element("Weight1")?.Value ?? "missing"),
-                Weight2 = double.Parse(stationsFromSave.Element("Weight2")?.Value ?? "missing"),
-                Weight3 = double.Parse(stationsFromSave.Element("Weight3")?.Value ?? "missing"),
-                Weight4 = double.Parse(stationsFromSave.Element("Weight4")?.Value ?? "missing"),
-                Weight5 = double.Parse(stationsFromSave.Element("Weight5")?.Value ?? "missing"),
-                Weight6 = double.Parse(stationsFromSave.Element("Weight6")?.Value ?? "missing"),
-                Weight7 = double.Parse(stationsFromSave.Element("Weight7")?.Value ?? "missing"),
-                Weight8 = double.Parse(stationsFromSave.Element("Weight8")?.Value ?? "missing"),
-                Weight9 = double.Parse(stationsFromSave.Element("Weight9")?.Value ?? "missing"),
-                Weight10 = double.Parse(stationsFromSave.Element("Weight10")?.Value ?? "missing"),
-                Weight11 = double.Parse(stationsFromSave.Element("Weight11")?.Value ?? "missing"),
-                Weight12 = double.Parse(stationsFromSave.Element("Weight12")?.Value ?? "missing"),
-                Weight13 = double.Parse(stationsFromSave.Element("Weight13")?.Value ?? "missing"),
-                Weight14 = double.Parse(stationsFromSave.Element("Weight14")?.Value ?? "missing"),
-                Weight15 = double.Parse(stationsFromSave.Element("Weight15")?.Value ?? "missing")
-            };
-
-            return payloadStations;
-        }
     }
 }

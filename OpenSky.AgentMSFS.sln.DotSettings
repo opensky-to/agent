@@ -590,4 +590,5 @@ OpenSky project $CURRENT_YEAR$&#xD;
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Multiselectors/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=performant/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Templated/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=winforms/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=WNDPROC/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

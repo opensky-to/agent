@@ -31,6 +31,9 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
+
+    using TrackingEventLogEntry = OpenSky.AgentMSFS.Models.TrackingEventLogEntry;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -192,7 +195,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             this.AircraftTrailLocations = new LocationCollection();
             this.SimbriefRouteLocations = new LocationCollection();
             this.TrackingEventLogEntries = new ObservableCollection<TrackingEventLogEntry>();
-            this.LandingReports = new ObservableCollection<LandingReport>();
+            this.LandingReports = new ObservableCollection<TouchDown>();
             this.TrackingConditions = new Dictionary<int, TrackingCondition>
             {
                 { (int)Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },

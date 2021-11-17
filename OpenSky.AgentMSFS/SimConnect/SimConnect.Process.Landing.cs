@@ -16,8 +16,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.Tools;
-
-    using OpenSkyApi;
+    using OpenSky.FlightLogXML;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -31,7 +30,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// Gets the landing reports.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ObservableCollection<LandingReport> LandingReports { get; }
+        public ObservableCollection<TouchDown> LandingReports { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -50,9 +49,11 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 // We have touchdown
                 Debug.WriteLine("Adding new landing report");
-                var landingReport = new LandingReport(
+                var landingReport = new TouchDown(
                     DateTime.UtcNow,
-                    pla.New.Location,
+                    pla.New.Location.Latitude,
+                    pla.New.Location.Longitude,
+                    (int)pla.New.Location.Altitude,
                     pla.New.LandingRate * -1.0,
                     Math.Max(pla.Old.Gforce, pla.New.Gforce),
                     pla.New.SpeedLong,
