@@ -27,8 +27,10 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
 
-    using OpenSkyApi;
+    using TrackingEventLogEntry = Models.TrackingEventLogEntry;
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

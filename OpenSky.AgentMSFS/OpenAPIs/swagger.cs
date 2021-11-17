@@ -6959,84 +6959,6 @@ namespace OpenSkyApi
     
     }
     
-    /// <summary>Flight tracking event types. 0 = TrackingStarted, 1 = TrackingResumed, 2 = TrackingPaused, 3 = TrackingStopped, 4 = PushbackStarted, 5 = PushbackFinished, 6 = GroundHandlingComplete, 10 = SimRateChanged, 11 = SkippedGroundHandling, 12 = SkippedHalfGroundHandling, 20 = Airborne, 21 = Touchdown, 22 = Crashed, 30 = Beacon, 31 = NavLights, 32 = Strobe, 33 = TaxiLights, 34 = LandingLights, 35 = BeaconOffEnginesOn, 36 = LandingLightsOffBelow10K, 37 = LandingLightsOffBelow300AGL, 38 = TaxiLandingLightsEngine, 40 = Engine, 41 = EngineOffRunway, 42 = BatteryMaster, 43 = LandingGear, 44 = GearUpOnGround, 45 = Flaps, 46 = AutoPilot, 47 = ParkingBrake, 48 = Spoilers, 49 = APU, 50 = SeatbeltSigns, 51 = NoSmokingSigns, 60 = Overspeed, 61 = Stall</summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
-    public enum FlightTrackingEventType
-    {
-        TrackingStarted = 0,
-    
-        TrackingResumed = 1,
-    
-        TrackingPaused = 2,
-    
-        TrackingStopped = 3,
-    
-        PushbackStarted = 4,
-    
-        PushbackFinished = 5,
-    
-        GroundHandlingComplete = 6,
-    
-        SimRateChanged = 10,
-    
-        SkippedGroundHandling = 11,
-    
-        SkippedHalfGroundHandling = 12,
-    
-        Airborne = 20,
-    
-        Touchdown = 21,
-    
-        Crashed = 22,
-    
-        Beacon = 30,
-    
-        NavLights = 31,
-    
-        Strobe = 32,
-    
-        TaxiLights = 33,
-    
-        LandingLights = 34,
-    
-        BeaconOffEnginesOn = 35,
-    
-        LandingLightsOffBelow10K = 36,
-    
-        LandingLightsOffBelow300AGL = 37,
-    
-        TaxiLandingLightsEngine = 38,
-    
-        Engine = 40,
-    
-        EngineOffRunway = 41,
-    
-        BatteryMaster = 42,
-    
-        LandingGear = 43,
-    
-        GearUpOnGround = 44,
-    
-        Flaps = 45,
-    
-        AutoPilot = 46,
-    
-        ParkingBrake = 47,
-    
-        Spoilers = 48,
-    
-        APU = 49,
-    
-        SeatbeltSigns = 50,
-    
-        NoSmokingSigns = 51,
-    
-        Overspeed = 60,
-    
-        Stall = 61,
-    
-    }
-    
     /// <summary>Forgot password model.</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public partial class ForgotPassword 
@@ -7244,9 +7166,6 @@ namespace OpenSkyApi
     
         [Newtonsoft.Json.JsonProperty("flightPhase", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public FlightPhase FlightPhase { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("flightTrackingEventType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public FlightTrackingEventType FlightTrackingEventType { get; set; }
     
         /// <summary>Gets or sets the fuel tank center 2 quantity.</summary>
         [Newtonsoft.Json.JsonProperty("fuelTankCenter2Quantity", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]

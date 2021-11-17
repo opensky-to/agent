@@ -24,9 +24,14 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
+    using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
+
+    using PositionReport = OpenSkyApi.PositionReport;
+    using TrackingEventMarker = OpenSky.AgentMSFS.Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -221,6 +226,24 @@ namespace OpenSky.AgentMSFS.SimConnect
                     // Start the ground handling thread for this flight
                     new Thread(this.DoGroundHandling) { Name = "OpenSky.SimConnect.GroundHandling" }.Start();
 
+                    // Add airport markers to map (do this in both new and restore, save file doesn't contain these cause the data would just be redundant)
+                    UpdateGUIDelegate addAirports = () =>
+                    {
+                        lock (this.trackingEventMarkers)
+                        {
+                            var originMarker = new TrackingEventMarker(new GeoCoordinate(value.Origin.Latitude, value.Origin.Longitude), value.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(originMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
+                            var alternateMarker = new TrackingEventMarker(new GeoCoordinate(value.Alternate.Latitude, value.Alternate.Longitude), value.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                            this.trackingEventMarkers.Add(alternateMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
+                            var destinationMarker = new TrackingEventMarker(new GeoCoordinate(value.Destination.Latitude, value.Destination.Longitude), value.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(destinationMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
+                        }
+                    };
+                    Application.Current.Dispatcher.BeginInvoke(addAirports);
+
                     if (!value.Resume)
                     {
                         Debug.WriteLine("Preparing to track new flight");
@@ -231,24 +254,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F2}";
                         this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}";
                         this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
-
-                        // Add airport markers to map
-                        UpdateGUIDelegate addAirports = () =>
-                        {
-                            lock (this.trackingEventMarkers)
-                            {
-                                var originMarker = new TrackingEventMarker(new GeoCoordinate(value.Origin.Latitude, value.Origin.Longitude), value.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
-                                this.trackingEventMarkers.Add(originMarker);
-                                this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
-                                var alternateMarker = new TrackingEventMarker(new GeoCoordinate(value.Alternate.Latitude, value.Alternate.Longitude), value.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
-                                this.trackingEventMarkers.Add(alternateMarker);
-                                this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
-                                var destinationMarker = new TrackingEventMarker(new GeoCoordinate(value.Destination.Latitude, value.Destination.Longitude), value.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
-                                this.trackingEventMarkers.Add(destinationMarker);
-                                this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
-                            }
-                        };
-                        Application.Current.Dispatcher.BeginInvoke(addAirports);
 
                         // Add simbrief navlog to map
                         UpdateGUIDelegate addNavlog = () =>
@@ -276,6 +281,37 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Resuming;
                         this.CheckCloudSave();
                         this.LoadFlight();
+
+                        this.flightLoadingTempStructs = new FlightLoadingTempStructs
+                        {
+                            FuelTanks = new FuelTanks
+                            {
+                                FuelTankCenterQuantity = value.FuelTankCenterQuantity ?? 0,
+                                FuelTankCenter2Quantity = value.FuelTankCenter2Quantity ?? 0,
+                                FuelTankCenter3Quantity = value.FuelTankCenter3Quantity ?? 0,
+                                FuelTankLeftMainQuantity = value.FuelTankLeftMainQuantity ?? 0,
+                                FuelTankLeftAuxQuantity = value.FuelTankLeftAuxQuantity ?? 0,
+                                FuelTankLeftTipQuantity = value.FuelTankLeftTipQuantity ?? 0,
+                                FuelTankRightMainQuantity = value.FuelTankRightMainQuantity ?? 0,
+                                FuelTankRightAuxQuantity = value.FuelTankRightAuxQuantity ?? 0,
+                                FuelTankRightTipCapacity = value.FuelTankRightTipQuantity ?? 0,
+                                FuelTankExternal1Quantity = value.FuelTankExternal1Quantity ?? 0,
+                                FuelTankExternal2Quantity = value.FuelTankExternal2Quantity ?? 0
+                            },
+                            PayloadStations = new PayloadStations(), // todo restore payload stations once we have that, all 0s for now
+                            SlewPlaneIntoPosition = new SlewPlaneIntoPosition
+                            {
+                                Latitude = value.Latitude ?? 0,
+                                Longitude = value.Longitude ?? 0,
+                                Heading = value.Heading ?? 0,
+                                BankAngle = value.BankAngle,
+                                PitchAngle = value.PitchAngle,
+                                OnGround = value.OnGround,
+                                AirspeedTrue = value.AirspeedTrue ?? 0,
+                                RadioHeight = value.RadioHeight ?? 0,
+                                VerticalSpeedSeconds = value.VerticalSpeedSeconds
+                            }
+                        };
                     }
                 }
                 else
@@ -422,7 +458,6 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                // todo debug this when using the start tracking -> skip ground handling shortcut
                 if (this.TrackingStatus != TrackingStatus.Tracking)
                 {
                     if (this.TrackingStatus == TrackingStatus.Preparing)
@@ -556,7 +591,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     FuelTanks = this.FuelTanks,
                     PayloadStations = this.PayloadStations,
-                    SlewPlaneIntoPosition = Structs.SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
+                    SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
                 };
             }
         }
