@@ -934,7 +934,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         }
                     }
 
-                    if (!this.SimConnect.GroundHandlingComplete)
+                    if (!this.SimConnect.GroundHandlingComplete && this.SimConnect.SecondaryTracking.EngineRunning)
                     {
                         Debug.WriteLine("Ground handling not complete, ask the user about skipping...");
                         MessageBoxResult? answer = MessageBoxResult.None;

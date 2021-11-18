@@ -137,15 +137,18 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 this.SimbriefRouteLocations.Clear();
                 this.simbriefWaypointMarkers.Clear();
-                this.SimbriefRouteLocations.Add(new Location(this.Flight.Origin.Latitude, this.Flight.Origin.Longitude));
-                foreach (var waypoint in log.NavLogWaypoints)
+                if (log.NavLogWaypoints.Count > 0)
                 {
-                    var waypointMarker = new SimbriefWaypointMarker(waypoint);
-                    this.simbriefWaypointMarkers.Add(waypointMarker);
-                    this.SimbriefRouteLocations.Add(new Location(waypoint.Latitude, waypoint.Longitude));
-                }
+                    this.SimbriefRouteLocations.Add(new Location(this.Flight.Origin.Latitude, this.Flight.Origin.Longitude));
+                    foreach (var waypoint in log.NavLogWaypoints)
+                    {
+                        var waypointMarker = new SimbriefWaypointMarker(waypoint);
+                        this.simbriefWaypointMarkers.Add(waypointMarker);
+                        this.SimbriefRouteLocations.Add(new Location(waypoint.Latitude, waypoint.Longitude));
+                    }
 
-                this.SimbriefRouteLocations.Add(new Location(this.Flight.Destination.Latitude, this.Flight.Destination.Longitude));
+                    this.SimbriefRouteLocations.Add(new Location(this.Flight.Destination.Latitude, this.Flight.Destination.Longitude));
+                }
             };
             Application.Current.Dispatcher.BeginInvoke(restoreSimbrief);
 
