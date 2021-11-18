@@ -342,7 +342,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 var timeDelta = pst.New.UtcDateTime - pst.Old.UtcDateTime;
-                if (timeDelta.TotalSeconds < 0)
+                if (timeDelta.TotalSeconds < -5)
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, time moved backwards!");
                     var assembly = Assembly.GetExecutingAssembly();

@@ -474,6 +474,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                         Debug.WriteLine("Flight tracking resuming...");
                         this.Speech.SpeakAsync("Flight tracking resumed");
                         this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
+
+                        // Check if we just resumed a save that failed to upload
+                        if (this.FlightPhase == FlightPhase.PostFlight)
+                        {
+                            this.FinishUpFlightTracking();
+                        }
                     }
 
                     this.trackingStarted = DateTime.UtcNow;
@@ -706,15 +712,17 @@ namespace OpenSky.AgentMSFS.SimConnect
                     if (saveFile != null)
                     {
                         var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
+                        xmlStream.Seek(0, SeekOrigin.Begin);
                         var targetMemoryStream = new MemoryStream();
+                        byte[] zippedBytes;
                         using (var gzip = new GZipStream(targetMemoryStream, CompressionMode.Compress))
                         {
                             xmlStream.CopyTo(gzip);
+                            gzip.Close();
+                            zippedBytes = targetMemoryStream.ToArray();
                         }
 
-                        targetMemoryStream.Seek(0, SeekOrigin.Begin);
-                        var bytes = targetMemoryStream.ToArray();
-                        var base64String = Convert.ToBase64String(bytes);
+                        var base64String = Convert.ToBase64String(zippedBytes);
 
                         Debug.WriteLine("Submitting final report to OpenSky server...");
                         var finalReport = new FinalReport
@@ -766,6 +774,8 @@ namespace OpenSky.AgentMSFS.SimConnect
             // todo only call this if the saving/etc. worked, ask user for retry etc.
             if (callStopFlight)
             {
+                this.DeleteSaveFile();
+                this.Flight = null;
                 this.StopTracking(false);
             }
         }
