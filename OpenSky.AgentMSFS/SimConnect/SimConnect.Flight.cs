@@ -661,8 +661,8 @@ namespace OpenSky.AgentMSFS.SimConnect
         private void FinishUpFlightTracking()
         {
             Debug.WriteLine("SimConnect finishing up flight tracking started");
-            this.SaveFlight(); // todo do this sync
 
+            var callStopFlight = false;
             if (this.Flight != null)
             {
                 try
@@ -698,38 +698,42 @@ namespace OpenSky.AgentMSFS.SimConnect
                         FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
                     };
 
-                    if (!this.flightSaveMutex.WaitOne(30 * 1000))
-                    {
-                        throw new Exception("Timeout waiting for save flight mutex.");
-                    }
+                    this.RefreshStructNow(Requests.FuelTanks);
+                    this.RefreshStructNow(Requests.PayloadStations);
+                    Thread.Sleep(500);
 
-                    var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
-                    flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
-                    var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
-
-                    if (!File.Exists(saveFileName))
+                    var saveFile = this.GenerateSaveFile();
+                    if (saveFile != null)
                     {
-                        throw new Exception("Unable find save file: " + saveFileName);
-                    }
+                        var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
+                        var targetMemoryStream = new MemoryStream();
+                        using (var gzip = new GZipStream(targetMemoryStream, CompressionMode.Compress))
+                        {
+                            xmlStream.CopyTo(gzip);
+                        }
 
-                    var bytes = File.ReadAllBytes(saveFileName);
-                    var base64String = Convert.ToBase64String(bytes);
+                        targetMemoryStream.Seek(0, SeekOrigin.Begin);
+                        var bytes = targetMemoryStream.ToArray();
+                        var base64String = Convert.ToBase64String(bytes);
 
-                    Debug.WriteLine("Submitting final report to OpenSky server...");
-                    var finalReport = new FinalReport
-                    {
-                        FinalPositionReport = positionReport,
-                        FlightLog = base64String
-                    };
+                        Debug.WriteLine("Submitting final report to OpenSky server...");
+                        var finalReport = new FinalReport
+                        {
+                            FinalPositionReport = positionReport,
+                            FlightLog = base64String
+                        };
 
-                    var result = OpenSkyService.Instance.CompleteFlightAsync(finalReport).Result;
-                    if (result.IsError)
-                    {
-                        Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Submitting final report to OpenSky server successfully!");
+                        var result = OpenSkyService.Instance.CompleteFlightAsync(finalReport).Result;
+                        if (result.IsError)
+                        {
+                            Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
+                            // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Submitting final report to OpenSky server successfully!");
+                            callStopFlight = true;
+                        }
                     }
                 }
                 catch (AbandonedMutexException)
@@ -739,6 +743,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error submitting final flight report: " + ex);
+                    // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
                 }
                 finally
                 {
@@ -755,10 +760,14 @@ namespace OpenSky.AgentMSFS.SimConnect
             else
             {
                 Debug.WriteLine("CRITICAL: Unable to finish up flight tracking and submitting final log because SimConnect.Flight is NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                callStopFlight = true;
             }
 
             // todo only call this if the saving/etc. worked, ask user for retry etc.
-            this.StopTracking(false);
+            if (callStopFlight)
+            {
+                this.StopTracking(false);
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
