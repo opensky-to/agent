@@ -16,13 +16,13 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Windows.Controls;
     using System.Xml.Linq;
 
-    using OpenSky.AgentMSFS.Properties;
-
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -241,9 +241,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                 try
                 {
                     Debug.WriteLine("Importing sim brief flight plan waypoints");
-                    if (string.IsNullOrWhiteSpace(Settings.Default.SimBriefUsername))
+                    if (string.IsNullOrEmpty(UserSessionService.Instance.LinkedAccounts?.SimbriefUsername))
                     {
-                        throw new Exception("No Simbrief user name configured!");
+                        throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
                     }
 
                     if (this.SimConnect.Flight == null)
@@ -251,18 +251,18 @@ namespace OpenSky.AgentMSFS.Views.Models
                         throw new Exception("No flight loaded!");
                     }
 
-                    var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={Settings.Default.SimBriefUsername}");
+                    var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={UserSessionService.Instance.LinkedAccounts?.SimbriefUsername}");
 
                     var ofp = XElement.Parse(xml);
                     var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
                     var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
 
-                    if (!this.SimConnect.Flight.OriginICAO.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    if (!this.SimConnect.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         throw new Exception("Departure airport doesn't match!");
                     }
 
-                    if (!this.SimConnect.Flight.DestinationICAO.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    if (!this.SimConnect.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         throw new Exception("Destination airport doesn't match!");
                     }
@@ -324,6 +324,11 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void MoveMapToCoordinate(object commandParameter)
         {
+            if (commandParameter is Airport airport)
+            {
+                this.MapPositionUpdated?.Invoke(this, new MapPositionUpdate(new Location(airport.Latitude, airport.Longitude, airport.Altitude), true));
+            }
+
             if (commandParameter is GeoCoordinate geoCoordinate)
             {
                 this.MapPositionUpdated?.Invoke(this, new MapPositionUpdate(new Location(geoCoordinate.Latitude, geoCoordinate.Longitude, geoCoordinate.Altitude), true));

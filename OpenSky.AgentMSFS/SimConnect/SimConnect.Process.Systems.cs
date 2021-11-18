@@ -18,6 +18,9 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
+
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -62,7 +65,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if ((DateTime.UtcNow - this.lastOverspeed).TotalSeconds > 10)
                 {
                     this.lastOverspeed = DateTime.UtcNow;
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, OpenSkyColors.OpenSkyRed, "Overspeed");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Overspeed, OpenSkyColors.OpenSkyRed, "Overspeed");
                 }
 
                 // todo xp
@@ -74,7 +77,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if ((DateTime.UtcNow - this.lastStall).TotalSeconds > 10)
                 {
                     this.lastStall = DateTime.UtcNow;
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, OpenSkyColors.OpenSkyRed, "Stall");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Stall, OpenSkyColors.OpenSkyRed, "Stall");
                 }
 
                 // todo xp
@@ -127,7 +130,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             // Was the engine turned off/on?
             if (pst.Old.EngineRunning != pst.New.EngineRunning)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.EngineRunning ? "Engine started" : "Engine shut down");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Engine, OpenSkyColors.OpenSkyTealLight, pst.New.EngineRunning ? "Engine started" : "Engine shut down");
                 if (pst.New.EngineRunning && this.TrackingStatus == TrackingStatus.Tracking)
                 {
                     // todo remove/replace this!
@@ -152,7 +155,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     //todo add some kind of xp reduction
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
                     this.fsConnect.SetText("OpenSky Warning: Beacon turned off when engine was started", 5);
                 }
 
@@ -160,7 +163,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if ((pst.New.LightTaxi || pst.New.LightLanding) && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
                     //todo add some kind of xp reduction
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TaxiLandingLightsEngine, OpenSkyColors.OpenSkyRed, $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
                     this.fsConnect.SetText($"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}", 5);
                 }
 
@@ -189,7 +192,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             if (!this.taxiInTurned)
                             {
                                 //todo add some kind of xp reduction
-                                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyWarningOrange, "Engine turned off on the runway?");
+                                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.EngineOffRunway, OpenSkyColors.OpenSkyWarningOrange, "Engine turned off on the runway?");
                                 this.fsConnect.SetText("OpenSky Warning: Engine turned off on the runway?", 5);
                             }
 
@@ -204,7 +207,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         };
                         Application.Current.Dispatcher.Invoke(addPositionReport);
 
-                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, "Flight tracking stopped");
+                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TrackingStopped, OpenSkyColors.OpenSkyTealLight, "Flight tracking stopped");
 
                         // Show landing report notification now?
                         if (LandingReportNotification.AfterTurningEnginesOff.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
@@ -235,19 +238,19 @@ namespace OpenSky.AgentMSFS.SimConnect
             // Pushback start?
             if (pst.Old.Pushback == Pushback.NoPushback && pst.New.Pushback != Pushback.NoPushback)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, "Pushback started");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.PushbackStarted, OpenSkyColors.OpenSkyTealLight, "Pushback started");
             }
 
             // Pushback finished?
             if (pst.Old.Pushback != Pushback.NoPushback && pst.New.Pushback == Pushback.NoPushback)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, "Pushback finished");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.PushbackFinished, OpenSkyColors.OpenSkyTealLight, "Pushback finished");
             }
 
             // Was the battery master turned off/on?
             if (pst.Old.ElectricalMasterBattery != pst.New.ElectricalMasterBattery && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.ElectricalMasterBattery ? "Battery master on" : "Battery master off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BatteryMaster, OpenSkyColors.OpenSkyTealLight, pst.New.ElectricalMasterBattery ? "Battery master on" : "Battery master off");
             }
 
             // Was the landing gear lowered/raised?
@@ -255,7 +258,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 if (!this.PrimaryTracking.OnGround)
                 {
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingGear, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");
 
                     // todo add check that removes xp if gear is still lowered above a certain agl depending on engine type (if gear is retractable)?
                 }
@@ -263,7 +266,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     if (!pst.New.GearHandle)
                     {
-                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyRed, "Tried to raise landing gear on the ground");
+                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.GearUpOnGround, OpenSkyColors.OpenSkyRed, "Tried to raise landing gear on the ground");
                         // todo xp reduction if raising gear while on the ground?
                     }
                 }
@@ -272,43 +275,43 @@ namespace OpenSky.AgentMSFS.SimConnect
             // Was the flaps position changed?
             if (Math.Abs(pst.Old.FlapsHandle - pst.New.FlapsHandle) > 1)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, $"Flaps set to {pst.New.FlapsHandle} %");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Flaps, OpenSkyColors.OpenSkyTealLight, $"Flaps set to {pst.New.FlapsHandle} %");
             }
 
             // Was the autopilot engaged/disengaged?
             if (pst.Old.AutoPilot != pst.New.AutoPilot)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.AutoPilot ? "AP engaged" : "AP disengaged");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.AutoPilot, OpenSkyColors.OpenSkyTealLight, pst.New.AutoPilot ? "AP engaged" : "AP disengaged");
             }
 
             // Was the parking brake set/released?
             if (pst.Old.ParkingBrake != pst.New.ParkingBrake)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.ParkingBrake ? "Parking brake set" : "Parking brake released");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.ParkingBrake, OpenSkyColors.OpenSkyTealLight, pst.New.ParkingBrake ? "Parking brake set" : "Parking brake released");
             }
 
             // Were the spoilers armed/disarmed?
             if (pst.Old.SpoilersArmed != pst.New.SpoilersArmed)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.SpoilersArmed ? "Spoilers armed" : "Spoilers disarmed");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Spoilers, OpenSkyColors.OpenSkyTealLight, pst.New.SpoilersArmed ? "Spoilers armed" : "Spoilers disarmed");
             }
 
             // Was the APU turned on/off?
             if (pst.Old.ApuGenerator != pst.New.ApuGenerator)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.ApuGenerator ? "APU started" : "APU shut down");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.APU, OpenSkyColors.OpenSkyTealLight, pst.New.ApuGenerator ? "APU started" : "APU shut down");
             }
 
             // Were the seatbelt signs turned on/off
             if (pst.Old.SeatBeltSign != pst.New.SeatBeltSign)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.SeatBeltSign ? "Seat belt signs on" : "Seat belt signs off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.SeatbeltSigns, OpenSkyColors.OpenSkyTealLight, pst.New.SeatBeltSign ? "Seat belt signs on" : "Seat belt signs off");
             }
 
             // Were the no smoking signs turned on/off
             if (pst.Old.NoSmokingSign != pst.New.NoSmokingSign)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, OpenSkyColors.OpenSkyTealLight, pst.New.NoSmokingSign ? "No smoking signs on" : "No smoking signs off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.NoSmokingSigns, OpenSkyColors.OpenSkyTealLight, pst.New.NoSmokingSign ? "No smoking signs on" : "No smoking signs off");
             }
 
             // Was the crash detection turned off?
@@ -339,7 +342,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 var timeDelta = pst.New.UtcDateTime - pst.Old.UtcDateTime;
-                if (timeDelta.TotalSeconds < 0)
+                if (timeDelta.TotalSeconds < -5)
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, time moved backwards!");
                     var assembly = Assembly.GetExecutingAssembly();

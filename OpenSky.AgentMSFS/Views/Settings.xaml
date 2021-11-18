@@ -25,7 +25,7 @@
     <StackPanel Orientation="Vertical" Margin="20" Grid.IsSharedSizeScope="True">
         <GroupBox>
             <GroupBox.Header>
-                <TextBlock FontSize="15" FontWeight="DemiBold">Keys and Users</TextBlock>
+                <TextBlock FontSize="15" FontWeight="DemiBold">OpenSky Account</TextBlock>
             </GroupBox.Header>
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
@@ -34,12 +34,8 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">OpenSky user</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Bing Maps key</TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">SimBrief user name</TextBlock>
                 <Grid Grid.Row="0" Grid.Column="1" Margin="10,5,0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -50,8 +46,6 @@
                     <Button Style="{StaticResource OpenSkyButtonStyle}" Grid.Column="1" Margin="3,0" Command="{Binding LoginOpenSkyUserCommand}">Login</Button>
                     <Button Style="{StaticResource OpenSkyButtonStyle}" Grid.Column="2" Command="{Binding LogoutOpenSkyUserCommand}">Logout</Button>
                 </Grid>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding BingMapsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimBriefUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </GroupBox>
         <GroupBox>

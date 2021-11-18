@@ -9,7 +9,6 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using System.Collections.Generic;
     using System.Device.Location;
     using System.Runtime.InteropServices;
-    using System.Xml.Linq;
 
     using CTrue.FsConnect;
 
@@ -160,77 +159,5 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("VERTICAL SPEED", "Feet per second", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("SIM ON GROUND", "Bool", SIMCONNECT_DATATYPE.INT32),
             };
-    }
-
-    /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Slew plane into position save/restore helper class.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 01/04/2021.
-    /// </remarks>
-    /// -------------------------------------------------------------------------------------------------
-    public static class SlewPlaneIntoPositionSaver
-    {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets slew plane into position for saving to file - Note we are actually using primary
-        /// tracking struct for this as this struct is not using a sample rate and only loaded on request.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="primary">
-        /// The primary.
-        /// </param>
-        /// <returns>
-        /// The primary tracking struct containing the slew plane into position info for saving.
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static XElement GetSlewPlaneIntoPositionForSave(PrimaryTracking primary)
-        {
-            var position = new XElement("ResumePosition");
-            position.SetAttributeValue("Lat", primary.Latitude);
-            position.SetAttributeValue("Lon", primary.Longitude);
-            position.SetAttributeValue("Alt", $"{primary.RadioHeight:F0}");
-            position.SetAttributeValue("Hdg", $"{primary.Heading:F2}");
-            position.SetAttributeValue("Tas", $"{primary.AirspeedTrue:F0}");
-            position.SetAttributeValue("Pit", $"{primary.PitchAngle:F2}");
-            position.SetAttributeValue("Bnk", $"{primary.BankAngle:F2}");
-            position.SetAttributeValue("Vss", $"{primary.VerticalSpeedSeconds:F2}");
-            position.SetAttributeValue("Gnd", primary.OnGround);
-            return position;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Restore slew plane into position from save file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="positionFromSave">
-        /// The position from the save file.
-        /// </param>
-        /// <returns>
-        /// A SlewPlaneIntoPosition.
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static SlewPlaneIntoPosition RestoreSlewPlaneIntoPositionFromSave(XElement positionFromSave)
-        {
-            var slew = new SlewPlaneIntoPosition
-            {
-                Latitude = double.Parse(positionFromSave.Attribute("Lat")?.Value ?? "missing"),
-                Longitude = double.Parse(positionFromSave.Attribute("Lon")?.Value ?? "missing"),
-                RadioHeight = double.Parse(positionFromSave.Attribute("Alt")?.Value ?? "missing"),
-                Heading = double.Parse(positionFromSave.Attribute("Hdg")?.Value ?? "missing"),
-                AirspeedTrue = double.Parse(positionFromSave.Attribute("Tas")?.Value ?? "missing"),
-                PitchAngle = double.Parse(positionFromSave.Attribute("Pit")?.Value ?? "missing"),
-                BankAngle = double.Parse(positionFromSave.Attribute("Bnk")?.Value ?? "missing"),
-                VerticalSpeedSeconds = double.Parse(positionFromSave.Attribute("Vss")?.Value ?? "missing"),
-                OnGround = bool.Parse(positionFromSave.Attribute("Gnd")?.Value ?? "missing")
-            };
-            return slew;
-        }
     }
 }

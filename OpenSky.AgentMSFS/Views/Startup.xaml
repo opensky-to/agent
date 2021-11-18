@@ -64,7 +64,6 @@
                     <mc:AlternateContent>
                         <mc:Choice Requires="debug">
                             <MenuItem Header="Tracking debug" Command="{Binding TrackingDebugCommand}" />
-                            <MenuItem Header="Test flight" Command="{Binding TestFlightCommand}" />
                         </mc:Choice>
                     </mc:AlternateContent>
                     <MenuItem Header="Aircraft types" Command="{Binding AircraftTypesCommand}" />
