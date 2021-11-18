@@ -54,6 +54,9 @@ namespace OpenSky.AgentMSFS.Models
         public AircraftTrailLocation(DateTime timestamp, PrimaryTracking primary, SecondaryTracking secondary, double fuelOnBoard) : base(primary.MapLocation.Latitude, primary.MapLocation.Longitude, primary.MapLocation.Altitude)
         {
             this.position.Timestamp = timestamp;
+            this.position.Latitude = primary.Latitude;
+            this.position.Longitude = primary.Longitude;
+            this.position.Altitude = (int)primary.Altitude;
             this.position.Airspeed = primary.AirspeedTrue;
             this.position.Groundspeed = primary.GroundSpeed;
             this.position.OnGround = primary.OnGround;

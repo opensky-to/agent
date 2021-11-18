@@ -661,12 +661,13 @@ namespace OpenSky.AgentMSFS.SimConnect
         private void FinishUpFlightTracking()
         {
             Debug.WriteLine("SimConnect finishing up flight tracking started");
-            this.SaveFlight();
+            this.SaveFlight(); // todo do this sync
 
             if (this.Flight != null)
             {
                 try
                 {
+                    Debug.WriteLine("Creating final position report...1");
                     var positionReport = new PositionReport
                     {
                         Id = this.Flight.Id,
@@ -714,6 +715,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     var bytes = File.ReadAllBytes(saveFileName);
                     var base64String = Convert.ToBase64String(bytes);
 
+                    Debug.WriteLine("Submitting final report to OpenSky server...");
                     var finalReport = new FinalReport
                     {
                         FinalPositionReport = positionReport,
@@ -724,6 +726,10 @@ namespace OpenSky.AgentMSFS.SimConnect
                     if (result.IsError)
                     {
                         Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Submitting final report to OpenSky server successfully!");
                     }
                 }
                 catch (AbandonedMutexException)
@@ -751,8 +757,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 Debug.WriteLine("CRITICAL: Unable to finish up flight tracking and submitting final log because SimConnect.Flight is NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
 
-
-            this.Flight = null;
+            // todo only call this if the saving/etc. worked, ask user for retry etc.
             this.StopTracking(false);
         }
 
