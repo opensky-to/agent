@@ -19,10 +19,11 @@ namespace OpenSky.AgentMSFS.Views.Models
     using JetBrains.Annotations;
 
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.Models.API;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
     using OpenSky.AgentMSFS.Tools;
+
+    using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -39,7 +40,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// The flight IDs for which we already displayed notifications.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly List<int> flightNotificationsDisplayed = new();
+        private readonly List<Guid> flightNotificationsDisplayed = new();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -145,10 +146,51 @@ namespace OpenSky.AgentMSFS.Views.Models
             // Initialize commands
             this.FlightTrackingCommand = new Command(this.OpenFlightTracking);
             this.TrackingDebugCommand = new Command(this.OpenTrackingDebug);
-            this.TestFlightCommand = new Command(this.OpenTestFlight);
             this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
+
+            // Check for new flight from API
+            new Thread(
+                () =>
+                {
+                    if (UserSessionService.Instance.IsUserLoggedIn)
+                    {
+                        _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                    }
+
+                    while (!SleepScheduler.IsShutdownInProgress)
+                    {
+                        if (UserSessionService.Instance.IsUserLoggedIn && SimConnect.Instance.Flight == null)
+                        {
+                            try
+                            {
+                                var result = OpenSkyService.Instance.GetFlightAsync().Result;
+                                if (!result.IsError)
+                                {
+                                    if (result.Data.Id != Guid.Empty)
+                                    {
+                                        SimConnect.Instance.Flight = result.Data;
+                                    }
+
+                                    // todo test what happens if we set the flight to NULL in simconnect?
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Error checking for new flight: " + result.Message + "\r\n" + result.ErrorDetails);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Error checking for new flight: " + ex);
+                            }
+                        }
+
+
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(30));
+                    }
+                })
+            { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -179,22 +221,22 @@ namespace OpenSky.AgentMSFS.Views.Models
                 // Show notification mini-view
                 if (e != null && FlightTracking.Instance == null)
                 {
-                    if (!this.flightNotificationsDisplayed.Contains(e.FlightID))
+                    if (!this.flightNotificationsDisplayed.Contains(e.Id))
                     {
                         Debug.WriteLine("Showing new flight notification to user (standard timeout)");
                         new NewFlightNotification().Show();
-                        this.flightNotificationsDisplayed.Add(e.FlightID);
+                        this.flightNotificationsDisplayed.Add(e.Id);
                     }
                 }
 
                 // Bring an existing flight tracking view forward, but don't create a new one
                 if (e != null && FlightTracking.Instance != null)
                 {
-                    if (!this.flightNotificationsDisplayed.Contains(e.FlightID))
+                    if (!this.flightNotificationsDisplayed.Contains(e.Id))
                     {
                         Debug.WriteLine("Showing new flight notification to user (short timeout)");
                         new NewFlightNotification(10 * 1000).Show();
-                        this.flightNotificationsDisplayed.Add(e.FlightID);
+                        this.flightNotificationsDisplayed.Add(e.Id);
                     }
 
                     Debug.WriteLine("New flight, bringing existing flight tracking view into focus");
@@ -399,30 +441,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         public Command SettingsCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the test flight command.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        [NotNull]
-        public Command TestFlightCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Opens the create test flight view.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 26/03/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private void OpenTestFlight()
-        {
-#if DEBUG
-            Debug.WriteLine("Opening test flight view");
-            TestFlight.Open();
-#endif
-        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

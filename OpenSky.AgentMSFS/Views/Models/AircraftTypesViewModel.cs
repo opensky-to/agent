@@ -157,6 +157,34 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string manufacturer;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string Manufacturer
+        {
+            get => this.manufacturer;
+        
+            set
+            {
+                if(Equals(this.manufacturer, value))
+                {
+                   return;
+                }
+        
+                this.manufacturer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets a value indicating whether to include or exclude the type from the world
         /// population.
         /// </summary>
@@ -794,11 +822,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                 EngineCount = this.SimConnect.PlaneIdentity.EngineCount,
                 EmptyWeight = this.SimConnect.WeightAndBalance.EmptyWeight,
                 FuelTotalCapacity = this.SimConnect.WeightAndBalance.FuelTotalCapacity,
+                FuelWeightPerGallon = Math.Round(this.SimConnect.WeightAndBalance.FuelWeightPerGallon, 2),
                 MaxGrossWeight = this.SimConnect.WeightAndBalance.MaxGrossWeight,
                 FlapsAvailable = this.SimConnect.PlaneIdentity.FlapsAvailable,
                 IsGearRetractable = this.SimConnect.PlaneIdentity.GearRetractable,
                 Name = this.Name,
                 VersionNumber = this.VersionNumber,
+                Manufacturer = this.Manufacturer,
                 Category = this.Category,
                 IsVanilla = this.IsVanilla,
                 IncludeInWorldPopulation = this.IncludeInWorldPopulation,
@@ -863,6 +893,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             this.Name = null;
             this.VersionNumber = 1;
+            this.Manufacturer = null;
             this.Category = AircraftTypeCategory.SEP;
             this.IsVanilla = false;
             this.IncludeInWorldPopulation = false;
@@ -1308,7 +1339,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     this.SaveEditedAircraftTypeCommand.ReportProgress(
                         () =>
                         {
-                            ModernWpf.MessageBox.Show(result.Message, "Update aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
+                            ModernWpf.MessageBox.Show(result.Message, "Update aircraft type", MessageBoxButton.OK, MessageBoxImage.Information);
                             this.CancelEditAircraft(); // This resets the input form and hides the groupbox
                             this.RefreshAircraftTypesCommand.DoExecute(null);
                         });

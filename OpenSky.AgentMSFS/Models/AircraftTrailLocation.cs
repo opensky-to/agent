@@ -7,13 +7,11 @@
 namespace OpenSky.AgentMSFS.Models
 {
     using System;
-    using System.Globalization;
-    using System.Xml.Linq;
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Structs;
+    using OpenSky.FlightLogXML;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -26,6 +24,13 @@ namespace OpenSky.AgentMSFS.Models
     /// -------------------------------------------------------------------------------------------------
     public class AircraftTrailLocation : Location
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The position report we are wrapping around.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly PositionReport position = new();
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Initializes a new instance of the <see cref="AircraftTrailLocation"/> class.
@@ -48,15 +53,18 @@ namespace OpenSky.AgentMSFS.Models
         /// -------------------------------------------------------------------------------------------------
         public AircraftTrailLocation(DateTime timestamp, PrimaryTracking primary, SecondaryTracking secondary, double fuelOnBoard) : base(primary.MapLocation.Latitude, primary.MapLocation.Longitude, primary.MapLocation.Altitude)
         {
-            this.Timestamp = timestamp;
-            this.Airspeed = primary.AirspeedTrue;
-            this.Groundspeed = primary.GroundSpeed;
-            this.OnGround = primary.OnGround;
-            this.RadioAlt = primary.RadioHeight;
-            this.Heading = primary.Heading;
-            this.FuelOnBoard = fuelOnBoard;
-            this.SimulationRate = primary.SimulationRate;
-            this.TimeOfDay = secondary.TimeOfDay;
+            this.position.Timestamp = timestamp;
+            this.position.Latitude = primary.Latitude;
+            this.position.Longitude = primary.Longitude;
+            this.position.Altitude = (int)primary.Altitude;
+            this.position.Airspeed = primary.AirspeedTrue;
+            this.position.Groundspeed = primary.GroundSpeed;
+            this.position.OnGround = primary.OnGround;
+            this.position.RadioAlt = primary.RadioHeight;
+            this.position.Heading = primary.Heading;
+            this.position.FuelOnBoard = fuelOnBoard;
+            this.position.SimulationRate = primary.SimulationRate;
+            this.position.TimeOfDay = (TimeOfDay)secondary.TimeOfDay;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -64,119 +72,22 @@ namespace OpenSky.AgentMSFS.Models
         /// Initializes a new instance of the <see cref="AircraftTrailLocation"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 01/04/2021.
+        /// sushi.at, 17/11/2021.
         /// </remarks>
-        /// <param name="locationFromSave">
-        /// The location from a save file to restore.
+        /// <param name="position">
+        /// The position report we are wrapping around, restored from a flight log xml file.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public AircraftTrailLocation(XElement locationFromSave)
+        public AircraftTrailLocation(PositionReport position) : base(position.Latitude, position.Longitude, position.Altitude)
         {
-            this.Timestamp = DateTime.ParseExact(locationFromSave.Attribute("Timestamp")?.Value, "O", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
-            this.Latitude = double.Parse(locationFromSave.Attribute("Lat")?.Value ?? "missing");
-            this.Longitude = double.Parse(locationFromSave.Attribute("Lon")?.Value ?? "missing");
-            this.Altitude = double.Parse(locationFromSave.Attribute("Alt")?.Value ?? "missing");
-            this.Airspeed = double.Parse(locationFromSave.Attribute("Airspeed")?.Value ?? "missing");
-            this.Groundspeed = double.Parse(locationFromSave.Attribute("Groundspeed")?.Value ?? "missing");
-            this.OnGround = bool.Parse(locationFromSave.Attribute("OnGround")?.Value ?? "missing");
-            this.RadioAlt = double.Parse(locationFromSave.Attribute("RadioAlt")?.Value ?? "missing");
-            this.Heading = double.Parse(locationFromSave.Attribute("Heading")?.Value ?? "missing");
-            this.FuelOnBoard = double.Parse(locationFromSave.Attribute("FuelOnBoard")?.Value ?? "missing");
-            this.SimulationRate = double.Parse(locationFromSave.Attribute("SimulationRate")?.Value ?? "missing");
-            Enum.TryParse(locationFromSave.Attribute("TimeOfDay")?.Value, out TimeOfDay timeOfDay);
-            this.TimeOfDay = timeOfDay;
+            this.position = position;
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the true airspeed.
+        /// Gets the position.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double Airspeed { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the fuel on board in gallons.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double FuelOnBoard { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the ground speed.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double Groundspeed { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the heading.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double Heading { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets a value indicating whether the plane is on the ground.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool OnGround { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the radio altitude (AGL).
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double RadioAlt { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the simulation rate.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double SimulationRate { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the time of day.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public TimeOfDay TimeOfDay { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the timestamp of the location.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public DateTime Timestamp { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets location XElement for save file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <returns>
-        /// The location for save.
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public XElement GetLocationForSave()
-        {
-            var locationElement = new XElement("Location");
-            locationElement.SetAttributeValue("Timestamp", $"{this.Timestamp:O}");
-            locationElement.SetAttributeValue("Lat", $"{this.Latitude}");
-            locationElement.SetAttributeValue("Lon", $"{this.Longitude}");
-            locationElement.SetAttributeValue("Alt", $"{this.Altitude:F0}");
-            locationElement.SetAttributeValue("Airspeed", $"{this.Airspeed:F0}");
-            locationElement.SetAttributeValue("Groundspeed", $"{this.Groundspeed:F0}");
-            locationElement.SetAttributeValue("OnGround", $"{this.OnGround}");
-            locationElement.SetAttributeValue("RadioAlt", $"{this.RadioAlt:F0}");
-            locationElement.SetAttributeValue("Heading", $"{this.Heading:F0}");
-            locationElement.SetAttributeValue("FuelOnBoard", $"{this.FuelOnBoard:F2}");
-            locationElement.SetAttributeValue("SimulationRate", $"{this.SimulationRate:F1}");
-            locationElement.SetAttributeValue("TimeOfDay", $"{this.TimeOfDay}");
-            return locationElement;
-        }
+        public PositionReport Position => this.position;
     }
 }

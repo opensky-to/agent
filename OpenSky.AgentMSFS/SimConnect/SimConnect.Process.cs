@@ -27,6 +27,10 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
+
+    using TrackingEventLogEntry = Models.TrackingEventLogEntry;
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -124,6 +128,9 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <param name="secondary">
         /// The secondary Simconnect tracking data.
         /// </param>
+        /// <param name="type">
+        /// The flight tracking event type.
+        /// </param>
         /// <param name="color">
         /// The color to use for the marker.
         /// </param>
@@ -131,7 +138,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The event text (what happened?).
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, Color color, string text)
+        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, FlightTrackingEventType type, Color color, string text)
         {
             if (this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations)
             {
@@ -156,7 +163,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.lastNonPositionReportMarker.AddEventToMarker(DateTime.UtcNow, text);
                 }
 
-                this.TrackingEventLogEntries.Add(new TrackingEventLogEntry(DateTime.UtcNow, color, text, primary.MapLocation));
+                this.TrackingEventLogEntries.Add(new TrackingEventLogEntry(type, DateTime.UtcNow, color, text, primary.MapLocation));
             };
             Application.Current.Dispatcher.BeginInvoke(addTrackingEvent);
         }
@@ -182,7 +189,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.TrackingConditions[(int)Models.TrackingConditions.DateTime].ConditionMet =
                     this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - pst.New.UtcDateTime).TotalMinutes) < 1;
-                //this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.PlaneIdentifierHash.Equals(this.Flight?.PlaneIdentifier, StringComparison.InvariantCultureIgnoreCase); // todo replace this with aircraft type check
+                this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.Flight?.Aircraft.Type.MatchesAircraftInSimulator() ?? false;
 
                 if (this.TrackingStatus == TrackingStatus.Preparing)
                 {
@@ -202,8 +209,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].Current =
-                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.Flight?.OriginCoordinates ?? new GeoCoordinate(0, 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.Flight?.OriginCoordinates ?? new GeoCoordinate(0, 0)) < 5000;
+                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) < 5000;
                 }
 
                 if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -237,8 +244,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             while (!this.close)
             {
-                ProcessLandingAnalysis pla;
-                while (this.landingAnalysisProcessingQueue.TryDequeue(out pla))
+                while (this.landingAnalysisProcessingQueue.TryDequeue(out var pla))
                 {
                     try
                     {
@@ -267,7 +273,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             try
             {
                 // Make sure the player didn't use the dev mode to switch the plane
-                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)) //&& this.PlaneIdentifierHash != this.Flight.PlaneIdentifier) // todo replace this with aircraft type check
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && !Flight.Aircraft.Type.MatchesAircraftInSimulator())
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
@@ -297,8 +303,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             while (!this.close)
             {
                 Location newLocation = null;
-                ProcessPrimaryTracking ppt;
-                while (this.primaryTrackingProcessingQueue.TryDequeue(out ppt))
+                while (this.primaryTrackingProcessingQueue.TryDequeue(out var ppt))
                 {
                     try
                     {
@@ -344,8 +349,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             while (!this.close)
             {
-                ProcessSecondaryTracking pst;
-                while (this.secondaryTrackingProcessingQueue.TryDequeue(out pst))
+                while (this.secondaryTrackingProcessingQueue.TryDequeue(out var pst))
                 {
                     try
                     {
@@ -387,25 +391,39 @@ namespace OpenSky.AgentMSFS.SimConnect
                     // Did the fuel go up?
                     if (newWB.FuelTotalQuantity > oldWB.FuelTotalQuantity)
                     {
-                        Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                        player.Play();
-                        this.Speech.SpeakAsync("Tracking aborted, fuel increased.");
-                        this.StopTracking(false);
-                        this.fsConnect.SetText("OpenSky Warning: Tracking aborted, fuel increased.", 5);
+                        if (newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity > 0.5)
+                        {
+                            Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
+                            var assembly = Assembly.GetExecutingAssembly();
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            player.Play();
+                            this.Speech.SpeakAsync("Tracking aborted, fuel increased.");
+                            this.StopTracking(false);
+                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, fuel increased.", 5);
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"Small fuel jump detected: {newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity} gallons");
+                        }
                     }
 
                     // Is the payload weight different from the flight?
-                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 2) > 1)
+                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) > 1)
                     {
-                        Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                        player.Play();
-                        this.Speech.SpeakAsync("Tracking aborted, payload changed.");
-                        this.StopTracking(false);
-                        this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                        if (newWB.PayloadWeight > (this.Flight?.PayloadPounds ?? 0) && Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) < 100)
+                        {
+                            Debug.WriteLine($"Small payload jump detected: {newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0} lbs");
+                        }
+                        else
+                        {
+                            Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
+                            var assembly = Assembly.GetExecutingAssembly();
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            player.Play();
+                            this.Speech.SpeakAsync("Tracking aborted, payload changed.");
+                            this.StopTracking(false);
+                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                        }
                     }
                 }
             }

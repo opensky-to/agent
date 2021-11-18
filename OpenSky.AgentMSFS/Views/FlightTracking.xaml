@@ -19,7 +19,7 @@
             xmlns:viewModels="clr-namespace:OpenSky.AgentMSFS.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
             xmlns:models="clr-namespace:OpenSky.AgentMSFS.Models"
-            mc:Ignorable="d"
+            mc:Ignorable="d" LoadingText="{Binding LoadingText}"
             Title="Flight Tracking" Height="1000" Width="1300" Loaded="FlightTrackingLoaded" Unloaded="FlightTrackingOnUnloaded" FontSize="14" HorizontalScrollBar="False" VerticalScrollBar="False">
     <Window.DataContext>
         <viewModels:FlightTrackingViewModel 
@@ -69,6 +69,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="1*"  />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Grid.Column="0">
             <GroupBox.Header>
@@ -89,16 +90,16 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Destination:</TextBlock>
                 <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Alternate:</TextBlock>
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.OriginICAO, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.OriginCoordinates, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Origin, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding SimConnect.Flight.Origin.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Origin, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Origin.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.DestinationICAO, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.DestinationCoordinates, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Destination, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding SimConnect.Flight.Destination.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Destination, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Destination.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.AlternateICAO, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.AlternateCoordinates, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Alternate, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding SimConnect.Flight.Alternate.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Alternate, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding SimConnect.Flight.Alternate.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" HorizontalAlignment="Stretch" Style="{StaticResource OpenSkyButtonStyle}" Foreground="White" FontSize="14" FontWeight="SemiBold" Command="{Binding ImportSimbriefCommand}" Visibility="{Binding ImportSimbriefVisibility}">Import waypoints from Simbrief flight plan</Button>
             </Grid>
@@ -298,6 +299,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -318,6 +320,15 @@
                 <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding SimConnect.PayloadLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
                     <Rectangle Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="1.5" RadiusY="1.5" />
                     <TextBlock Foreground="#404040" Margin="5">Payload loading complete</TextBlock>
+                </Grid>
+
+                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,1" Visibility="{Binding SkipGroundHandlingVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,3,0" Command="{Binding SpeedUpGroundHandlingCommand}">Skip half</Button>
+                    <Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,0,0,0" Command="{Binding SkipGroundHandlingCommand}">Skip</Button>
                 </Grid>
             </Grid>
         </GroupBox>
@@ -443,7 +454,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Fuel (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.FuelGallons, FallbackValue=??}" Margin="0,0,3,0"/>
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.FuelGallons, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0"/>
                                 <TextBlock FontSize="15" FontWeight="DemiBold">gallons)</TextBlock>
                             </StackPanel>
                         </Expander.Header>
@@ -466,7 +477,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Payload (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.PayloadPounds, FallbackValue=??}" Margin="0,0,3,0" />
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.PayloadPounds, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0" />
                                 <TextBlock FontSize="15" FontWeight="DemiBold">lbs)</TextBlock>
                             </StackPanel>
                         </Expander.Header>
@@ -488,12 +499,34 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <Grid Grid.Column="3" Grid.Row="0" Grid.RowSpan="7">
+        <GroupBox Grid.Row="0" Grid.RowSpan="7" Grid.Column="3" Visibility="{Binding OfpVisibility}">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="15" FontWeight="DemiBold">OFP</TextBlock>
+                    <Button Padding="5,0" FontSize="11" Margin="5,-2,0,0" Command="{Binding ToggleOfpCommand}">hide</Button>
+                </StackPanel>
+            </GroupBox.Header>
+            <TextBox Text="{Binding SimConnect.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
+        </GroupBox>
+        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="7">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0">
+                <GroupBox.Header>
+                    <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="10">Route</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <TextBlock FontSize="10" Margin="0,10,0,0">Alternate route</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <Button Style="{StaticResource OpenSkyButtonStyle}" Margin="0,10,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Flight events</TextBlock>
                 </GroupBox.Header>
@@ -509,7 +542,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </GroupBox>
-            <GroupBox Grid.Row="1" Grid.Column="0">
+            <GroupBox Grid.Row="2" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Graphs</TextBlock>
                 </GroupBox.Header>
@@ -559,7 +592,7 @@
                 </StackPanel>
             </Grid>
         </GroupBox>
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Grid.ColumnSpan="4" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
+        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
                 <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please assign a new flight from the OpenSky client or if you have the Alpha debugging client, create one using the "Test Flight" option from the main menu.</TextBlock>

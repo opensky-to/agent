@@ -6,10 +6,8 @@
 
 namespace OpenSky.AgentMSFS.SimConnect.Structs
 {
-    using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
-    using System.Xml.Linq;
 
     using CTrue.FsConnect;
 
@@ -297,69 +295,5 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("FUEL TANK EXTERNAL1 QUANTITY", "Gallons", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("FUEL TANK EXTERNAL2 QUANTITY", "Gallons", SIMCONNECT_DATATYPE.FLOAT64),
             };
-    }
-
-    /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Fuel tanks save/restore helper class.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 01/04/2021.
-    /// </remarks>
-    /// -------------------------------------------------------------------------------------------------
-    public static class FuelTanksSaver
-    {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets fuel tanks for saving to a file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="tanks">
-        /// The tanks.
-        /// </param>
-        /// <returns>
-        /// The fuel tanks for saving.
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static XElement GetFuelTanksForSave(FuelTanks tanks)
-        {
-            var fuelTanks = new XElement("FuelTanks");
-            foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
-            {
-                fuelTanks.Add(new XElement(tank.ToString(), tanks.Quantities[tank]));
-            }
-
-            return fuelTanks;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Restore fuel tanks from save file.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 01/04/2021.
-        /// </remarks>
-        /// <param name="tanksFromSave">
-        /// The tanks from the save file.
-        /// </param>
-        /// <returns>
-        /// The FuelTanks struct restored (only quantities, not capacities!).
-        /// </returns>
-        /// -------------------------------------------------------------------------------------------------
-        public static FuelTanks RestoreFuelTanksFromSave(XElement tanksFromSave)
-        {
-            var tanks = new FuelTanks();
-            var quantities = tanks.Quantities;
-            foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
-            {
-                quantities[tank] = double.Parse(tanksFromSave.Element(tank.ToString())?.Value ?? "missing");
-            }
-
-            tanks.UpdateQuantitiesFromDictionary(quantities);
-
-            return tanks;
-        }
     }
 }

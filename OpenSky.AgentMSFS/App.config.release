@@ -16,12 +16,6 @@
             <setting name="SettingsUpdateRequired" serializeAs="String">
                 <value>True</value>
             </setting>
-            <setting name="BingMapsKey" serializeAs="String">
-                <value />
-            </setting>
-            <setting name="SimBriefUsername" serializeAs="String">
-                <value />
-            </setting>
             <setting name="SimulatorHostName" serializeAs="String">
                 <value>localhost</value>
             </setting>

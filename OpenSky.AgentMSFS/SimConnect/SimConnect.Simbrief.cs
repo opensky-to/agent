@@ -123,6 +123,53 @@ namespace OpenSky.AgentMSFS.SimConnect
                 Application.Current.Dispatcher.BeginInvoke(addLocation);
             }
 
+            var sbOfpHtml = (string)ofp.Element("text")?.Element("plan_html");
+            if (!string.IsNullOrEmpty(sbOfpHtml))
+            {
+                // todo maybe can use this in the future if we find more performant html rendering control
+                //if (!sbOfpHtml.StartsWith("<html>"))
+                //{
+                //    const string style = "body { background-color: #29323c; color: #c2c2c2; margin: -1px; } div { margin-top: 10px; margin-left: 10px; margin-bottom: -10px; }";
+                //    sbOfpHtml = $"<html><head><style type=\"text/css\">{style}</style></head><body>{sbOfpHtml}</body></html>";
+                //}
+
+                // Remove comments
+                while (sbOfpHtml.Contains("<!--"))
+                {
+                    var start = sbOfpHtml.IndexOf("<!--", StringComparison.InvariantCultureIgnoreCase);
+                    var end = sbOfpHtml.IndexOf("-->", start, StringComparison.InvariantCultureIgnoreCase);
+                    if (start != -1 && end != -1)
+                    {
+                        sbOfpHtml = sbOfpHtml.Substring(0, start) + sbOfpHtml.Substring(end + 3);
+                    }
+                }
+
+                // Replace page breaks
+                sbOfpHtml = sbOfpHtml.Replace("<h2 style=\"page-break-after: always;\"> </h2>", "\r\n\r\n");
+
+                // Remove html tags
+                while (sbOfpHtml.Contains("<"))
+                {
+                    var start = sbOfpHtml.IndexOf("<", StringComparison.InvariantCultureIgnoreCase);
+                    var end = sbOfpHtml.IndexOf(">", start, StringComparison.InvariantCultureIgnoreCase);
+                    if (start != -1 && end != -1)
+                    {
+                        // Are we removing an image?
+                        if (sbOfpHtml.Substring(start, 4) == "<img")
+                        {
+                            sbOfpHtml = sbOfpHtml.Substring(0, start) + "---Image removed---" + sbOfpHtml.Substring(end + 1);
+                        }
+                        else
+                        {
+                            sbOfpHtml = sbOfpHtml.Substring(0, start) + sbOfpHtml.Substring(end + 1);
+                        }
+                    }
+                }
+
+                UpdateGUIDelegate setOfp = () => this.Flight.OfpHtml = sbOfpHtml;
+                Application.Current.Dispatcher.BeginInvoke(setOfp);
+            }
+
             this.SimbriefOfpLoaded = true;
         }
     }

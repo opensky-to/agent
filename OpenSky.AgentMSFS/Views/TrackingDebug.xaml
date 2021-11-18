@@ -316,6 +316,7 @@
         <TextBlock Grid.Column="6" Grid.Row="28" VerticalAlignment="Center" HorizontalAlignment="Right">CG forward limit</TextBlock>
         <TextBlock Grid.Column="6" Grid.Row="29" VerticalAlignment="Center" HorizontalAlignment="Right">CG aft limit</TextBlock>
         <TextBlock Grid.Column="6" Grid.Row="30" VerticalAlignment="Center" HorizontalAlignment="Right">CG lateral</TextBlock>
+        <TextBlock Grid.Column="6" Grid.Row="31" VerticalAlignment="Center" HorizontalAlignment="Right">Fuel weight / gallon</TextBlock>
         <TextBox Grid.Column="7" Grid.Row="23" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight, Mode=OneWay, StringFormat=F1}" />
         <UniformGrid Grid.Row="24" Grid.Column="7" Margin="5,2,20,2" Rows="1" Columns="2">
             <TextBox Margin="0,2,0,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.FuelWeight, Mode=OneWay, StringFormat=F1}" DockPanel.Dock="Left"  />
@@ -333,6 +334,7 @@
         <TextBox Grid.Column="7" Grid.Row="28" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.CgFwdLimit, Mode=OneWay, StringFormat=P}" />
         <TextBox Grid.Column="7" Grid.Row="29" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.CgAftLimit, Mode=OneWay, StringFormat=P}" />
         <TextBox Grid.Column="7" Grid.Row="30" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.CgPercentLateral, Mode=OneWay, StringFormat=P}" />
+        <TextBox Grid.Column="7" Grid.Row="31" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.WeightAndBalance.FuelWeightPerGallon, Mode=OneWay, StringFormat=F2}" />
 
         <TextBlock Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="22" FontWeight="Bold" HorizontalAlignment="Center">Landing Analysis</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="23" VerticalAlignment="Center" HorizontalAlignment="Right">Sample rate</TextBlock>

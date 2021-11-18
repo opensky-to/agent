@@ -7,6 +7,7 @@
 namespace OpenSky.AgentMSFS
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
@@ -44,6 +45,13 @@ namespace OpenSky.AgentMSFS
         /// -------------------------------------------------------------------------------------------------
         [CanBeNull]
         private Delegate afterShutdownCleanUpCodeDelegate;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether this application is in design mode.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static bool IsDesignMode => DesignerProperties.GetIsInDesignMode(new DependencyObject());
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

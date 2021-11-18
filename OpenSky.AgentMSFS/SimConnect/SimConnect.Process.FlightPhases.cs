@@ -7,12 +7,14 @@
 namespace OpenSky.AgentMSFS.SimConnect
 {
     using System;
+    using System.Device.Location;
     using System.Diagnostics;
     using System.Media;
     using System.Reflection;
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
@@ -180,19 +182,20 @@ namespace OpenSky.AgentMSFS.SimConnect
             var unknownFlightPhase = true;
             var newNextStepFlashing = false;
             var currentPosition = this.PrimaryTracking.GeoCoordinate;
-            var distanceToDepartureAirport = this.Flight?.OriginCoordinates.GetDistanceTo(currentPosition) / 1000 * 0.539957 ?? 0;
-            var distanceToDestinationAirport = this.Flight?.DestinationCoordinates.GetDistanceTo(currentPosition) / 1000 * 0.539957 ?? 0;
-            var distanceToAlternateAirport = this.Flight?.AlternateCoordinates.GetDistanceTo(currentPosition) / 1000 * 0.539957 ?? 0;
+            var distanceToDepartureAirport = new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
+            var distanceToDestinationAirport = new GeoCoordinate(this.Flight?.Destination.Latitude ?? 0, this.Flight?.Destination.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
+            var distanceToAlternateAirport = new GeoCoordinate(this.Flight?.Alternate.Latitude ?? 0, this.Flight?.Alternate.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
+
             if (!this.WasAirborne && this.PrimaryTracking.RadioHeight >= 50)
             {
                 this.WasAirborne = true;
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTeal, "Airborne");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Airborne, OpenSkyColors.OpenSkyTeal, "Airborne");
             }
 
             // InMenu
             if (this.PrimaryTracking.OnGround && Math.Abs(Math.Round(this.PrimaryTracking.Latitude, 1)) < 0.5 && Math.Abs(Math.Round(this.PrimaryTracking.Longitude, 1)) < 0.5)
             {
-                this.FlightPhase = FlightPhase.InMenu;
+                this.FlightPhase = FlightPhase.Briefing;
                 this.NextFlightStep = string.Empty;
                 unknownFlightPhase = false;
                 if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
@@ -406,7 +409,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
             {
-                // todo save pre-crash flight phase to submit as part of crash report?
+                // todo save pre-crash flight phase to submit as part of crash report? implement this in the systems section?
 
                 if (unknownFlightPhase)
                 {

@@ -12,6 +12,9 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.Tools;
+    using OpenSky.FlightLogXML;
+
+    using TomsToolbox.Essentials;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -26,6 +29,13 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private readonly Mutex isGroundHandlingThreadRunning = new(false);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if fuel loading is complete.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool fuelLoadingComplete;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -50,10 +60,24 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True if fuel loading is complete.
+        /// True if payload loading is complete.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private bool fuelLoadingComplete;
+        private bool payloadLoadingComplete;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if payload loading complete sound played.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool payloadLoadingCompleteSoundPlayed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload loading estimate in minutes.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string payloadLoadingEstimateMinutes = "??";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -78,28 +102,21 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True if payload loading is complete.
+        /// Gets the fuel loading estimate minutes.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private bool payloadLoadingComplete;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets a value indicating whether the payload loading is complete.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool PayloadLoadingComplete
+        public string FuelLoadingEstimateMinutes
         {
-            get => this.payloadLoadingComplete;
+            get => this.fuelLoadingEstimateMinutes;
 
             private set
             {
-                if (Equals(this.payloadLoadingComplete, value))
+                if (Equals(this.fuelLoadingEstimateMinutes, value))
                 {
                     return;
                 }
 
-                this.payloadLoadingComplete = value;
+                this.fuelLoadingEstimateMinutes = value;
                 this.OnPropertyChanged();
             }
         }
@@ -127,35 +144,21 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True if payload loading complete sound played.
+        /// Gets a value indicating whether the payload loading is complete.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private bool payloadLoadingCompleteSoundPlayed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The payload loading estimate in minutes.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string payloadLoadingEstimateMinutes = "??";
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the fuel loading estimate minutes.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string FuelLoadingEstimateMinutes
+        public bool PayloadLoadingComplete
         {
-            get => this.fuelLoadingEstimateMinutes;
+            get => this.payloadLoadingComplete;
 
             private set
             {
-                if (Equals(this.fuelLoadingEstimateMinutes, value))
+                if (Equals(this.payloadLoadingComplete, value))
                 {
                     return;
                 }
 
-                this.fuelLoadingEstimateMinutes = value;
+                this.payloadLoadingComplete = value;
                 this.OnPropertyChanged();
             }
         }
@@ -183,6 +186,73 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Skip ground handling (add time saved to time warp).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// <returns>
+        /// True if it succeeds, false if it fails.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public bool SkipGroundHandling(bool startTracking)
+        {
+            if (this.Flight != null && !this.GroundHandlingComplete && (this.TrackingStatus == TrackingStatus.GroundOperations || startTracking))
+            {
+                var fuelSecondsLeft = ((this.Flight?.FuelLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
+                var payloadSecondsLeft = ((this.Flight?.PayloadLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
+                var secondsToSkip = Math.Max(fuelSecondsLeft, payloadSecondsLeft);
+                this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow;
+                this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow;
+
+                if (startTracking)
+                {
+                    this.GroundHandlingComplete = true;
+                    this.TrackingStatus = TrackingStatus.Preparing;
+                    this.StartTracking();
+                }
+
+                this.timeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate.AddSeconds(secondsToSkip);
+                this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.SkippedGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped ground handling");
+                return true;
+            }
+
+            return false;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Speed up ground handling by 2X (add time saved to time warp).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// <returns>
+        /// True if it succeeds, false if it fails.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public bool SpeedUpGroundHandling()
+        {
+            if (this.Flight != null && !this.GroundHandlingComplete && this.TrackingStatus == TrackingStatus.GroundOperations)
+            {
+                var fuelSecondsLeft = ((this.Flight?.FuelLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
+                var payloadSecondsLeft = ((this.Flight?.PayloadLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
+                var secondsToSkip = Math.Max(fuelSecondsLeft, payloadSecondsLeft) / 2;
+
+                this.timeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate.AddSeconds(secondsToSkip);
+                this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
+                this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(fuelSecondsLeft / 2);
+                this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(payloadSecondsLeft / 2);
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.SkippedHalfGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped half ground handling");
+                return true;
+            }
+
+            return false;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Update ground handling estimates from API and update UI/play sounds.
         /// </summary>
         /// <remarks>
@@ -201,8 +271,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             try
             {
-                // todo poll this from the OpenSky api
-
                 // No flight? No go! (should not happen but just in case)
                 if (this.Flight == null)
                 {
@@ -285,7 +353,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     this.FuelLoadingComplete = true;
                     this.PayloadLoadingComplete = true;
-                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, OpenSkyColors.OpenSkyTealLight, "Ground handling complete");
+                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.GroundHandlingComplete, OpenSkyColors.OpenSkyTealLight, "Ground handling complete");
 
                     if (this.TrackingStatus == TrackingStatus.GroundOperations)
                     {
