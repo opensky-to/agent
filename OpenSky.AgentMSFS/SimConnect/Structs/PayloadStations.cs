@@ -155,6 +155,46 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The payload station name 16.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Name16;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station name 17.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Name17;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station name 18.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Name18;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station name 19.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Name19;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station name 20.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Name20;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The payload station weight 1.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -258,6 +298,41 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// -------------------------------------------------------------------------------------------------
         public double Weight15 { get; set; }
 
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station weight 16.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Weight16 { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station weight 17.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Weight17 { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station weight 18.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Weight18 { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station weight 19.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Weight19 { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload station weight 20.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Weight20 { get; set; }
+
         // ==================================================================================================
         // END OF STRUCT PROPERTIES - BELOW ARE GET-ONLY COMPUTED PROPERTIES FOR OPENSKY
         // ==================================================================================================
@@ -284,7 +359,12 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 this.Name12?.Replace("TT:MENU.PAYLOAD.", string.Empty),
                 this.Name13?.Replace("TT:MENU.PAYLOAD.", string.Empty),
                 this.Name14?.Replace("TT:MENU.PAYLOAD.", string.Empty),
-                this.Name15?.Replace("TT:MENU.PAYLOAD.", string.Empty)
+                this.Name15?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name16?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name17?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name18?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name19?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name20?.Replace("TT:MENU.PAYLOAD.", string.Empty),
             };
     }
 
@@ -322,6 +402,11 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("PAYLOAD STATION NAME:13", null, SIMCONNECT_DATATYPE.STRING256),
                 new SimVar("PAYLOAD STATION NAME:14", null, SIMCONNECT_DATATYPE.STRING256),
                 new SimVar("PAYLOAD STATION NAME:15", null, SIMCONNECT_DATATYPE.STRING256),
+                new SimVar("PAYLOAD STATION NAME:16", null, SIMCONNECT_DATATYPE.STRING256),
+                new SimVar("PAYLOAD STATION NAME:17", null, SIMCONNECT_DATATYPE.STRING256),
+                new SimVar("PAYLOAD STATION NAME:18", null, SIMCONNECT_DATATYPE.STRING256),
+                new SimVar("PAYLOAD STATION NAME:19", null, SIMCONNECT_DATATYPE.STRING256),
+                new SimVar("PAYLOAD STATION NAME:20", null, SIMCONNECT_DATATYPE.STRING256),
                 new SimVar("PAYLOAD STATION WEIGHT:1", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PAYLOAD STATION WEIGHT:2", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PAYLOAD STATION WEIGHT:3", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
@@ -337,6 +422,11 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("PAYLOAD STATION WEIGHT:13", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PAYLOAD STATION WEIGHT:14", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PAYLOAD STATION WEIGHT:15", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PAYLOAD STATION WEIGHT:16", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PAYLOAD STATION WEIGHT:17", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PAYLOAD STATION WEIGHT:18", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PAYLOAD STATION WEIGHT:19", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PAYLOAD STATION WEIGHT:20", "Pounds", SIMCONNECT_DATATYPE.FLOAT64),
             };
     }
 }
