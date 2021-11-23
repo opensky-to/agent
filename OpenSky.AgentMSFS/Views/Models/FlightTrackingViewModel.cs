@@ -173,7 +173,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Set up payload stations collection
             this.PayloadStationWeights = new ObservableCollection<double>();
-            for (var i = 0; i < 15; i++)
+            for (var i = 0; i < 20; i++)
             {
                 this.PayloadStationWeights.Add(0.0);
             }
