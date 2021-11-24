@@ -1209,7 +1209,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         {
                             try
                             {
-                                this.flightAutoSaveTrackFlightMutex.ReleaseMutex();
+                                this.autoSaveUploadMutex.ReleaseMutex();
                             }
                             catch
                             {
