@@ -53,6 +53,9 @@
             <setting name="OpenSkyAPIUrl" serializeAs="String">
                 <value>https://api.opensky.to</value>
             </setting>
+			<setting name="AutoUpdateURL" serializeAs="String">
+				<value>https://api.github.com/repos/opensky-to/agent-msfs/releases/latest</value>
+			</setting>
         </OpenSky.AgentMSFS.Properties.Settings>
     </applicationSettings>
 </configuration>

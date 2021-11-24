@@ -150,6 +150,10 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
 
+            // Check for update
+            UpdateGUIDelegate autoUpdate = () => new AutoUpdate().Show();
+            Application.Current.Dispatcher.BeginInvoke(autoUpdate);
+
             // Check for new flight from API
             new Thread(
                 () =>
