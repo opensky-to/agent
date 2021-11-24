@@ -294,17 +294,27 @@
         <TextBox Grid.Column="3" Grid.Row="31" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight9, Mode=OneWay}" />
         <TextBox Grid.Column="3" Grid.Row="32" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight10, Mode=OneWay}" />
 
-        <TextBlock Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="22" FontWeight="Bold" HorizontalAlignment="Center">Payload Stations [11-15]</TextBlock>
+        <TextBlock Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="22" FontWeight="Bold" HorizontalAlignment="Center">Payload Stations [11-20]</TextBlock>
         <TextBlock Grid.Column="4" Grid.Row="23" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[10], FallbackValue=??, Mode=OneWay}" />
         <TextBlock Grid.Column="4" Grid.Row="24" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[11], FallbackValue=??, Mode=OneWay}" />
         <TextBlock Grid.Column="4" Grid.Row="25" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[12], FallbackValue=??, Mode=OneWay}" />
         <TextBlock Grid.Column="4" Grid.Row="26" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[13], FallbackValue=??, Mode=OneWay}" />
         <TextBlock Grid.Column="4" Grid.Row="27" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[14], FallbackValue=??, Mode=OneWay}" />
+        <TextBlock Grid.Column="4" Grid.Row="28" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[15], FallbackValue=??, Mode=OneWay}" />
+        <TextBlock Grid.Column="4" Grid.Row="29" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[16], FallbackValue=??, Mode=OneWay}" />
+        <TextBlock Grid.Column="4" Grid.Row="30" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[17], FallbackValue=??, Mode=OneWay}" />
+        <TextBlock Grid.Column="4" Grid.Row="31" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[18], FallbackValue=??, Mode=OneWay}" />
+        <TextBlock Grid.Column="4" Grid.Row="32" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SimConnect.PayloadStations.Names[19], FallbackValue=??, Mode=OneWay}" />
         <TextBox Grid.Column="5" Grid.Row="23" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight11, Mode=OneWay}" />
         <TextBox Grid.Column="5" Grid.Row="24" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight12, Mode=OneWay}" />
         <TextBox Grid.Column="5" Grid.Row="25" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight13, Mode=OneWay}" />
         <TextBox Grid.Column="5" Grid.Row="26" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight14, Mode=OneWay}" />
         <TextBox Grid.Column="5" Grid.Row="27" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight15, Mode=OneWay}" />
+        <TextBox Grid.Column="5" Grid.Row="28" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight16, Mode=OneWay}" />
+        <TextBox Grid.Column="5" Grid.Row="29" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight17, Mode=OneWay}" />
+        <TextBox Grid.Column="5" Grid.Row="30" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight18, Mode=OneWay}" />
+        <TextBox Grid.Column="5" Grid.Row="31" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight19, Mode=OneWay}" />
+        <TextBox Grid.Column="5" Grid.Row="32" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding SimConnect.PayloadStations.Weight20, Mode=OneWay}" />
 
 
         <TextBlock Grid.Column="6" Grid.ColumnSpan="2" Grid.Row="22" FontWeight="Bold" HorizontalAlignment="Center">Weight and Balance</TextBlock>
