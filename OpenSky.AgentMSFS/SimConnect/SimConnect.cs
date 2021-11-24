@@ -945,9 +945,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (simConnectObject is WeightAndBalance isWeightAndBalance)
                 {
                     new Thread(
-                            () => { this.ProcessWeightAndBalance(this.WeightAndBalance, isWeightAndBalance); })
+                            () =>
+                            {
+                                this.ProcessWeightAndBalance(this.WeightAndBalance, isWeightAndBalance);
+                                this.WeightAndBalance = isWeightAndBalance;
+                            })
                     { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
-                    this.WeightAndBalance = isWeightAndBalance;
                     this.LastReceivedTimes[Requests.WeightAndBalance] = DateTime.UtcNow;
                 }
 

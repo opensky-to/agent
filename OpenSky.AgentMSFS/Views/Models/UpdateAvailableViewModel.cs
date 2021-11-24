@@ -342,7 +342,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         {
                             if (!string.IsNullOrEmpty((string)json?.assets[i].browser_download_url))
                             {
-                                var url = (string)json?.assets[0].browser_download_url;
+                                var url = (string)json.assets[0].browser_download_url;
                                 Debug.WriteLine($"Auto update asset URL: {url}");
                                 if (url.ToLowerInvariant().EndsWith(".msi"))
                                 {

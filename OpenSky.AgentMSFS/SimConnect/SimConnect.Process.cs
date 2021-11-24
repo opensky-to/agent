@@ -408,21 +408,28 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
 
                     // Is the payload weight different from the flight?
-                    if (Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) > 1)
+                    if (Math.Abs(oldWB.PayloadWeight - newWB.PayloadWeight) > 0.01)
                     {
-                        if (newWB.PayloadWeight > (this.Flight?.PayloadPounds ?? 0) && Math.Abs(newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0) < 100)
+                        if (newWB.PayloadWeight > oldWB.PayloadWeight)
                         {
-                            Debug.WriteLine($"Small payload jump detected: {newWB.PayloadWeight - this.Flight?.PayloadPounds ?? 0} lbs");
+                            Debug.WriteLine($"Payload increase detected. Icing? Increase: {newWB.PayloadWeight - oldWB.PayloadWeight:F2} lbs");
                         }
                         else
                         {
-                            Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed.");
-                            var assembly = Assembly.GetExecutingAssembly();
-                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                            player.Play();
-                            this.Speech.SpeakAsync("Tracking aborted, payload changed.");
-                            this.StopTracking(false);
-                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                            if (newWB.PayloadWeight >= (this.Flight?.PayloadPounds ?? 0))
+                            {
+                                Debug.WriteLine($"Payload decrease detected. Icing? Still above required! Decrease: {newWB.PayloadWeight - oldWB.PayloadWeight:F2} lbs");
+                            }
+                            else
+                            {
+                                Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
+                                var assembly = Assembly.GetExecutingAssembly();
+                                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                                player.Play();
+                                this.Speech.SpeakAsync("Tracking aborted, payload changed.");
+                                this.StopTracking(false);
+                                this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                            }
                         }
                     }
                 }
