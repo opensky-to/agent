@@ -10,10 +10,14 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.IO;
     using System.Speech.Synthesis;
     using System.Windows;
+    using System.Windows.Media.Imaging;
 
     using JetBrains.Annotations;
+
+    using Microsoft.Win32;
 
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
@@ -34,10 +38,31 @@ namespace OpenSky.AgentMSFS.Views.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The Bing maps key.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string bingMapsKey;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Are there changes to the settings to be saved?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private bool isDirty;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string loadingText;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The profile image.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private BitmapImage profileImage;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -55,6 +80,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The simBrief username.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string simBriefUsername;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The simulator host name.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -66,7 +98,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private uint simulatorPort;
-
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -80,11 +111,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         public SettingsViewModel()
         {
             // Create command first so that IsDirty can set the CanExecute property
-            this.SaveSettingsCommand = new Command(this.SaveSettings, false);
+            this.SaveSettingsCommand = new AsynchronousCommand(this.SaveSettings, false);
             this.RestoreDefaultsCommand = new Command(this.RestoreDefaults);
             this.TestTextToSpeechVoiceCommand = new Command(this.TestTextToSpeechVoice);
             this.LoginOpenSkyUserCommand = new Command(this.LoginOpenSkyUser, !this.UserSession.IsUserLoggedIn);
             this.LogoutOpenSkyUserCommand = new AsynchronousCommand(this.LogoutOpenSkyUser, this.UserSession.IsUserLoggedIn);
+            this.ChangePasswordCommand = new Command(this.ChangePassword, this.UserSession.IsUserLoggedIn);
+            this.UpdateProfileImageCommand = new AsynchronousCommand(this.UpdateProfileImage, this.UserSession.IsUserLoggedIn);
 
             // Fetch available text to speech voices
             var speech = new SpeechSynthesizer();
@@ -101,10 +134,34 @@ namespace OpenSky.AgentMSFS.Views.Models
             Properties.Settings.Default.Reload();
             this.SimulatorHostName = Properties.Settings.Default.SimulatorHostName;
             this.SimulatorPort = Properties.Settings.Default.SimulatorPort;
+            this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
+            this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Properties.Settings.Default.LandingReportNotification);
             if (!string.IsNullOrEmpty(Properties.Settings.Default.TextToSpeechVoice))
             {
                 this.SelectedTextToSpeechVoice = Properties.Settings.Default.TextToSpeechVoice;
+            }
+
+            // Load profile image
+            if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
+            {
+                var image = new BitmapImage();
+                using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
+                {
+                    image.BeginInit();
+                    image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.UriSource = null;
+                    image.StreamSource = mem;
+                    image.EndInit();
+                }
+
+                image.Freeze();
+                this.ProfileImage = image;
+            }
+            else
+            {
+                this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
             }
 
             // Make sure we are notified if the UserSession service changes user logged in status
@@ -114,7 +171,34 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.IsDirty = false;
         }
 
-        
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the Bing maps key.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string BingMapsKey
+        {
+            get => this.bingMapsKey;
+
+            set
+            {
+                if (Equals(this.bingMapsKey, value))
+                {
+                    return;
+                }
+
+                this.bingMapsKey = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the change password command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ChangePasswordCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -147,6 +231,27 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the loading text.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string LoadingText
+        {
+            get => this.loadingText;
+
+            set
+            {
+                if (Equals(this.loadingText, value))
+                {
+                    return;
+                }
+
+                this.loadingText = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the login OpenSky user command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -158,6 +263,27 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand LogoutOpenSkyUserCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the profile image.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public BitmapImage ProfileImage
+        {
+            get => this.profileImage;
+
+            set
+            {
+                if (Equals(this.profileImage, value))
+                {
+                    return;
+                }
+
+                this.profileImage = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -173,7 +299,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        public Command SaveSettingsCommand { get; }
+        public AsynchronousCommand SaveSettingsCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -219,7 +345,27 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
         }
 
-        
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the simBrief username.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string SimBriefUsername
+        {
+            get => this.simBriefUsername;
+
+            set
+            {
+                if (Equals(this.simBriefUsername, value))
+                {
+                    return;
+                }
+
+                this.simBriefUsername = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -281,10 +427,30 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the update profile image command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand UpdateProfileImageCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the user session.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public UserSessionService UserSession => UserSessionService.Instance;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Change password (opens page in browser).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ChangePassword()
+        {
+            Process.Start(Properties.Settings.Default.OpenSkyChangePasswordUrl);
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -333,6 +499,17 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
 
             this.UserSession.Logout();
+            this.NotifyPropertyChanged(nameof(this.UserSession));
+
+            this.LogoutOpenSkyUserCommand.ReportProgress(
+                () =>
+                {
+                    var wasDirty = this.IsDirty;
+                    this.BingMapsKey = null;
+                    this.SimBriefUsername = null;
+                    this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
+                    this.IsDirty = wasDirty;
+                });
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -365,6 +542,9 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void SaveSettings()
         {
             Debug.WriteLine("Saving user settings...");
+            this.LoadingText = "Saving settings...";
+
+            // Save local settings
             try
             {
                 Properties.Settings.Default.SimulatorHostName = this.SimulatorHostName;
@@ -377,13 +557,51 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 Properties.Settings.Default.Save();
-                this.IsDirty = false;
+                this.SaveSettingsCommand.ReportProgress(() => this.IsDirty = false);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Error saving settings: " + ex);
-                ModernWpf.MessageBox.Show(ex.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.SaveSettingsCommand.ReportProgress(
+                    () =>
+                        ModernWpf.MessageBox.Show(ex.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error));
             }
+
+            // Save server-side settings
+            try
+            {
+                var linkedAccounts = new LinkedAccounts
+                {
+                    BingMapsKey = this.BingMapsKey,
+                    SimbriefUsername = this.SimBriefUsername
+                };
+
+                var result = OpenSkyService.Instance.UpdateLinkedAccountsAsync(linkedAccounts).Result;
+                if (!result.IsError)
+                {
+                    _ = UserSessionService.Instance.RefreshLinkedAccounts();
+                }
+                else
+                {
+                    this.SaveSettingsCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error saving settings: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.SaveSettingsCommand, "Error saving settings.");
+            }
+
+            this.LoadingText = null;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -414,6 +632,90 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Updates the profile image.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 25/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void UpdateProfileImage()
+        {
+            bool? answer = null;
+            string fileName = null;
+            this.UpdateProfileImageCommand.ReportProgress(
+                () =>
+                {
+                    var openDialog = new OpenFileDialog
+                    {
+                        CheckFileExists = true,
+                        Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg"
+                    };
+
+                    answer = openDialog.ShowDialog();
+                    if (answer == true)
+                    {
+                        fileName = openDialog.FileName;
+                    }
+                },
+                true);
+
+            if (answer != true || string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            try
+            {
+                var result = OpenSkyService.Instance.UploadProfileImageAsync(new FileParameter(File.OpenRead(fileName), fileName, fileName.ToLowerInvariant().EndsWith(".png") ? "image/png" : "image/jpeg")).Result;
+                if (result.IsError)
+                {
+                    this.UpdateProfileImageCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error updating profile image: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            ModernWpf.MessageBox.Show(result.Message, "Error updating profile image", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                }
+                else
+                {
+                    _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+
+                    // Load profile image
+                    if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
+                    {
+                        var image = new BitmapImage();
+                        using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
+                        {
+                            image.BeginInit();
+                            image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                            image.CacheOption = BitmapCacheOption.OnLoad;
+                            image.UriSource = null;
+                            image.StreamSource = mem;
+                            image.EndInit();
+                        }
+
+                        image.Freeze();
+                        this.ProfileImage = image;
+                    }
+                    else
+                    {
+                        this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.UpdateProfileImageCommand, "Error updating profile image.");
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// User session property changed.
         /// </summary>
         /// <remarks>
@@ -430,10 +732,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             if (e.PropertyName == nameof(this.UserSession.IsUserLoggedIn))
             {
+                // Update login/logout buttons
                 UpdateGUIDelegate updateCommands = () =>
                 {
                     this.LoginOpenSkyUserCommand.CanExecute = !this.UserSession.IsUserLoggedIn;
                     this.LogoutOpenSkyUserCommand.CanExecute = this.UserSession.IsUserLoggedIn;
+                    this.ChangePasswordCommand.CanExecute = this.UserSession.IsUserLoggedIn;
+                    this.UpdateProfileImageCommand.CanExecute = this.UserSession.IsUserLoggedIn;
                 };
                 Application.Current.Dispatcher.BeginInvoke(updateCommands);
 
@@ -441,15 +746,50 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     try
                     {
+                        // Refresh account info and linked accounts/keys sections
+                        _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
                         _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+
+                        UpdateGUIDelegate updateUserSettings = () =>
+                        {
+                            try
+                            {
+                                // Load profile image
+                                if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
+                                {
+                                    var image = new BitmapImage();
+                                    using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
+                                    {
+                                        image.BeginInit();
+                                        image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                                        image.CacheOption = BitmapCacheOption.OnLoad;
+                                        image.UriSource = null;
+                                        image.StreamSource = mem;
+                                        image.EndInit();
+                                    }
+
+                                    image.Freeze();
+                                    this.ProfileImage = image;
+                                }
+
+                                var wasDirty = this.IsDirty;
+                                this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
+                                this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
+                                this.IsDirty = wasDirty;
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Error updating user settings after login: " + ex);
+                            }
+                        };
+                        Application.Current.Dispatcher.BeginInvoke(updateUserSettings);
 
                         this.NotifyPropertyChanged(nameof(this.UserSession));
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Ignore
+                        Debug.WriteLine("Error processing user after-login: " + ex);
                     }
-                    
                 }
             }
         }
