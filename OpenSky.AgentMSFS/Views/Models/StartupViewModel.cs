@@ -161,6 +161,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (UserSessionService.Instance.IsUserLoggedIn)
                     {
                         _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                        _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
                     }
 
                     while (!SleepScheduler.IsShutdownInProgress)
