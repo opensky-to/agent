@@ -221,7 +221,7 @@
     <Compile Include="Views\Models\SettingsViewModel.cs" />
     <Compile Include="Views\Models\StartupViewModel.cs" />
     <Compile Include="Views\Models\TrackingDebugViewModel.cs" />
-    <Compile Include="Views\Models\UpdateAvailableViewModel.cs" />
+    <Compile Include="Views\Models\AutoUpdateViewModel.cs" />
     <Compile Include="Views\NewFlightNotification.xaml.cs">
       <DependentUpon>NewFlightNotification.xaml</DependentUpon>
     </Compile>

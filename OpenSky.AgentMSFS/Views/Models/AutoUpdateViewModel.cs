@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateAvailableViewModel.cs" company="OpenSky">
+// <copyright file="AutoUpdateViewModel.cs" company="OpenSky">
 // OpenSky project 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -21,14 +21,14 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Update available view model.
+    /// Auto update view model.
     /// </summary>
     /// <remarks>
     /// sushi.at, 24/11/2021.
     /// </remarks>
     /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
-    public class UpdateAvailableViewModel : ViewModel
+    public class AutoUpdateViewModel : ViewModel
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -88,13 +88,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateAvailableViewModel"/> class.
+        /// Initializes a new instance of the <see cref="AutoUpdateViewModel"/> class.
         /// </summary>
         /// <remarks>
         /// sushi.at, 24/11/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public UpdateAvailableViewModel()
+        public AutoUpdateViewModel()
         {
             this.InstalledVersion = Assembly.GetEntryAssembly().GetVersionWithoutRevision();
 
