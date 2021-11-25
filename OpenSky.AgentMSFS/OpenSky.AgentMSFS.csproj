@@ -449,7 +449,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\OSdingdong.wav" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\profile200.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"</PreBuildEvent>

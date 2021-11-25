@@ -167,5 +167,14 @@ namespace OpenSky.AgentMSFS.Properties {
                 return ((string)(this["AutoUpdateURL"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5001/changepassword")]
+        public string OpenSkyChangePasswordUrl {
+            get {
+                return ((string)(this["OpenSkyChangePasswordUrl"]));
+            }
+        }
     }
 }
