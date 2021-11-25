@@ -7,6 +7,8 @@ Version 0.2.0 (ALPHA2)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 *) Increased payload station count to support JU52
 *) Added auto update support
+*) Expanded settings
+*) Fixed icing payload change issue causing tracking aborts
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 Version 0.1.0 (ALPHA1)
