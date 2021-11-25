@@ -87,6 +87,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True to include, false to exclude the type in the world population.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool includeInWorldPopulation;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True if is aircraft type is vanilla, false if not.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -108,6 +115,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string manufacturer;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The maximum price.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -119,6 +133,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private int minimumPrice;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The minimum length of the runway required by the type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int minimumRunwayLength;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -150,91 +171,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True to include, false to exclude the type in the world population.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool includeInWorldPopulation;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The manufacturer.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string manufacturer;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the manufacturer.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string Manufacturer
-        {
-            get => this.manufacturer;
-        
-            set
-            {
-                if(Equals(this.manufacturer, value))
-                {
-                   return;
-                }
-        
-                this.manufacturer = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether to include or exclude the type from the world
-        /// population.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool IncludeInWorldPopulation
-        {
-            get => this.includeInWorldPopulation;
-        
-            set
-            {
-                if(Equals(this.includeInWorldPopulation, value))
-                {
-                   return;
-                }
-        
-                this.includeInWorldPopulation = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The minimum length of the runway required by the type.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private int minimumRunwayLength;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the minimum runway length required by the type.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public int MinimumRunwayLength
-        {
-            get => this.minimumRunwayLength;
-        
-            set
-            {
-                if(Equals(this.minimumRunwayLength, value))
-                {
-                   return;
-                }
-        
-                this.minimumRunwayLength = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Initializes a new instance of the <see cref="AircraftTypesViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -263,6 +199,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.ClearVariantOfEditedCommand = new Command(this.ClearVariantOfEdited);
             this.ClearNextVersionOfEditedCommand = new Command(this.ClearNextVersionOfEdited);
             this.SaveEditedAircraftTypeCommand = new AsynchronousCommand(this.SaveEditedAircraftType, false);
+            this.IdentifyAircraftCommand = new Command(this.IdentifyAircraft);
 
             this.GetUserRolesCommand.DoExecute(null);
         }
@@ -539,6 +476,35 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the identify aircraft command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command IdentifyAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether to include or exclude the type from the world
+        /// population.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IncludeInWorldPopulation
+        {
+            get => this.includeInWorldPopulation;
+
+            set
+            {
+                if (Equals(this.includeInWorldPopulation, value))
+                {
+                    return;
+                }
+
+                this.includeInWorldPopulation = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets a value indicating whether this aircraft type is vanilla.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -602,6 +568,27 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string Manufacturer
+        {
+            get => this.manufacturer;
+
+            set
+            {
+                if (Equals(this.manufacturer, value))
+                {
+                    return;
+                }
+
+                this.manufacturer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the maximum price.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -638,6 +625,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.minimumPrice = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the minimum runway length required by the type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int MinimumRunwayLength
+        {
+            get => this.minimumRunwayLength;
+
+            set
+            {
+                if (Equals(this.minimumRunwayLength, value))
+                {
+                    return;
+                }
+
+                this.minimumRunwayLength = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -1257,6 +1265,39 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Identify aircraft.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 25/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void IdentifyAircraft()
+        {
+            if (!SimConnect.Instance.Connected)
+            {
+                ModernWpf.MessageBox.Show("Not connected to sim!", "Identify aircraft", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var foundMatch = false;
+            foreach (var type in this.ExistingAircraftTypes)
+            {
+                if (type.MatchesAircraftInSimulator())
+                {
+                    foundMatch = true;
+                    this.SelectedAircraftType = type;
+                    ModernWpf.MessageBox.Show($"Aircraft identified as: {type}", "Identify aircraft", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+
+            if (!foundMatch)
+            {
+                ModernWpf.MessageBox.Show("No matching aircraft type found.", "Identify aircraft", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Refreshes the list of existing aircraft types.
         /// </summary>
         /// <remarks>
@@ -1379,6 +1420,35 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void StartAddAircraft()
         {
+            if (!SimConnect.Instance.Connected)
+            {
+                ModernWpf.MessageBox.Show("Not connected to sim!", "Add aircraft type", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            AircraftType matchedType = null;
+            foreach (var type in this.ExistingAircraftTypes)
+            {
+                if (type.MatchesAircraftInSimulator())
+                {
+                    matchedType = type;
+                    break;
+                }
+            }
+
+            if (matchedType != null)
+            {
+                var answer = ModernWpf.MessageBox.Show(
+                    $"The aircraft currently loaded in the sim seems to be a match for the existing type: {matchedType}\r\n\r\nAre you sure you want to add another type?",
+                    "Add aircraft type",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+                if (answer != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
+
             this.AddAircraftVisibility = Visibility.Visible;
         }
 
