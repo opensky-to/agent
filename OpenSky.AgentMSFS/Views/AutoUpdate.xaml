@@ -20,7 +20,7 @@
                         mc:Ignorable="d" SizeToContent="WidthAndHeight" ShowMinMaxButtons="False"
                         Title="Update available" Height="450" Width="800" ShowInTaskbar="{Binding ShowInTaskbar}" Opacity="{Binding WindowOpacity}">
     <Window.DataContext>
-        <models:UpdateAvailableViewModel Close="UpdateAvailableViewModelOnClose" />
+        <models:AutoUpdateViewModel Close="AutoUpdateViewModelOnClose" />
     </Window.DataContext>
     <StackPanel Orientation="Vertical" Margin="30,15">
         <TextBlock FontSize="13" FontWeight="Bold" Margin="5,0">A new version of the OpenSky Agent for Microsoft Flight Simulator is available!</TextBlock>

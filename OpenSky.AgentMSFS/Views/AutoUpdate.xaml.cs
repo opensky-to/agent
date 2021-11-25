@@ -42,7 +42,7 @@ namespace OpenSky.AgentMSFS.Views
         /// Event information.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void UpdateAvailableViewModelOnClose(object sender, EventArgs e)
+        private void AutoUpdateViewModelOnClose(object sender, EventArgs e)
         {
             this.Close();
         }
