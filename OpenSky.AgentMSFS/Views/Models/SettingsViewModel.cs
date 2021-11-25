@@ -647,6 +647,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     var openDialog = new OpenFileDialog
                     {
+                        Title = "Select new profile image",
                         CheckFileExists = true,
                         Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg"
                     };

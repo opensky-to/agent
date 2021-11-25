@@ -96,9 +96,6 @@ namespace OpenSky.AgentMSFS.Views
         /// -------------------------------------------------------------------------------------------------
         private void ProfileImageOnMouseEnter(object sender, MouseEventArgs e)
         {
-            //this.CameraCanvas.Visibility = Visibility.Visible;
-
-
             this.CameraCanvas.Visibility = this.ProfileImage.IsMouseOver || this.CameraCanvas.IsMouseOver ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -118,10 +115,7 @@ namespace OpenSky.AgentMSFS.Views
         /// -------------------------------------------------------------------------------------------------
         private void ProfileImageOnMouseLeave(object sender, MouseEventArgs e)
         {
-            //            this.CameraCanvas.Visibility = Visibility.Collapsed;
-
             this.CameraCanvas.Visibility = this.ProfileImage.IsMouseOver || this.CameraCanvas.IsMouseOver ? Visibility.Visible : Visibility.Collapsed;
-
         }
     }
 }
