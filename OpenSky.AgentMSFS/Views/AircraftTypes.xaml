@@ -22,6 +22,7 @@
             xmlns:ui="http://schemas.modernwpf.com/2019"
             xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
             xmlns:tools="clr-namespace:OpenSky.AgentMSFS.Tools"
+            xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
             mc:Ignorable="d"
             Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False" VerticalScrollBar="False" LoadingText="{Binding LoadingText}">
     <Window.DataContext>
@@ -54,12 +55,18 @@
                 </DrawingGroup>
             </DrawingBrush.Drawing>
         </DrawingBrush>
+        <CollectionViewSource Source="{Binding ExistingAircraftTypes}" x:Key="ExistingAircraftTypesViewSource">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="Name" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshAircraftTypesCommand}" />
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding StartAddAircraftCommand}" />
+        <KeyBinding Key="I" Modifiers="Control" Command="{Binding IdentifyAircraftCommand}" />
     </Window.InputBindings>
-    <Grid>
+    <Grid Margin="5,5,5,10">
         <Grid.Resources>
             <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <converters:AircraftTypeForeignKeyConverter x:Key="AircraftTypeForeignKeyConverter" AircraftTypes="{Binding DataContext.ExistingAircraftTypes, Source={x:Reference ProxyElement}}" />
@@ -240,6 +247,11 @@
                         <ui:AppBarButton Icon="Accept" Label="Enable" ToolTip="Enable the selected aircraft type" Command="{Binding EnableTypeCommand}" />
                         <ui:AppBarButton Icon="Clear" Label="Disable" ToolTip="Disable the selected aircraft type" Command="{Binding DisableTypeCommand}" />
                         <ui:AppBarButton Icon="Edit" Label="Edit" ToolTip="Edit the selected aircraft type" Command="{Binding StartEditAircraftCommand}" />
+                        <ui:AppBarButton Label="Identify" ToolTip="Identify aircraft currently loaded in the simulator [Ctrl+I]" Command="{Binding IdentifyAircraftCommand}">
+                            <ui:AppBarButton.Icon>
+                                <ui:FontIcon Glyph="&#xE721;" />
+                            </ui:AppBarButton.Icon>
+                        </ui:AppBarButton>
                     </ui:CommandBar.PrimaryCommands>
                     <ui:CommandBar.SecondaryCommands>
                         <ui:AppBarButton Icon="Accept" Label="Enable checks" ToolTip="Enable the selected aircraft type's detailed checks (Only for patch days!)" Command="{Binding EnableDetailedChecksCommand}" />
@@ -248,7 +260,7 @@
                     </ui:CommandBar.SecondaryCommands>
                 </ui:CommandBar>
                 <DataGrid x:Name="AircraftTypesGrid"
-                          ItemsSource="{Binding ExistingAircraftTypes}" 
+                          ItemsSource="{Binding Source={StaticResource ExistingAircraftTypesViewSource}}" 
                           tools:MultiSelectExtension.SelectedItems="{Binding SelectedAircraftTypes}"
                           SelectedItem="{Binding SelectedAircraftType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow"
