@@ -49,7 +49,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 // Engine running?
                 if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
-                    //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off while engine was running");
                     this.fsConnect.SetText("OpenSky Warning: Beacon turned off while engine was running", 5);
                 }
@@ -80,15 +79,13 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop)
                 {
                     // 10000 feet landing lights (give 500 feet spare)
-                    if (this.PrimaryTracking.Altitude < 9500 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
+                    if (this.PrimaryTracking.IndicatedAltitude < 9500 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
                     {
                         if (!this.landingLightWarningActive)
                         {
                             this.landingLightWarningActive = true;
                             this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
                             this.fsConnect.SetText("OpenSky Warning: Landing lights off below 10k feet", 5);
-
-                            //todo add some kind of xp reduction
                         }
                     }
                     else
@@ -104,8 +101,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.landingLightWarningActive = true;
                         this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
                         this.fsConnect.SetText("OpenSky Warning: Landing lights off below 300 feet AGL", 5);
-
-                        //todo add some kind of xp reduction
                     }
                     else
                     {
