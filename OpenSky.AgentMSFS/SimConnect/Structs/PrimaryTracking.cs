@@ -58,6 +58,13 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The indicated altitude in feet.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double IndicatedAltitude { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Is the plane on the ground?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -197,6 +204,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 new SimVar("PLANE LONGITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE ALTITUDE", "Feet", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE ALT ABOVE GROUND", "Feet", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("INDICATED ALTITUDE", "Feet", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("SIM ON GROUND", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("PLANE HEADING DEGREES MAGNETIC", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("AIRSPEED TRUE", "Knots", SIMCONNECT_DATATYPE.FLOAT64),
