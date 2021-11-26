@@ -366,6 +366,29 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
                 this.Name19?.Replace("TT:MENU.PAYLOAD.", string.Empty),
                 this.Name20?.Replace("TT:MENU.PAYLOAD.", string.Empty),
             };
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the total payload weight across all stations.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double TotalWeight
+        {
+            get
+            {
+                var total = 0.0;
+                for (var i = 1; i < this.Count + 1; i++)
+                {
+                    var propInfo = this.GetType().GetProperty($"Weight{i}");
+                    if (propInfo != null)
+                    {
+                        total += (double)propInfo.GetValue(this);
+                    }
+                }
+
+                return total;
+            }
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

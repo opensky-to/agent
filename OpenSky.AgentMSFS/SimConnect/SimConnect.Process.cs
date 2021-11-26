@@ -197,13 +197,13 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F2}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.WeightAndBalance.PayloadWeight:F2}";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F2}";
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
                         this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.Flight?.FuelGallons ?? 0) < 0.01;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.WeightAndBalance.PayloadWeight - this.Flight?.PayloadPounds ?? 0) < 0.01;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds ?? 0) < 0.01;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
@@ -227,7 +227,9 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].Current = currentLocation;
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = (this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) < 100) && Math.Abs(this.PrimaryTracking.RadioHeight - this.flightLoadingTempStructs?.SlewPlaneIntoPosition.RadioHeight ?? -1000) < 50;
+                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet =
+                        (this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) < 100) &&
+                        Math.Abs(this.PrimaryTracking.RadioHeight - this.flightLoadingTempStructs?.SlewPlaneIntoPosition.RadioHeight ?? -1000) < 50;
                 }
             }
         }
@@ -262,6 +264,47 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Process the payload stations.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 26/11/2021.
+        /// </remarks>
+        /// <param name="oldPayload">
+        /// The old payload stations.
+        /// </param>
+        /// <param name="newPayload">
+        /// The new payload stations.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void ProcessPayloadStations(PayloadStations oldPayload, PayloadStations newPayload)
+        {
+            try
+            {
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
+                {
+                    if (Math.Abs(oldPayload.TotalWeight - newPayload.TotalWeight) > 0.1)
+                    {
+                        if (Math.Abs(newPayload.TotalWeight - this.Flight.PayloadPounds) > 0.5)
+                        {
+                            Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
+                            var assembly = Assembly.GetExecutingAssembly();
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            player.Play();
+                            this.Speech.SpeakAsync("Tracking aborted, payload changed.");
+                            this.StopTracking(false);
+                            this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error processing payload stations: " + ex);
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Process the plane identity.
         /// </summary>
         /// <remarks>
@@ -273,7 +316,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             try
             {
                 // Make sure the player didn't use the dev mode to switch the plane
-                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && !Flight.Aircraft.Type.MatchesAircraftInSimulator())
+                if (this.Flight != null && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && !this.Flight.Aircraft.Type.MatchesAircraftInSimulator())
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
@@ -404,32 +447,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         else
                         {
                             Debug.WriteLine($"Small fuel jump detected: {newWB.FuelTotalQuantity - oldWB.FuelTotalQuantity} gallons");
-                        }
-                    }
-
-                    // Is the payload weight different from the flight?
-                    if (Math.Abs(oldWB.PayloadWeight - newWB.PayloadWeight) > 0.01)
-                    {
-                        if (newWB.PayloadWeight > oldWB.PayloadWeight)
-                        {
-                            Debug.WriteLine($"Payload increase detected. Icing? Increase: {newWB.PayloadWeight - oldWB.PayloadWeight:F2} lbs");
-                        }
-                        else
-                        {
-                            if (newWB.PayloadWeight >= (this.Flight?.PayloadPounds ?? 0))
-                            {
-                                Debug.WriteLine($"Payload decrease detected. Icing? Still above required! Decrease: {newWB.PayloadWeight - oldWB.PayloadWeight:F2} lbs");
-                            }
-                            else
-                            {
-                                Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
-                                var assembly = Assembly.GetExecutingAssembly();
-                                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                                player.Play();
-                                this.Speech.SpeakAsync("Tracking aborted, payload changed.");
-                                this.StopTracking(false);
-                                this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
-                            }
                         }
                     }
                 }
