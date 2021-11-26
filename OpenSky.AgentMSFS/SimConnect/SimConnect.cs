@@ -931,7 +931,13 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 if (simConnectObject is PayloadStations isPayloadStations)
                 {
-                    this.PayloadStations = isPayloadStations;
+                    new Thread(
+                        () =>
+                        {
+                            this.ProcessPayloadStations(this.PayloadStations, isPayloadStations);
+                            this.PayloadStations = isPayloadStations;
+                        })
+                    { Name = "OpenSky.ProcessPayloadStations" }.Start();
                     this.LastReceivedTimes[Requests.PayloadStations] = DateTime.UtcNow;
                 }
 
