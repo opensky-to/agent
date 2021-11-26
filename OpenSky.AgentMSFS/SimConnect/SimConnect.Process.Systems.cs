@@ -67,8 +67,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.lastOverspeed = DateTime.UtcNow;
                     this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Overspeed, OpenSkyColors.OpenSkyRed, "Overspeed");
                 }
-
-                // todo xp
             }
 
             // Start of stall?
@@ -79,8 +77,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.lastStall = DateTime.UtcNow;
                     this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Stall, OpenSkyColors.OpenSkyRed, "Stall");
                 }
-
-                // todo xp
             }
 
             // Slew activated?
@@ -154,7 +150,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 // Was the beacon light off when the engine was started?
                 if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
-                    //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
                     this.fsConnect.SetText("OpenSky Warning: Beacon turned off when engine was started", 5);
                 }
@@ -162,7 +157,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 // Was the taxi or landing light on when turning on/off the engine?
                 if ((pst.New.LightTaxi || pst.New.LightLanding) && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
-                    //todo add some kind of xp reduction
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TaxiLandingLightsEngine, OpenSkyColors.OpenSkyRed, $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
                     this.fsConnect.SetText($"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}", 5);
                 }
@@ -191,7 +185,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         {
                             if (!this.taxiInTurned)
                             {
-                                //todo add some kind of xp reduction
                                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.EngineOffRunway, OpenSkyColors.OpenSkyWarningOrange, "Engine turned off on the runway?");
                                 this.fsConnect.SetText("OpenSky Warning: Engine turned off on the runway?", 5);
                             }
@@ -267,7 +260,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                     if (!pst.New.GearHandle)
                     {
                         this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.GearUpOnGround, OpenSkyColors.OpenSkyRed, "Tried to raise landing gear on the ground");
-                        // todo xp reduction if raising gear while on the ground?
                     }
                 }
             }
