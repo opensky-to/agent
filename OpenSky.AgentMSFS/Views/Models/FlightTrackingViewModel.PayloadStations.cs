@@ -84,6 +84,11 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SetPayloadStations()
         {
+            if (this.SimConnect.Flight == null || this.SimConnect.Flight.Aircraft.Type.RequiresManualLoading)
+            {
+                return;
+            }
+
             try
             {
                 var payloadStations = this.SimConnect.PayloadStations;

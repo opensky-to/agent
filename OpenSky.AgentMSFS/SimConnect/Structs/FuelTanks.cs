@@ -186,6 +186,25 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the total quantity of fuel in all tanks.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double TotalQuantity
+        {
+            get
+            {
+                var total = 0.0;
+                foreach (var quantity in Quantities)
+                {
+                    total += quantity.Value;
+                }
+
+                return total;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the fuel tank capacities dictionary.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.Tools;
     using OpenSky.FlightLogXML;
 
-    using TrackingEventLogEntry = OpenSky.AgentMSFS.Models.TrackingEventLogEntry;
+    using TrackingEventLogEntry = Models.TrackingEventLogEntry;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
