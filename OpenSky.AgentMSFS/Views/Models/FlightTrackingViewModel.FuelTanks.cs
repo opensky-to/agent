@@ -119,6 +119,11 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             try
             {
+                if (this.SimConnect.Flight == null || this.SimConnect.Flight.Aircraft.Type.RequiresManualFuelling)
+                {
+                    return;
+                }
+
                 var fuelTanks = this.SimConnect.FuelTanks;
                 var quantities = fuelTanks.Quantities;
                 foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
