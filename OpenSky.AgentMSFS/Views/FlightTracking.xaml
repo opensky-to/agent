@@ -142,25 +142,31 @@
 
                 <CheckBox Grid.Row="1" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[1].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">Fuel</TextBlock>
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Margin="5,0">Sim:</TextBlock>
-                    <TextBlock Text="{Binding SimConnect.TrackingConditions[1].Current}" />
-                    <TextBlock Margin="5,0,0,0">|</TextBlock>
-                    <TextBlock Margin="5,0">Flight:</TextBlock>
-                    <TextBlock Text="{Binding SimConnect.TrackingConditions[1].Expected}" />
+                <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
+                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[1].Current}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
+                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[1].Expected}" />
+                    </StackPanel>
                 </StackPanel>
-                <CheckBox Grid.Row="1" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[1].AutoSet, Mode=TwoWay}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
+                <CheckBox Grid.Row="1" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[1].AutoSet, Mode=TwoWay}" Visibility="{Binding SimConnect.Flight.Aircraft.Type.RequiresManualFuelling, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
                 <CheckBox Grid.Row="2" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[2].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">Payload</TextBlock>
-                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Margin="5,0">Sim:</TextBlock>
-                    <TextBlock Text="{Binding SimConnect.TrackingConditions[2].Current}" />
-                    <TextBlock Margin="5,0,0,0">|</TextBlock>
-                    <TextBlock Margin="5,0">Flight:</TextBlock>
-                    <TextBlock Text="{Binding SimConnect.TrackingConditions[2].Expected}" />
+                <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
+                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[2].Current}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
+                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[2].Expected}" />
+                    </StackPanel>
                 </StackPanel>
-                <CheckBox Grid.Row="2" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[2].AutoSet, Mode=TwoWay}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
+                <CheckBox Grid.Row="2" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[2].AutoSet, Mode=TwoWay}" Visibility="{Binding SimConnect.Flight.Aircraft.Type.RequiresManualLoading, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
                 <CheckBox Grid.Row="3" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[3].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Plane model</TextBlock>

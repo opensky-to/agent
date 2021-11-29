@@ -660,6 +660,11 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.ImportSimbriefCommand.CanExecute = e != null;
                 this.NoFlightVisibility = e != null ? Visibility.Collapsed : Visibility.Visible;
                 this.StartTrackingButtonText = e?.Resume == true ? "Resume Tracking" : "Start Tracking";
+
+                this.SetFuelTanksCommand.CanExecute = e != null && !e.Aircraft.Type.RequiresManualFuelling;
+                this.SetPayloadStationsCommand.CanExecute = e != null && !e.Aircraft.Type.RequiresManualLoading;
+                this.SetFuelAndPayloadCommand.CanExecute = e != null && (!e.Aircraft.Type.RequiresManualFuelling || !e.Aircraft.Type.RequiresManualLoading);
+                this.ToggleAdvancedWeightAndBalanceCommand.CanExecute = e != null && (!e.Aircraft.Type.RequiresManualFuelling || !e.Aircraft.Type.RequiresManualLoading);
             };
 
             Application.Current.Dispatcher.BeginInvoke(updateCommands);
