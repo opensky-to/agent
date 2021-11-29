@@ -244,6 +244,13 @@ namespace OpenSky.AgentMSFS.SimConnect
                     };
                     Application.Current.Dispatcher.BeginInvoke(addAirports);
 
+                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
+
+                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
+
                     if (!value.Resume)
                     {
                         Debug.WriteLine("Preparing to track new flight");
@@ -251,9 +258,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Preparing;
 
                         this.WarpInfo = "No [*]";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F2}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F2}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
 
                         // Add simbrief navlog to map
                         UpdateGUIDelegate addNavlog = () =>
@@ -312,6 +316,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                                 VerticalSpeedSeconds = value.VerticalSpeedSeconds
                             }
                         };
+
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{this.flightLoadingTempStructs.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     }
                 }
                 else
@@ -402,6 +408,20 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.trackingStatus = value;
                 this.OnPropertyChanged();
                 this.TrackingStatusChanged?.Invoke(this, value);
+
+                // Reduce the loading and fuel sample rates while preparing to make it easier for the user to adjust them for manual aircraft
+                if (value is not TrackingStatus.NotTracking and not TrackingStatus.Tracking)
+                {
+                    this.SampleRates[Requests.FuelTanks] = 2000;
+                    this.SampleRates[Requests.PayloadStations] = 2000;
+                    this.SampleRates[Requests.WeightAndBalance] = 2000;
+                }
+                else
+                {
+                    this.SampleRates[Requests.FuelTanks] = 15000;
+                    this.SampleRates[Requests.PayloadStations] = 15000;
+                    this.SampleRates[Requests.WeightAndBalance] = 15000;
+                }
             }
         }
 
@@ -591,14 +611,38 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.Speech.SpeakAsync("Flight saved and paused.");
                 this.UploadPositionReport();
                 this.UploadAutoSave();
-                this.PauseFlight();
 
-                this.flightLoadingTempStructs = new FlightLoadingTempStructs
+                try
                 {
-                    FuelTanks = this.FuelTanks,
-                    PayloadStations = this.PayloadStations,
-                    SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
-                };
+                    if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                    {
+                        throw new Exception("Timeout waiting for save flight mutex.");
+                    }
+
+                    this.PauseFlight();
+
+                    this.flightLoadingTempStructs = new FlightLoadingTempStructs
+                    {
+                        FuelTanks = this.FuelTanks,
+                        PayloadStations = this.PayloadStations,
+                        SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error waiting for saves and uploads before pausing flight: {ex}");
+                }
+                finally
+                {
+                    try
+                    {
+                        this.flightSaveMutex.ReleaseMutex();
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                }
             }
         }
 
@@ -996,7 +1040,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                         catch (Exception ex)
                         {
                             Debug.WriteLine("Error saving flight: " + ex);
-                            throw;
                         }
                         finally
                         {

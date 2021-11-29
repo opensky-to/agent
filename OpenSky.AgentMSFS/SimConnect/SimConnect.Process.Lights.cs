@@ -6,6 +6,8 @@
 
 namespace OpenSky.AgentMSFS.SimConnect
 {
+    using System.Diagnostics;
+
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.FlightLogXML;
@@ -83,6 +85,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         if (!this.landingLightWarningActive)
                         {
+                            Debug.WriteLine($"Landing lights 10K: indicated {this.PrimaryTracking.IndicatedAltitude}, alt {this.PrimaryTracking.Altitude}");
                             this.landingLightWarningActive = true;
                             this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
                             this.fsConnect.SetText("OpenSky Warning: Landing lights off below 10k feet", 5);

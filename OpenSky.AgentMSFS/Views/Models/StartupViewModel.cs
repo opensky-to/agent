@@ -166,7 +166,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                     while (!SleepScheduler.IsShutdownInProgress)
                     {
-                        if (UserSessionService.Instance.IsUserLoggedIn && SimConnect.Instance.Flight == null)
+                        if (UserSessionService.Instance.IsUserLoggedIn)
                         {
                             try
                             {
@@ -175,10 +175,26 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 {
                                     if (result.Data.Id != Guid.Empty)
                                     {
-                                        SimConnect.Instance.Flight = result.Data;
+                                        if (SimConnect.Instance.Flight == null)
+                                        {
+                                            SimConnect.Instance.Flight = result.Data;
+                                        }
+                                        else
+                                        {
+                                            if (SimConnect.Instance.Flight.Id != result.Data.Id)
+                                            {
+                                                // Different flight from current one?
+                                                SimConnect.Instance.StopTracking(true);
+                                            }
+                                        }
                                     }
-
-                                    // todo test what happens if we set the flight to NULL in simconnect?
+                                    else
+                                    {
+                                        if (SimConnect.Instance.Flight != null)
+                                        {
+                                            SimConnect.Instance.Flight = null;
+                                        }
+                                    }
                                 }
                                 else
                                 {

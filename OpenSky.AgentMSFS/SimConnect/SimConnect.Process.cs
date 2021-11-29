@@ -196,14 +196,14 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = true;
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F2}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F2}";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F1} gal, {this.WeightAndBalance.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F1} lbs, {this.PayloadStations.TotalWeight * 0.453592:F1} kg";
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.Flight?.FuelGallons ?? 0) < 0.01;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.Flight?.FuelGallons ?? 0) < 0.27; // Allow roughly 1 liter of margin
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds ?? 0) < 0.01;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds ?? 0) < 1; // Allow 1 lbs of margin
 
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
@@ -215,8 +215,29 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 if (this.TrackingStatus == TrackingStatus.Resuming)
                 {
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = false;
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = false;
+                    if (this.Flight?.Aircraft.Type.RequiresManualFuelling != true)
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = false;
+                    }
+                    else
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = true;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F1} gal, {this.WeightAndBalance.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
+                            this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.flightLoadingTempStructs.FuelTanks.TotalQuantity) < 0.27; // Allow roughly 1 liter of margin
+                    }
+
+                    if (this.Flight?.Aircraft.Type.RequiresManualLoading != true)
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = false;
+                    }
+                    else
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F1} lbs, {this.PayloadStations.TotalWeight * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
+                            this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs((double)(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds)) < 1; // Allow 1 lbs of margin
+                    }
 
                     var currentLocation = $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) / 1000:F2} km from resume location";
                     currentLocation += $"\r\nLatitude: {this.flightLoadingTempStructs?.SlewPlaneIntoPosition.Latitude:F4}";
