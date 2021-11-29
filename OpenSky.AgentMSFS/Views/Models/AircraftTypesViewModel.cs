@@ -171,6 +171,62 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True if requires manual fuelling.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool requiresManualFuelling;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the aircraft requires manual fuelling.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool RequiresManualFuelling
+        {
+            get => this.requiresManualFuelling;
+        
+            set
+            {
+                if(Equals(this.requiresManualFuelling, value))
+                {
+                   return;
+                }
+        
+                this.requiresManualFuelling = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if requires manual loading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool requiresManualLoading;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the aircraft requires manual loading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool RequiresManualLoading
+        {
+            get => this.requiresManualLoading;
+        
+            set
+            {
+                if(Equals(this.requiresManualLoading, value))
+                {
+                   return;
+                }
+        
+                this.requiresManualLoading = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="AircraftTypesViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -841,6 +897,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                 IsVanilla = this.IsVanilla,
                 IncludeInWorldPopulation = this.IncludeInWorldPopulation,
                 NeedsCoPilot = this.NeedsCoPilot,
+                RequiresManualFuelling = this.RequiresManualFuelling,
+                RequiresManualLoading = this.RequiresManualLoading,
                 IsVariantOf = this.IsVariantOf?.Id,
                 MinimumRunwayLength = this.MinimumRunwayLength,
                 MinPrice = this.MinimumPrice,
