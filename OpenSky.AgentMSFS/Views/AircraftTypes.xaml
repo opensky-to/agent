@@ -36,11 +36,6 @@
                 <x:Type TypeName="openSkyApi:AircraftTypeCategory" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="SimulationDataProvider" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="openSkyApi:Simulator" />
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
         <DrawingBrush x:Key="GreyDottedBrush" Viewport="0,0,3,3" ViewportUnits="Absolute" TileMode="Tile">
             <DrawingBrush.Drawing>
                 <DrawingGroup>
@@ -282,7 +277,6 @@
                         <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}" />
                         <DataGridTextColumn Header="Version" Binding="{Binding VersionNumber}" />
                         <DataGridComboBoxColumn Header="Category" ItemsSource="{Binding Source={StaticResource CategoryDataProvider}}" SelectedItemBinding="{Binding Category}" dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" />
-                        <DataGridComboBoxColumn Header="Simulator" ItemsSource="{Binding Source={StaticResource SimulationDataProvider}}" SelectedItemBinding="{Binding Simulator}" dgx:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" />
                         <DataGridCheckBoxColumn Header="Enabled?" Binding="{Binding Enabled}" />
                         <DataGridCheckBoxColumn Header="No Checks?" Binding="{Binding DetailedChecksDisabled}" />
                         <DataGridTextColumn Header="Next version" Binding="{Binding NextVersion, Converter={StaticResource AircraftTypeForeignKeyConverter}}" />

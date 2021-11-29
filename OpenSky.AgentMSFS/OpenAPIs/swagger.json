@@ -802,9 +802,52 @@
         "tags": [
           "AircraftType"
         ],
-        "summary": "Gets all aircraft types (including disabled and previous).",
+        "summary": "Gets all aircraft types (including disabled and previous versions).",
         "description": "sushi.at, 02/06/2021.",
         "operationId": "GetAllAircraftTypes",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftTypeIEnumerableApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftTypeIEnumerableApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AircraftTypeIEnumerableApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/AircraftType/simulator/{simulator}": {
+      "get": {
+        "tags": [
+          "AircraftType"
+        ],
+        "summary": "Gets all aircraft types for the specified simulator (including disabled and previous).\r\nversions).",
+        "description": "sushi.at, 29/11/2021.",
+        "operationId": "GetSimulatorAircraftTypes",
+        "parameters": [
+          {
+            "name": "simulator",
+            "in": "path",
+            "description": "The simulator. 0 = MSFS, 1 = XPlane11",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Simulator"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -6117,16 +6160,19 @@
       },
       "Simulator": {
         "enum": [
-          0
+          0,
+          1
         ],
         "type": "integer",
-        "description": "Simulators. 0 = MSFS",
+        "description": "Simulators. 0 = MSFS, 1 = XPlane11",
         "format": "int32",
         "x-enumNames": [
-          "MSFS"
+          "MSFS",
+          "XPlane11"
         ],
         "x-enum-varnames": [
-          "MSFS"
+          "MSFS",
+          "XPlane11"
         ]
       },
       "StringApiResponse": {
