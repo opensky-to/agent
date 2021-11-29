@@ -135,14 +135,14 @@ namespace OpenSky.AgentMSFS.Views.Models
         public Visibility SkipGroundHandlingVisibility
         {
             get => this.skipGroundHandlingVisibility;
-        
+
             set
             {
-                if(Equals(this.skipGroundHandlingVisibility, value))
+                if (Equals(this.skipGroundHandlingVisibility, value))
                 {
-                   return;
+                    return;
                 }
-        
+
                 this.skipGroundHandlingVisibility = value;
                 this.NotifyPropertyChanged();
             }
@@ -194,7 +194,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.SetPayloadStationsCommand = new Command(this.SetPayloadStations);
             this.StartTrackingCommand = new AsynchronousCommand(this.StartTracking, false);
             this.AbortFlightCommand = new AsynchronousCommand(this.AbortFlight, false);
-            this.ToggleFlightPauseCommand = new Command(this.ToggleFlightPause, false);
+            this.ToggleFlightPauseCommand = new AsynchronousCommand(this.ToggleFlightPause, false);
             this.StopTrackingCommand = new AsynchronousCommand(this.StopTracking, false);
             this.ImportSimbriefCommand = new AsynchronousCommand(this.ImportSimbrief, false);
             this.MoveMapToCoordinateCommand = new Command(this.MoveMapToCoordinate);
@@ -478,7 +478,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// Gets the toggle flight pause command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Command ToggleFlightPauseCommand { get; }
+        public AsynchronousCommand ToggleFlightPauseCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1102,8 +1102,17 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void ToggleFlightPause()
         {
-            Debug.WriteLine("Toggling simconnect flight pause");
-            this.SimConnect.Pause(!this.SimConnect.IsPaused);
+            try
+            {
+                Debug.WriteLine("Toggling simconnect flight pause");
+                this.SimConnect.Pause(!this.SimConnect.IsPaused);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error pausing/resuming sim: " + ex);
+                this.ToggleFlightPauseCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error pausing/resuming simulator", MessageBoxButton.OK, MessageBoxImage.Error));
+
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------

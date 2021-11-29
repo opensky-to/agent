@@ -157,6 +157,20 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True if requires manual fuelling.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool requiresManualFuelling;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if requires manual loading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool requiresManualLoading;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The selected aircraft type.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -168,62 +182,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private int versionNumber = 1;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// True if requires manual fuelling.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool requiresManualFuelling;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether the aircraft requires manual fuelling.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool RequiresManualFuelling
-        {
-            get => this.requiresManualFuelling;
-        
-            set
-            {
-                if(Equals(this.requiresManualFuelling, value))
-                {
-                   return;
-                }
-        
-                this.requiresManualFuelling = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// True if requires manual loading.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool requiresManualLoading;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether the aircraft requires manual loading.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool RequiresManualLoading
-        {
-            get => this.requiresManualLoading;
-        
-            set
-            {
-                if(Equals(this.requiresManualLoading, value))
-                {
-                   return;
-                }
-        
-                this.requiresManualLoading = value;
-                this.NotifyPropertyChanged();
-            }
-        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -754,6 +712,48 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand RefreshAircraftTypesCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the aircraft requires manual fuelling.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool RequiresManualFuelling
+        {
+            get => this.requiresManualFuelling;
+
+            set
+            {
+                if (Equals(this.requiresManualFuelling, value))
+                {
+                    return;
+                }
+
+                this.requiresManualFuelling = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the aircraft requires manual loading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool RequiresManualLoading
+        {
+            get => this.requiresManualLoading;
+
+            set
+            {
+                if (Equals(this.requiresManualLoading, value))
+                {
+                    return;
+                }
+
+                this.requiresManualLoading = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1367,7 +1367,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Refreshing aircraft types";
             try
             {
-                var result = OpenSkyService.Instance.GetAllAircraftTypesAsync().Result;
+                var result = OpenSkyService.Instance.GetSimulatorAircraftTypesAsync(Simulator.MSFS).Result;
                 if (!result.IsError)
                 {
                     this.RefreshAircraftTypesCommand.ReportProgress(
