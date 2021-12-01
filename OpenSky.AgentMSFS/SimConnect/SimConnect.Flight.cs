@@ -240,9 +240,37 @@ namespace OpenSky.AgentMSFS.SimConnect
                             var destinationMarker = new TrackingEventMarker(new GeoCoordinate(value.Destination.Latitude, value.Destination.Longitude), value.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                             this.trackingEventMarkers.Add(destinationMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
+
+                            var originDetailMarker = new TrackingEventMarker(value.Origin, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(originDetailMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, originDetailMarker);
+                            var alternateDetailMarker = new TrackingEventMarker(value.Alternate, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                            this.trackingEventMarkers.Add(alternateDetailMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, alternateDetailMarker);
+                            var destinationDetailMarker = new TrackingEventMarker(value.Destination, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(destinationDetailMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, destinationDetailMarker);
+
+                            foreach (var runway in value.Origin.Runways)
+                            {
+                                var runwayMarker = new TrackingEventMarker(runway);
+                                this.trackingEventMarkers.Add(runwayMarker);
+                                this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
+                            }
+                            foreach (var runway in value.Alternate.Runways)
+                            {
+                                var runwayMarker = new TrackingEventMarker(runway);
+                                this.trackingEventMarkers.Add(runwayMarker);
+                                this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
+                            }
+                            foreach (var runway in value.Destination.Runways)
+                            {
+                                var runwayMarker = new TrackingEventMarker(runway);
+                                this.trackingEventMarkers.Add(runwayMarker);
+                                this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
+                            }
                         }
                     };
-                    Application.Current.Dispatcher.BeginInvoke(addAirports);
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
@@ -256,6 +284,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         Debug.WriteLine("Preparing to track new flight");
                         this.flightLoadingTempStructs = null;
                         this.TrackingStatus = TrackingStatus.Preparing;
+                        Application.Current.Dispatcher.BeginInvoke(addAirports);
 
                         this.WarpInfo = "No [*]";
 
@@ -283,6 +312,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         Debug.WriteLine("Preparing to track resumed flight");
                         this.TrackingStatus = TrackingStatus.Resuming;
+                        Application.Current.Dispatcher.BeginInvoke(addAirports);
                         this.CheckCloudSave();
                         this.LoadFlight();
 

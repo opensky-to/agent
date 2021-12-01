@@ -236,78 +236,76 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void ImportSimbrief()
         {
-            using (var client = new WebClient())
+            using var client = new WebClient();
+            try
             {
-                try
+                Debug.WriteLine("Importing sim brief flight plan waypoints");
+                if (string.IsNullOrEmpty(UserSessionService.Instance.LinkedAccounts?.SimbriefUsername))
                 {
-                    Debug.WriteLine("Importing sim brief flight plan waypoints");
-                    if (string.IsNullOrEmpty(UserSessionService.Instance.LinkedAccounts?.SimbriefUsername))
-                    {
-                        throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
-                    }
-
-                    if (this.SimConnect.Flight == null)
-                    {
-                        throw new Exception("No flight loaded!");
-                    }
-
-                    var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={UserSessionService.Instance.LinkedAccounts?.SimbriefUsername}");
-
-                    var ofp = XElement.Parse(xml);
-                    var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
-                    var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
-
-                    if (!this.SimConnect.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        throw new Exception("Departure airport doesn't match!");
-                    }
-
-                    if (!this.SimConnect.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        throw new Exception("Destination airport doesn't match!");
-                    }
-
-                    this.SimConnect.ImportSimbrief(ofp);
-                    this.ImportSimbriefVisibility = Visibility.Collapsed;
+                    throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
                 }
-                catch (WebException ex)
+
+                if (this.SimConnect.Flight == null)
                 {
-                    Debug.WriteLine("Web error received from simbrief api: " + ex);
+                    throw new Exception("No flight loaded!");
+                }
 
-                    var responseStream = ex.Response.GetResponseStream();
-                    if (responseStream != null)
+                var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={UserSessionService.Instance.LinkedAccounts?.SimbriefUsername}");
+
+                var ofp = XElement.Parse(xml);
+                var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
+                var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
+
+                if (!this.SimConnect.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new Exception("Departure airport doesn't match!");
+                }
+
+                if (!this.SimConnect.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new Exception("Destination airport doesn't match!");
+                }
+
+                this.SimConnect.ImportSimbrief(ofp);
+                this.ImportSimbriefVisibility = Visibility.Collapsed;
+            }
+            catch (WebException ex)
+            {
+                Debug.WriteLine("Web error received from simbrief api: " + ex);
+
+                var responseStream = ex.Response.GetResponseStream();
+                if (responseStream != null)
+                {
+                    var responseString = string.Empty;
+                    var reader = new StreamReader(responseStream, Encoding.UTF8);
+                    var buffer = new char[1024];
+                    var count = reader.Read(buffer, 0, buffer.Length);
+                    while (count > 0)
                     {
-                        var responseString = string.Empty;
-                        var reader = new StreamReader(responseStream, Encoding.UTF8);
-                        var buffer = new char[1024];
-                        var count = reader.Read(buffer, 0, buffer.Length);
-                        while (count > 0)
-                        {
-                            responseString += new string(buffer, 0, count);
-                            count = reader.Read(buffer, 0, buffer.Length);
-                        }
+                        responseString += new string(buffer, 0, count);
+                        count = reader.Read(buffer, 0, buffer.Length);
+                    }
 
-                        Debug.WriteLine(responseString);
-                        if (responseString.Contains("<OFP>"))
+                    Debug.WriteLine(responseString);
+                    if (responseString.Contains("<OFP>"))
+                    {
+                        var ofp = XElement.Parse(responseString);
+                        var status = ofp.Element("fetch")?.Element("status")?.Value;
+                        if (!string.IsNullOrWhiteSpace(status))
                         {
-                            var ofp = XElement.Parse(responseString);
-                            var status = ofp.Element("fetch")?.Element("status")?.Value;
-                            if (!string.IsNullOrWhiteSpace(status))
-                            {
-                                Debug.WriteLine("Error fetching flight plan from Simbrief: " + status);
-                                this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(status, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
-                                return;
-                            }
+                            Debug.WriteLine("Error fetching flight plan from Simbrief: " + status);
+                            this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(status, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
+                            return;
                         }
                     }
+                }
 
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Error fetching flight plan from Simbrief: " + ex);
-                    this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
-                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error fetching flight plan from Simbrief: " + ex);
+                this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
             }
         }
 

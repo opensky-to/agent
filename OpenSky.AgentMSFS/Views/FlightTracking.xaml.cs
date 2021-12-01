@@ -217,6 +217,11 @@ namespace OpenSky.AgentMSFS.Views
                 {
                     BindingOperations.ClearAllBindings(simbrief);
                 }
+
+                if (child is TrackingEventMarker { IsAirportMarker: true })
+                {
+                    BindingOperations.ClearAllBindings(child);
+                }
             }
 
             this.MapView.Children.Clear();
@@ -302,11 +307,18 @@ namespace OpenSky.AgentMSFS.Views
                     BindingOperations.ClearBinding(e, SimbriefWaypointMarker.TextLabelVisibleProperty);
                 }
 
+                if (BindingOperations.IsDataBound(e, SimbriefWaypointMarker.TextLabelFontSizeProperty))
+                {
+                    BindingOperations.ClearBinding(e, SimbriefWaypointMarker.TextLabelFontSizeProperty);
+                }
+
                 this.MapView.Children.Add(e);
 
                 // Add zoom level -> visibility binding with custom converter
-                var zoomLevelBinding = new Binding { Source = this.MapView, Path = new PropertyPath("ZoomLevel"), Converter = new MapZoomLevelVisibilityConverter() };
+                var zoomLevelBinding = new Binding { Source = this.MapView, Path = new PropertyPath("ZoomLevel"), Converter = new MapZoomLevelVisibilityConverter(), ConverterParameter = 6.0 };
                 BindingOperations.SetBinding(e, SimbriefWaypointMarker.TextLabelVisibleProperty, zoomLevelBinding);
+                var fontSizeBinding = new Binding { Source = this.MapView, Path = new PropertyPath("ZoomLevel"), Converter = new MapZoomLevelFontSizeConverter() };
+                BindingOperations.SetBinding(e, SimbriefWaypointMarker.TextLabelFontSizeProperty, fontSizeBinding);
             }
             catch (Exception ex)
             {
@@ -335,8 +347,26 @@ namespace OpenSky.AgentMSFS.Views
                 // Make sure we remove it from any previous map layers
                 var existingMapLayer = e.Parent as MapLayer;
                 existingMapLayer?.Children.Remove(e);
+                if (BindingOperations.IsDataBound(e, VisibilityProperty))
+                {
+                    BindingOperations.ClearBinding(e, VisibilityProperty);
+                }
 
                 this.MapView.Children.Add(e);
+
+                if (e.IsAirportMarker)
+                {
+                    if (e.IsAirportDetailMarker)
+                    {
+                        var zoomLevelBinding = new Binding { Source = this.MapView, Path = new PropertyPath("ZoomLevel"), Converter = new MapZoomLevelVisibilityConverter(), ConverterParameter = 12.0 };
+                        BindingOperations.SetBinding(e, VisibilityProperty, zoomLevelBinding);
+                    }
+                    else
+                    {
+                        var zoomLevelBinding = new Binding { Source = this.MapView, Path = new PropertyPath("ZoomLevel"), Converter = new MapZoomLevelVisibilityConverter(), ConverterParameter = -12.0 };
+                        BindingOperations.SetBinding(e, VisibilityProperty, zoomLevelBinding);
+                    }
+                }
             }
             catch (Exception ex)
             {
