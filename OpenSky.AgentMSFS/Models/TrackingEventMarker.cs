@@ -171,6 +171,8 @@ namespace OpenSky.AgentMSFS.Models
 
             MapLayer.SetPosition(this, new Location(location.Latitude, location.Longitude));
             MapLayer.SetPositionOrigin(this, PositionOrigin.Center);
+            this.marker.Latitude = location.Latitude;
+            this.marker.Longitude = location.Longitude;
             this.marker.IsAirportMarker = true;
         }
 
@@ -265,6 +267,9 @@ namespace OpenSky.AgentMSFS.Models
             }
 
             this.marker.IsAirportMarker = true;
+            this.marker.Latitude = airport.Latitude;
+            this.marker.Longitude = airport.Longitude;
+            this.marker.Altitude = airport.Altitude;
             this.IsAirportDetailMarker = true;
         }
 
@@ -283,12 +288,14 @@ namespace OpenSky.AgentMSFS.Models
         {
             if (runway.RunwayEnds.Count == 2)
             {
+                this.SetValue(ZIndexProperty, 998);
                 var leftEnd = runway.RunwayEnds.First().Longitude <= runway.RunwayEnds.Last().Longitude ? runway.RunwayEnds.First() : runway.RunwayEnds.Last();
                 var rightEnd = runway.RunwayEnds.First().Longitude <= runway.RunwayEnds.Last().Longitude ? runway.RunwayEnds.Last() : runway.RunwayEnds.First();
+                var color = leftEnd.HasClosedMarkings && rightEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal;
 
                 var line = new Line
                 {
-                    StrokeThickness = 5, Stroke = new SolidColorBrush(OpenSkyColors.OpenSkyTeal),
+                    StrokeThickness = 5, Stroke = new SolidColorBrush(color),
                     X1 = 0,
                 };
                 if (leftEnd.Latitude <= rightEnd.Latitude)
@@ -310,11 +317,11 @@ namespace OpenSky.AgentMSFS.Models
 
                 {
                     var runwayEnd = runway.RunwayEnds.First();
-                    var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
+                    var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(runwayEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
                     this.Children.Add(textBorder);
                     textBorder.Child = new TextBlock
                     {
-                        Text = runwayEnd.Name,
+                        Text = runwayEnd.HasClosedMarkings ? "XX" : runwayEnd.Name,
                         FontSize = 13,
                         FontWeight = FontWeights.Bold,
                         HorizontalAlignment = HorizontalAlignment.Center,
@@ -336,11 +343,11 @@ namespace OpenSky.AgentMSFS.Models
 
                 {
                     var runwayEnd = runway.RunwayEnds.Last();
-                    var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
+                    var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(runwayEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
                     this.Children.Add(textBorder);
                     textBorder.Child = new TextBlock
                     {
-                        Text = runwayEnd.Name,
+                        Text = runwayEnd.HasClosedMarkings ? "XX" : runwayEnd.Name,
                         FontSize = 13,
                         FontWeight = FontWeights.Bold,
                         HorizontalAlignment = HorizontalAlignment.Center,
@@ -362,6 +369,8 @@ namespace OpenSky.AgentMSFS.Models
 
                 MapLayer.SetPositionRectangle(this, new LocationRect(new Location(leftEnd.Latitude, leftEnd.Longitude), new Location(rightEnd.Latitude, rightEnd.Longitude)));
                 this.marker.IsAirportMarker = true;
+                this.marker.Latitude = leftEnd.Latitude;
+                this.marker.Longitude = leftEnd.Longitude;
                 this.IsAirportDetailMarker = true;
             }
         }
