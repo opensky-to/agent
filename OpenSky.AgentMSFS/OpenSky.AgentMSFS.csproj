@@ -119,6 +119,7 @@
     <Compile Include="Converters\CgColorConverter.cs" />
     <Compile Include="Converters\FuelTankCapacityVisibilityConverter.cs" />
     <Compile Include="Converters\IsPausedButtonConverter.cs" />
+    <Compile Include="Converters\MapZoomLevelFontSizeConverter.cs" />
     <Compile Include="Converters\MapZoomLevelVisibilityConverter.cs" />
     <Compile Include="Converters\NullItemToVisibilityConverter.cs" />
     <Compile Include="Converters\PayloadStationsVisibilityConverter.cs" />

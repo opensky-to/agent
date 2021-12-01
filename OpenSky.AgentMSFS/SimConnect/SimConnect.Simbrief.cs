@@ -123,6 +123,71 @@ namespace OpenSky.AgentMSFS.SimConnect
                 Application.Current.Dispatcher.BeginInvoke(addLocation);
             }
 
+            // Route
+            var sbOriginICAO = (string)ofp.Element("origin")?.Element("icao_code");
+            var sbDestinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
+            var sbRoute = (string)ofp.Element("general")?.Element("route");
+            if (!string.IsNullOrEmpty(sbRoute))
+            {
+                // Add airports and runways to route
+                var sbOriginRunway = (string)ofp.Element("origin")?.Element("plan_rwy");
+                var sbDestinationRunway = (string)ofp.Element("destination")?.Element("plan_rwy");
+                if (!string.IsNullOrEmpty(sbOriginICAO))
+                {
+                    var prefix = sbOriginICAO;
+                    if (!string.IsNullOrEmpty(sbOriginRunway))
+                    {
+                        prefix += $"/{sbOriginRunway}";
+                    }
+
+                    sbRoute = $"{prefix} {sbRoute}";
+                }
+
+                if (!string.IsNullOrEmpty(sbDestinationICAO))
+                {
+                    var postFix = sbDestinationICAO;
+                    if (!string.IsNullOrEmpty(sbDestinationRunway))
+                    {
+                        postFix += $"/{sbDestinationRunway}";
+                    }
+
+                    sbRoute += $" {postFix}";
+                }
+
+                UpdateGUIDelegate updateRoute = () =>
+                {
+                    this.Flight.Route = sbRoute;
+                    this.OnPropertyChanged(nameof(this.Flight));
+                };
+                Application.Current.Dispatcher.BeginInvoke(updateRoute);
+            }
+
+            // Alternate route
+            var sbAlternateICAO = (string)ofp.Element("alternate")?.Element("icao_code");
+            var sbAlternateRoute = (string)ofp.Element("alternate")?.Element("route");
+            if (!string.IsNullOrEmpty(sbAlternateRoute))
+            {
+                // Add airport and runway to route
+                var sbAlternateRunway = (string)ofp.Element("alternate")?.Element("plan_rwy");
+                if (!string.IsNullOrEmpty(sbAlternateICAO))
+                {
+                    var postFix = sbAlternateICAO;
+                    if (!string.IsNullOrEmpty(sbAlternateRunway))
+                    {
+                        postFix += $"/{sbAlternateRunway}";
+                    }
+
+                    sbAlternateRoute += $" {postFix}";
+                }
+
+                UpdateGUIDelegate updateAlternateRoute = () =>
+                {
+                    this.Flight.AlternateRoute = sbAlternateRoute;
+                    this.OnPropertyChanged(nameof(this.Flight));
+                };
+                Application.Current.Dispatcher.BeginInvoke(updateAlternateRoute);
+            }
+
             var sbOfpHtml = (string)ofp.Element("text")?.Element("plan_html");
             if (!string.IsNullOrEmpty(sbOfpHtml))
             {
@@ -166,7 +231,11 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
                 }
 
-                UpdateGUIDelegate setOfp = () => this.Flight.OfpHtml = sbOfpHtml;
+                UpdateGUIDelegate setOfp = () =>
+                {
+                    this.Flight.OfpHtml = sbOfpHtml;
+                    this.OnPropertyChanged(nameof(this.Flight));
+                };
                 Application.Current.Dispatcher.BeginInvoke(setOfp);
             }
 

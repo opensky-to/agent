@@ -3,22 +3,30 @@ OpenSky Agent for MSFS Changelog
 ========================================================================================================================================================
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+Version 0.2.2 (ALPHA2)
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+- Dynamic font size for simBrief waypoints on maps
+- Changed when account overview and linked accounts are updated
+- Added detailed airport view with runways once zoomed in far enough
+- Local simBrief import now fetches routes
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 Version 0.2.1 (ALPHA2)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-*) Improved concurrent token refresh handling
-*) Added support for manual fuelling and payload loading aircraft
-*) Improved flight fetching/switching/aborting
-*) Fixed pausing/resuming could cause agent crash bug
+- Improved concurrent token refresh handling
+- Added support for manual fuelling and payload loading aircraft
+- Improved flight fetching/switching/aborting
+- Fixed pausing/resuming could cause agent crash bug
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 Version 0.2.0 (ALPHA2)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-*) Increased payload station count to support JU52
-*) Added auto update support
-*) Expanded settings
-*) Fixed icing payload change issue causing tracking aborts
+- Increased payload station count to support JU52
+- Added auto update support
+- Expanded settings
+- Fixed icing payload change issue causing tracking aborts
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 Version 0.1.0 (ALPHA1)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-*) First version released to alpha testers
+- First version released to alpha testers
