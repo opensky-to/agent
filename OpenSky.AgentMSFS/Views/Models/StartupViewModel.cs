@@ -164,6 +164,15 @@ namespace OpenSky.AgentMSFS.Views.Models
                         _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
                     }
 
+                    UserSessionService.Instance.PropertyChanged += (sender, e) =>
+                    {
+                        if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn) && UserSessionService.Instance.IsUserLoggedIn)
+                        {
+                            _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                            _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                        }
+                    };
+
                     while (!SleepScheduler.IsShutdownInProgress)
                     {
                         if (UserSessionService.Instance.IsUserLoggedIn)
@@ -207,8 +216,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                             }
                         }
 
-
-                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(30));
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(SimConnect.Instance.Flight == null ? 30 : 120));
                     }
                 })
             { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();

@@ -747,10 +747,6 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     try
                     {
-                        // Refresh account info and linked accounts/keys sections
-                        _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
-                        _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
-
                         UpdateGUIDelegate updateUserSettings = () =>
                         {
                             try
