@@ -865,9 +865,14 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             if (string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcModel) || string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcType))
             {
+                MessageBoxResult? answer = MessageBoxResult.None;
                 this.AddAircraftTypeCommand.ReportProgress(
-                    () => ModernWpf.MessageBox.Show("ATC plane model or type not set, are you connected to the simulator and is the plane loaded correctly?", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
-                return;
+                    () => answer = ModernWpf.MessageBox.Show("ATC plane model or type not set, are you connected to the simulator and is the plane loaded correctly? Are you sure you want to continue?", "Missing ATC identification", MessageBoxButton.YesNo, MessageBoxImage.Hand), true);
+
+                if (answer != MessageBoxResult.Yes)
+                {
+                    return;
+                }
             }
 
             if (string.IsNullOrEmpty(this.Name) || this.Name.Length < 5)

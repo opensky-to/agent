@@ -384,7 +384,10 @@
       <Version>1.3.3</Version>
     </PackageReference>
     <PackageReference Include="DataGridExtensions">
-      <Version>2.5.12</Version>
+      <Version>2.5.13</Version>
+    </PackageReference>
+    <PackageReference Include="DiscordRichPresence">
+      <Version>1.0.175</Version>
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf">
       <Version>1.1.0</Version>
@@ -419,7 +422,7 @@
       <Version>0.1.4</Version>
     </PackageReference>
     <PackageReference Include="TomsToolbox.Wpf">
-      <Version>2.7.3</Version>
+      <Version>2.7.4</Version>
     </PackageReference>
     <PackageReference Include="XDMessaging.Lite">
       <Version>5.0.6</Version>

@@ -16,6 +16,9 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
 
+    using DiscordRPC;
+    using DiscordRPC.Logging;
+
     using JetBrains.Annotations;
 
     using OpenSky.AgentMSFS.Models;
@@ -115,6 +118,34 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The discord RPC client.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DiscordRpcClient discordRpcClient;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the discord RPC client.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public DiscordRpcClient DiscordRpcClient
+        {
+            get => this.discordRpcClient;
+        
+            private set
+            {
+                if(Equals(this.discordRpcClient, value))
+                {
+                   return;
+                }
+        
+                this.discordRpcClient = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="StartupViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -153,6 +184,32 @@ namespace OpenSky.AgentMSFS.Views.Models
             // Check for update
             UpdateGUIDelegate autoUpdate = () => new AutoUpdate().Show();
             Application.Current.Dispatcher.BeginInvoke(autoUpdate);
+
+            // Initialize discord RPC
+            this.DiscordRpcClient = new DiscordRpcClient("918167200492314675");
+#if DEBUG
+            this.DiscordRpcClient.Logger = new ConsoleLogger() { Level = LogLevel.Info };
+            this.DiscordRpcClient.OnReady += (_, e) =>
+            {
+                Debug.WriteLine("Received Ready from user {0}", e.User.Username);
+            };
+
+            this.DiscordRpcClient.OnPresenceUpdate += (_, e) =>
+            {
+                Debug.WriteLine("Received Update! {0}", e.Presence);
+            };
+#endif
+            this.DiscordRpcClient.Initialize();
+            this.DiscordRpcClient.SetPresence(new RichPresence
+            {
+                State = "Not Connected",
+                Details = "Trying to connect to MSFS",
+                Assets = new Assets
+                {
+                    LargeImageKey = "openskylogogrey512",
+                    LargeImageText = "OpenSky Agent for MSFS"
+                }
+            });
 
             // Check for new flight from API
             new Thread(
@@ -299,6 +356,17 @@ namespace OpenSky.AgentMSFS.Views.Models
                     this.redFlashing = false;
                     this.NotificationIcon = this.greyIcon;
                     this.NotificationStatusString = "OpenSky is trying to connect to Flight Simulator 2020...";
+
+                    this.DiscordRpcClient.SetPresence(new RichPresence
+                    {
+                        State = "Not Connected",
+                        Details = "Trying to connect to MSFS",
+                        Assets = new Assets
+                        {
+                            LargeImageKey = "openskylogogrey512",
+                            LargeImageText = "OpenSky Agent for MSFS"
+                        }
+                    });
                 }
                 else
                 {
@@ -307,12 +375,36 @@ namespace OpenSky.AgentMSFS.Views.Models
                         this.redFlashing = false;
                         this.NotificationIcon = this.openSkyIcon;
                         this.NotificationStatusString = "OpenSky is connected to the sim but not tracking a flight";
+
+                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        {
+                            State = "Idle",
+                            Details = "Waiting for a flight",
+                            Assets = new Assets
+                            {
+                                LargeImageKey = "openskylogo512",
+                                LargeImageText = "OpenSky Agent for MSFS"
+                            }
+                        });
                     }
                     else if (SimConnect.Instance.IsPaused)
                     {
                         this.redFlashing = false;
                         this.NotificationIcon = this.pauseIcon;
                         this.NotificationStatusString = "OpenSky tracking and your flight are paused";
+
+                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        {
+                            State = $"Paused, {SimConnect.Instance.Flight?.FlightPhase}",
+                            Details = $"Tracking flight {SimConnect.Instance.Flight?.FullFlightNumber}",
+                            Assets = new Assets
+                            {
+                                LargeImageKey = "openskylogo512",
+                                LargeImageText = "OpenSky Agent for MSFS",
+                                SmallImageKey = "pause512",
+                                SmallImageText = "Paused"
+                            }
+                        });
                     }
                     else
                     {
@@ -320,6 +412,18 @@ namespace OpenSky.AgentMSFS.Views.Models
                         this.redFlashing = true;
                         this.NotificationStatusString = "OpenSky is tracking your flight";
 
+                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        {
+                            State = $"Recording, {SimConnect.Instance.Flight?.FlightPhase}",
+                            Details = $"Tracking flight {SimConnect.Instance.Flight?.FullFlightNumber}",
+                            Assets = new Assets
+                            {
+                                LargeImageKey = "openskylogo512",
+                                LargeImageText = "OpenSky Agent for MSFS",
+                                SmallImageKey = "record512",
+                                SmallImageText = "Recording"
+                            }
+                        });
 
                         new Thread(
                                 () =>
@@ -544,6 +648,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 SimConnect.Instance.Close();
                 SleepScheduler.Shutdown();
                 this.NotificationVisibility = Visibility.Collapsed;
+                this.DiscordRpcClient.Dispose();
             };
             ((App)Application.Current).RequestShutdown(cleanUp);
         }
