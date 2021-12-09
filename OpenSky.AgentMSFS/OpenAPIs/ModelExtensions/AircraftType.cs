@@ -152,12 +152,12 @@ namespace OpenSkyApi
         {
             if (SimConnect.Instance.Connected)
             {
-                if (!string.Equals(SimConnect.Instance.PlaneIdentity.AtcTypeProperty, this.AtcType, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(!string.IsNullOrEmpty(SimConnect.Instance.PlaneIdentity.AtcTypeProperty) ? SimConnect.Instance.PlaneIdentity.AtcTypeProperty : "MISSING", this.AtcType, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return false;
                 }
 
-                if (!string.Equals(SimConnect.Instance.PlaneIdentity.AtcModelProperty, this.AtcModel, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(!string.IsNullOrEmpty(SimConnect.Instance.PlaneIdentity.AtcModelProperty) ? SimConnect.Instance.PlaneIdentity.AtcModelProperty : "MISSING", this.AtcModel, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return false;
                 }

@@ -885,8 +885,8 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 Id = Guid.Empty, // API will assign this
                 UploaderID = "OpenSkyUser", // API will assign this
-                AtcType = this.SimConnect.PlaneIdentity.AtcType,
-                AtcModel = this.SimConnect.PlaneIdentity.AtcModel,
+                AtcType = !string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcType) ? this.SimConnect.PlaneIdentity.AtcType : "MISSING",
+                AtcModel = !string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcModel) ? this.SimConnect.PlaneIdentity.AtcModel : "MISSING",
                 EngineType = this.SimConnect.PlaneIdentity.EngineType,
                 EngineCount = this.SimConnect.PlaneIdentity.EngineCount,
                 EmptyWeight = this.SimConnect.WeightAndBalance.EmptyWeight,

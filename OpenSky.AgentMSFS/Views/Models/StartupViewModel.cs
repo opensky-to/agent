@@ -131,14 +131,14 @@ namespace OpenSky.AgentMSFS.Views.Models
         public DiscordRpcClient DiscordRpcClient
         {
             get => this.discordRpcClient;
-        
+
             private set
             {
-                if(Equals(this.discordRpcClient, value))
+                if (Equals(this.discordRpcClient, value))
                 {
-                   return;
+                    return;
                 }
-        
+
                 this.discordRpcClient = value;
                 this.NotifyPropertyChanged();
             }
@@ -349,7 +349,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SimConnectPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(SimConnect.Connected) or nameof(SimConnect.Instance.TrackingStatus) or nameof(SimConnect.Instance.IsPaused))
+            if (e.PropertyName is nameof(SimConnect.Connected) or nameof(SimConnect.Instance.TrackingStatus) or nameof(SimConnect.Instance.IsPaused) or nameof(SimConnect.Instance.Flight) or nameof(SimConnect.Instance.FlightPhase))
             {
                 if (!SimConnect.Instance.Connected)
                 {
@@ -372,26 +372,46 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     if (SimConnect.Instance.TrackingStatus is TrackingStatus.NotTracking or TrackingStatus.Preparing or TrackingStatus.Resuming)
                     {
-                        this.redFlashing = false;
-                        this.NotificationIcon = this.openSkyIcon;
-                        this.NotificationStatusString = "OpenSky is connected to the sim but not tracking a flight";
-
-                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        if (SimConnect.Instance.Flight == null)
                         {
-                            State = "Idle",
-                            Details = "Waiting for a flight",
-                            Assets = new Assets
+                            this.redFlashing = false;
+                            this.NotificationIcon = this.openSkyIcon;
+                            this.NotificationStatusString = "OpenSky is connected to the sim but not tracking a flight";
+
+                            this.DiscordRpcClient.SetPresence(new RichPresence
                             {
-                                LargeImageKey = "openskylogo512",
-                                LargeImageText = "OpenSky Agent for MSFS"
-                            }
-                        });
+                                State = "Idle",
+                                Details = "Waiting for a flight",
+                                Assets = new Assets
+                                {
+                                    LargeImageKey = "openskylogo512",
+                                    LargeImageText = "OpenSky Agent for MSFS"
+                                }
+                            });
+                        }
+                        else
+                        {
+                            this.redFlashing = false;
+                            this.NotificationIcon = this.openSkyIcon;
+                            this.NotificationStatusString = $"OpenSky is preparing to track flight {SimConnect.Instance.Flight?.FullFlightNumber}";
+
+                            this.DiscordRpcClient.SetPresence(new RichPresence
+                            {
+                                State = SimConnect.Instance.TrackingStatus.ToString(),
+                                Details = $"Preparing flight {SimConnect.Instance.Flight?.FullFlightNumber}",
+                                Assets = new Assets
+                                {
+                                    LargeImageKey = "openskylogo512",
+                                    LargeImageText = "OpenSky Agent for MSFS"
+                                }
+                            });
+                        }
                     }
                     else if (SimConnect.Instance.IsPaused)
                     {
                         this.redFlashing = false;
                         this.NotificationIcon = this.pauseIcon;
-                        this.NotificationStatusString = "OpenSky tracking and your flight are paused";
+                        this.NotificationStatusString = $"OpenSky tracking and your flight {SimConnect.Instance.Flight?.FullFlightNumber} are paused";
 
                         this.DiscordRpcClient.SetPresence(new RichPresence
                         {
@@ -410,7 +430,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     {
                         this.NotificationIcon = this.redIcon;
                         this.redFlashing = true;
-                        this.NotificationStatusString = "OpenSky is tracking your flight";
+                        this.NotificationStatusString = $"OpenSky is tracking your flight {SimConnect.Instance.Flight?.FullFlightNumber}";
 
                         this.DiscordRpcClient.SetPresence(new RichPresence
                         {
