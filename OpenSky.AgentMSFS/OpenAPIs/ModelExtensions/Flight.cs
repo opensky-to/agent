@@ -56,9 +56,25 @@ namespace OpenSkyApi
         {
             get
             {
-                // todo sum up the total payloads to be transported
+                // Just the pilot in the beginning
+                var totalPayload = 190.0;
 
-                return 0;
+                if (this.Aircraft.Type.NeedsCoPilot)
+                {
+                    totalPayload += 190;
+                }
+
+                if (this.Aircraft.Type.NeedsFlightEngineer)
+                {
+                    totalPayload += 190;
+                }
+
+                foreach (var flightPayload in this.FlightPayloads)
+                {
+                    totalPayload += flightPayload.Payload.Weight;
+                }
+
+                return totalPayload;
             }
         }
     }
