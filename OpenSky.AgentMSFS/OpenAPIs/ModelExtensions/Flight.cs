@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FlightExtensions.cs" company="OpenSky">
+// <copyright file="Flight.cs" company="OpenSky">
 // OpenSky project 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 // ReSharper disable once CheckNamespace
+
 namespace OpenSkyApi
 {
     using System;
@@ -20,33 +21,6 @@ namespace OpenSkyApi
     /// -------------------------------------------------------------------------------------------------
     public partial class Flight
     {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets a value indicating whether the flight can resume (all necessary parameters are present).
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool Resume
-        {
-            get
-            {
-                // Fuel tanks have values?
-                if (!this.FuelTankCenterQuantity.HasValue || !this.FuelTankCenter2Quantity.HasValue || !this.FuelTankCenter3Quantity.HasValue || !this.FuelTankLeftMainQuantity.HasValue || !this.FuelTankLeftAuxQuantity.HasValue ||
-                    !this.FuelTankLeftTipQuantity.HasValue || !this.FuelTankRightMainQuantity.HasValue || !this.FuelTankRightTipQuantity.HasValue || !this.FuelTankExternal1Quantity.HasValue || !this.FuelTankExternal2Quantity.HasValue)
-                {
-                    return false;
-                }
-
-                // todo check payload stations
-
-                if (!this.Latitude.HasValue || !this.Longitude.HasValue || !this.RadioHeight.HasValue || !this.Heading.HasValue || !this.AirspeedTrue.HasValue)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Gets the total payload pounds.
@@ -75,6 +49,79 @@ namespace OpenSkyApi
                 }
 
                 return totalPayload;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the payload summary.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string PayloadSummary
+        {
+            get
+            {
+                var summary = string.Empty;
+                foreach (var flightPayload in this.FlightPayloads)
+                {
+                    summary += $"{flightPayload.Payload.Description} ▷ {flightPayload.Payload.DestinationICAO}\r\n";
+                }
+
+                return summary.TrimEnd('\r', '\n');
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the crew summary.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string CrewSummary
+        {
+            get
+            {
+                var summary = "Flight crew: Pilot, ";
+                if (this.Aircraft.Type.NeedsCoPilot)
+                {
+                    summary += "Co-Pilot, ";
+                }
+                if (this.Aircraft.Type.NeedsFlightEngineer)
+                {
+                    summary += "Flight engineer, ";
+                }
+
+                summary = summary.TrimEnd(' ', ',') + "\r\n";
+
+                // todo add other crew once that's added
+
+                return summary.TrimEnd('\r', '\n');
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether the flight can resume (all necessary parameters are present).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool Resume
+        {
+            get
+            {
+                // Fuel tanks have values?
+                if (!this.FuelTankCenterQuantity.HasValue || !this.FuelTankCenter2Quantity.HasValue || !this.FuelTankCenter3Quantity.HasValue || !this.FuelTankLeftMainQuantity.HasValue || !this.FuelTankLeftAuxQuantity.HasValue ||
+                    !this.FuelTankLeftTipQuantity.HasValue || !this.FuelTankRightMainQuantity.HasValue || !this.FuelTankRightTipQuantity.HasValue || !this.FuelTankExternal1Quantity.HasValue || !this.FuelTankExternal2Quantity.HasValue)
+                {
+                    return false;
+                }
+
+                // todo check payload stations
+
+                if (!this.Latitude.HasValue || !this.Longitude.HasValue || !this.RadioHeight.HasValue || !this.Heading.HasValue || !this.AirspeedTrue.HasValue)
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
     }

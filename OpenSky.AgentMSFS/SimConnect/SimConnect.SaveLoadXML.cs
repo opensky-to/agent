@@ -221,7 +221,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     },
 
                     FuelGallons = this.Flight.FuelGallons ?? 0,
-                    Payload = "None", // todo add this from flight once we have it
+                    Payload = this.Flight.PayloadSummary,
                     PayloadPounds = this.Flight.PayloadPounds
                 };
 
