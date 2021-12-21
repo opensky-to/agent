@@ -5546,26 +5546,32 @@ namespace OpenSkyApi
     
         /// <summary>Gets the available jobs at the specified airport.</summary>
         /// <param name="icao">The ICAO code of the airport.</param>
+        /// <param name="direction">The direction of the jobs to return. 0 = From, 1 = To, 2 = RoundTrip</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportAsync(string icao)
+        public System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportAsync(string icao, JobDirection direction)
         {
-            return GetJobsAtAirportAsync(icao, System.Threading.CancellationToken.None);
+            return GetJobsAtAirportAsync(icao, direction, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Gets the available jobs at the specified airport.</summary>
         /// <param name="icao">The ICAO code of the airport.</param>
+        /// <param name="direction">The direction of the jobs to return. 0 = From, 1 = To, 2 = RoundTrip</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportAsync(string icao, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportAsync(string icao, JobDirection direction, System.Threading.CancellationToken cancellationToken)
         {
             if (icao == null)
                 throw new System.ArgumentNullException("icao");
     
+            if (direction == null)
+                throw new System.ArgumentNullException("direction");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Job/atAirport/{icao}");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Job/atAirport/{icao}/{direction}");
             urlBuilder_.Replace("{icao}", System.Uri.EscapeDataString(ConvertToString(icao, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{direction}", System.Uri.EscapeDataString(ConvertToString(direction, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -6106,9 +6112,21 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("fuellingUntil", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset? FuellingUntil { get; set; }
     
+        /// <summary>Gets the current heading of the aircraft, or 0 if not available.</summary>
+        [Newtonsoft.Json.JsonProperty("heading", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Heading { get; set; }
+    
+        /// <summary>Gets the latitude.</summary>
+        [Newtonsoft.Json.JsonProperty("latitude", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Latitude { get; set; }
+    
         /// <summary>Gets or sets the Date/Time until the aircraft is loading payload (cargo or pax).</summary>
         [Newtonsoft.Json.JsonProperty("loadingUntil", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset? LoadingUntil { get; set; }
+    
+        /// <summary>Gets the longitude.</summary>
+        [Newtonsoft.Json.JsonProperty("longitude", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Longitude { get; set; }
     
         /// <summary>Gets or sets the user-chosen name of the aircraft.</summary>
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -7924,14 +7942,6 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("originICAO", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OriginICAO { get; set; }
     
-        /// <summary>Gets or sets the payload.</summary>
-        [Newtonsoft.Json.JsonProperty("payload", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Payload { get; set; }
-    
-        /// <summary>Gets or sets the payload weight.</summary>
-        [Newtonsoft.Json.JsonProperty("payloadWeight", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double PayloadWeight { get; set; }
-    
         /// <summary>Gets or sets the pilot.</summary>
         [Newtonsoft.Json.JsonProperty("pilot", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Pilot { get; set; }
@@ -8365,6 +8375,18 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Value { get; set; }
     
+    
+    }
+    
+    /// <summary>Job directions. 0 = From, 1 = To, 2 = RoundTrip</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum JobDirection
+    {
+        From = 0,
+    
+        To = 1,
+    
+        RoundTrip = 2,
     
     }
     
