@@ -7,6 +7,8 @@ Version 0.3.0 (ALPHA3)
 --------------------------------------------------------------------------------------
 - Added support for aircraft types without ATC type or model, Aerosoft CRJ
 - Added Discord rich presence support
+- Added support for aircraft types with flight engineers
+- Added payload support with crew and payload summaries displayed on tracking view
 
 --------------------------------------------------------------------------------------
 Version 0.2.2 (ALPHA2)
