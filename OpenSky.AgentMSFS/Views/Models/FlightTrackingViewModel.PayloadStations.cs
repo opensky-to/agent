@@ -134,7 +134,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void SuggestPayload()
         {
             Debug.WriteLine("Calculating suggested payload distribution");
-            var payloadToLoad = 0; // todo this.SimConnect.Flight?.PayloadPounds ?? 0.0;
+            var payloadToLoad = this.SimConnect.Flight?.PayloadPounds ?? 0.0;
 
             // Check for pilot/copilot first
             var nonPilotStations = 0;
