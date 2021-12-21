@@ -63,6 +63,7 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -340,11 +341,17 @@
         </GroupBox>
         <GroupBox Grid.Row="6" Grid.Column="0">
             <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Payload</TextBlock>
+            </GroupBox.Header>
+            <TextBlock Text="{Binding SimConnect.Flight.PayloadSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
+        </GroupBox>
+        <GroupBox Grid.Row="7" Grid.Column="0">
+            <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Crew</TextBlock>
             </GroupBox.Header>
-            <TextBlock>Coming soon™</TextBlock>
+            <TextBlock Text="{Binding SimConnect.Flight.CrewSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.RowSpan="7" Grid.Column="1" IsEnabled="{Binding SimConnect.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}">
+        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" IsEnabled="{Binding SimConnect.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Weights and Balances</TextBlock>
@@ -505,7 +512,7 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.RowSpan="7" Grid.Column="3" Visibility="{Binding OfpVisibility}">
+        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="3" Visibility="{Binding OfpVisibility}">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">OFP</TextBlock>
@@ -514,7 +521,7 @@
             </GroupBox.Header>
             <TextBox Text="{Binding SimConnect.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
         </GroupBox>
-        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="7">
+        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
@@ -555,7 +562,7 @@
                 <TextBlock>Coming soon™</TextBlock>
             </GroupBox>
         </Grid>
-        <GroupBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="7" Margin="5,3">
+        <GroupBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="8" Margin="5,3">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Map</TextBlock>
             </GroupBox.Header>
@@ -598,7 +605,7 @@
                 </StackPanel>
             </Grid>
         </GroupBox>
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
+        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="8" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
                 <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please assign a new flight from the OpenSky client or if you have the Alpha debugging client, create one using the "Test Flight" option from the main menu.</TextBlock>

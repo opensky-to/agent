@@ -267,7 +267,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             // Was the flaps position changed?
             if (Math.Abs(pst.Old.FlapsHandle - pst.New.FlapsHandle) > 1)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Flaps, OpenSkyColors.OpenSkyTealLight, $"Flaps set to {pst.New.FlapsHandle} %");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Flaps, OpenSkyColors.OpenSkyTealLight, $"Flaps set to {(int)pst.New.FlapsHandle} %");
             }
 
             // Was the autopilot engaged/disengaged?

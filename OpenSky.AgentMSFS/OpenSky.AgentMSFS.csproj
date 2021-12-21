@@ -407,7 +407,7 @@
       <Version>1.0.0.3</Version>
     </PackageReference>
     <PackageReference Include="ModernWpf.MessageBox">
-      <Version>0.5.1</Version>
+      <Version>0.5.2</Version>
     </PackageReference>
     <PackageReference Include="ModernWpfUI">
       <Version>0.9.4</Version>

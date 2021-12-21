@@ -157,6 +157,14 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True if this type needs a flight engineer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool needsFlightEngineer;
+
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True if requires manual fuelling.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -687,6 +695,28 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets a value indicating whether the type needs a flight engineer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool NeedsFlightEngineer
+        {
+            get => this.needsFlightEngineer;
+
+            set
+            {
+                if (Equals(this.needsFlightEngineer, value))
+                {
+                    return;
+                }
+
+                this.needsFlightEngineer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets a value indicating whether the type needs a co-pilot.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -902,6 +932,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 IsVanilla = this.IsVanilla,
                 IncludeInWorldPopulation = this.IncludeInWorldPopulation,
                 NeedsCoPilot = this.NeedsCoPilot,
+                NeedsFlightEngineer = this.NeedsFlightEngineer,
                 RequiresManualFuelling = this.RequiresManualFuelling,
                 RequiresManualLoading = this.RequiresManualLoading,
                 IsVariantOf = this.IsVariantOf?.Id,
@@ -969,6 +1000,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.IsVanilla = false;
             this.IncludeInWorldPopulation = false;
             this.NeedsCoPilot = false;
+            this.NeedsFlightEngineer = false;
             this.IsVariantOf = null;
             this.MinimumPrice = 0;
             this.MaximumPrice = 0;

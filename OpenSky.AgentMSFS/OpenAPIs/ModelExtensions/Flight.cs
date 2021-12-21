@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FlightExtensions.cs" company="OpenSky">
+// <copyright file="Flight.cs" company="OpenSky">
 // OpenSky project 2021
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 // ReSharper disable once CheckNamespace
+
 namespace OpenSkyApi
 {
     using System;
@@ -20,6 +21,83 @@ namespace OpenSkyApi
     /// -------------------------------------------------------------------------------------------------
     public partial class Flight
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the total payload pounds.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double PayloadPounds
+        {
+            get
+            {
+                // Just the pilot in the beginning
+                var totalPayload = 190.0;
+
+                if (this.Aircraft.Type.NeedsCoPilot)
+                {
+                    totalPayload += 190;
+                }
+
+                if (this.Aircraft.Type.NeedsFlightEngineer)
+                {
+                    totalPayload += 190;
+                }
+
+                foreach (var flightPayload in this.FlightPayloads)
+                {
+                    totalPayload += flightPayload.Payload.Weight;
+                }
+
+                return totalPayload;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the payload summary.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string PayloadSummary
+        {
+            get
+            {
+                var summary = string.Empty;
+                foreach (var flightPayload in this.FlightPayloads)
+                {
+                    summary += $"{flightPayload.Payload.Description} ▷ {flightPayload.Payload.DestinationICAO}\r\n";
+                }
+
+                return summary.TrimEnd('\r', '\n');
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the crew summary.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string CrewSummary
+        {
+            get
+            {
+                var summary = "Flight crew: Pilot, ";
+                if (this.Aircraft.Type.NeedsCoPilot)
+                {
+                    summary += "Co-Pilot, ";
+                }
+                if (this.Aircraft.Type.NeedsFlightEngineer)
+                {
+                    summary += "Flight engineer, ";
+                }
+
+                summary = summary.TrimEnd(' ', ',') + "\r\n";
+
+                // todo add other crew once that's added
+
+                return summary.TrimEnd('\r', '\n');
+            }
+        }
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Gets a value indicating whether the flight can resume (all necessary parameters are present).
@@ -44,21 +122,6 @@ namespace OpenSkyApi
                 }
 
                 return true;
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the total payload pounds.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double PayloadPounds
-        {
-            get
-            {
-                // todo sum up the total payloads to be transported
-
-                return 0;
             }
         }
     }
