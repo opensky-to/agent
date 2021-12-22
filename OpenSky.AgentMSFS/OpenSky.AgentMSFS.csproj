@@ -110,6 +110,7 @@
     <Compile Include="Controls\PayloadStationControl.xaml.cs">
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ScrollingListBox.cs" />
     <Compile Include="Converters\AircraftTypeEngineInfoConverter.cs" />
     <Compile Include="Converters\AircraftTypeForeignKeyConverter.cs" />
     <Compile Include="Converters\InvertedBooleanVisibilityConverter.cs" />
