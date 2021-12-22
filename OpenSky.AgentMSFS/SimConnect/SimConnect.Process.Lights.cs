@@ -101,9 +101,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                     // 300 feet AGL landing lights
                     if (this.PrimaryTracking.RadioHeight < 300 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
                     {
-                        this.landingLightWarningActive = true;
-                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
-                        this.fsConnect.SetText("OpenSky Warning: Landing lights off below 300 feet AGL", 5);
+                        if (!this.landingLightWarningActive)
+                        {
+                            this.landingLightWarningActive = true;
+                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
+                            this.fsConnect.SetText("OpenSky Warning: Landing lights off below 300 feet AGL", 5);
+                        }
                     }
                     else
                     {
