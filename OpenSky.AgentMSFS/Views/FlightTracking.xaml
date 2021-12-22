@@ -543,7 +543,7 @@
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Flight events</TextBlock>
                 </GroupBox.Header>
-                <ListBox Name="EventLog" FontFamily="Consolas" ItemsSource="{Binding SimConnect.TrackingEventLogEntries, Mode=OneWay}" MouseDoubleClick="EventLogMouseDoubleClick" BorderThickness="0" Background="#1a1e22">
+                <controls:ScrollingListBox x:Name="EventLog" FontFamily="Consolas" ItemsSource="{Binding SimConnect.TrackingEventLogEntries, Mode=OneWay}" MouseDoubleClick="EventLogMouseDoubleClick" BorderThickness="0" Background="#1a1e22">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="models:TrackingEventLogEntry">
                             <StackPanel Orientation="Horizontal" Margin="-5">
@@ -553,7 +553,7 @@
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                </ListBox>
+                </controls:ScrollingListBox>
             </GroupBox>
             <GroupBox Grid.Row="2" Grid.Column="0">
                 <GroupBox.Header>
