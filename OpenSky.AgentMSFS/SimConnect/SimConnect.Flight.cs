@@ -231,33 +231,33 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         lock (this.trackingEventMarkers)
                         {
-                            var originMarker = new TrackingEventMarker(new GeoCoordinate(value.Origin.Latitude, value.Origin.Longitude), value.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
-                            this.trackingEventMarkers.Add(originMarker);
-                            this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
                             var alternateMarker = new TrackingEventMarker(new GeoCoordinate(value.Alternate.Latitude, value.Alternate.Longitude), value.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
                             this.trackingEventMarkers.Add(alternateMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
+                            var originMarker = new TrackingEventMarker(new GeoCoordinate(value.Origin.Latitude, value.Origin.Longitude), value.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(originMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
                             var destinationMarker = new TrackingEventMarker(new GeoCoordinate(value.Destination.Latitude, value.Destination.Longitude), value.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
                             this.trackingEventMarkers.Add(destinationMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
 
-                            var originDetailMarker = new TrackingEventMarker(value.Origin, OpenSkyColors.OpenSkyTeal, Colors.White);
-                            this.trackingEventMarkers.Add(originDetailMarker);
-                            this.TrackingEventMarkerAdded?.Invoke(this, originDetailMarker);
                             var alternateDetailMarker = new TrackingEventMarker(value.Alternate, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
                             this.trackingEventMarkers.Add(alternateDetailMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, alternateDetailMarker);
+                            var originDetailMarker = new TrackingEventMarker(value.Origin, OpenSkyColors.OpenSkyTeal, Colors.White);
+                            this.trackingEventMarkers.Add(originDetailMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, originDetailMarker);
                             var destinationDetailMarker = new TrackingEventMarker(value.Destination, OpenSkyColors.OpenSkyTeal, Colors.White);
                             this.trackingEventMarkers.Add(destinationDetailMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, destinationDetailMarker);
 
-                            foreach (var runway in value.Origin.Runways)
+                            foreach (var runway in value.Alternate.Runways)
                             {
                                 var runwayMarker = new TrackingEventMarker(runway);
                                 this.trackingEventMarkers.Add(runwayMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
                             }
-                            foreach (var runway in value.Alternate.Runways)
+                            foreach (var runway in value.Origin.Runways)
                             {
                                 var runwayMarker = new TrackingEventMarker(runway);
                                 this.trackingEventMarkers.Add(runwayMarker);
