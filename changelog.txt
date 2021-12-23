@@ -7,6 +7,7 @@ Version 0.3.1 (ALPHA3)
 --------------------------------------------------------------------------------------
 - Fixed landing light 300 AGL triggering multiple times
 - Added auto-scroll to bottom for flight events
+- Aircraft type max allowed payload delta
 
 --------------------------------------------------------------------------------------
 Version 0.3.0 (ALPHA3)
