@@ -32,7 +32,7 @@ namespace OpenSky.AgentMSFS.Controls
         {
             this.Loaded += (_, _) =>
               {
-                  if (this.Items != null)
+                  if (this.Items is { Count: > 0 })
                   {
                       this.ScrollIntoView(this.Items[this.Items.Count - 1]);
                   }
