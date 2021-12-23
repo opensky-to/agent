@@ -22,6 +22,22 @@ namespace OpenSky.AgentMSFS.Controls
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Initializes a new instance of the <see cref="ScrollingListBox"/> class.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 22/12/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public ScrollingListBox()
+        {
+            this.Loaded += (_, _) =>
+              {
+                  this.ScrollIntoView(this.Items[this.Items.Count - 1]);
+              };
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Updates the current selection when an item in the
         /// <see cref="T:System.Windows.Controls.Primitives.Selector" /> has changed.
         /// </summary>
@@ -35,7 +51,7 @@ namespace OpenSky.AgentMSFS.Controls
         /// -------------------------------------------------------------------------------------------------
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems.Count > 0)
+            if (e.NewItems?.Count > 0)
             {
                 this.ScrollIntoView(e.NewItems[e.NewItems.Count - 1]);
             }

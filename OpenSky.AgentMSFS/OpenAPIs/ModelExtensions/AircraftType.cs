@@ -82,6 +82,7 @@ namespace OpenSkyApi
             this.UploaderID = copyFrom.UploaderID;
             this.UploaderName = copyFrom.UploaderName;
             this.VersionNumber = copyFrom.VersionNumber;
+            this.MaxPayloadDeltaAllowed = copyFrom.MaxPayloadDeltaAllowed;
         }
 
         /// -------------------------------------------------------------------------------------------------
