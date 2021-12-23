@@ -305,7 +305,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     if (Math.Abs(oldPayload.TotalWeight - newPayload.TotalWeight) > 0.1)
                     {
-                        if (Math.Abs(newPayload.TotalWeight - this.Flight.PayloadPounds) > 0.5)
+                        if (Math.Abs(newPayload.TotalWeight - this.Flight.PayloadPounds) > this.Flight.Aircraft.Type.MaxPayloadDeltaAllowed)
                         {
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
                             var assembly = Assembly.GetExecutingAssembly();

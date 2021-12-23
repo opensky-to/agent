@@ -129,6 +129,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The maximum payload delta allowed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int maxPayloadDeltaAllowed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The minimum price.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -161,7 +168,6 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private bool needsFlightEngineer;
-
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -632,6 +638,27 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the maximum payload delta allowed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int MaxPayloadDeltaAllowed
+        {
+            get => this.maxPayloadDeltaAllowed;
+
+            set
+            {
+                if (Equals(this.maxPayloadDeltaAllowed, value))
+                {
+                    return;
+                }
+
+                this.maxPayloadDeltaAllowed = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the minimum price.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -695,28 +722,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets a value indicating whether the type needs a flight engineer.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool NeedsFlightEngineer
-        {
-            get => this.needsFlightEngineer;
-
-            set
-            {
-                if (Equals(this.needsFlightEngineer, value))
-                {
-                    return;
-                }
-
-                this.needsFlightEngineer = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets or sets a value indicating whether the type needs a co-pilot.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -732,6 +737,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
 
                 this.needsCoPilot = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the type needs a flight engineer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool NeedsFlightEngineer
+        {
+            get => this.needsFlightEngineer;
+
+            set
+            {
+                if (Equals(this.needsFlightEngineer, value))
+                {
+                    return;
+                }
+
+                this.needsFlightEngineer = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -897,7 +923,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 MessageBoxResult? answer = MessageBoxResult.None;
                 this.AddAircraftTypeCommand.ReportProgress(
-                    () => answer = ModernWpf.MessageBox.Show("ATC plane model or type not set, are you connected to the simulator and is the plane loaded correctly? Are you sure you want to continue?", "Missing ATC identification", MessageBoxButton.YesNo, MessageBoxImage.Hand), true);
+                    () => answer = ModernWpf.MessageBox.Show(
+                        "ATC plane model or type not set, are you connected to the simulator and is the plane loaded correctly? Are you sure you want to continue?",
+                        "Missing ATC identification",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Hand),
+                    true);
 
                 if (answer != MessageBoxResult.Yes)
                 {
@@ -939,6 +970,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 MinimumRunwayLength = this.MinimumRunwayLength,
                 MinPrice = this.MinimumPrice,
                 MaxPrice = this.MaximumPrice,
+                MaxPayloadDeltaAllowed = this.MaxPayloadDeltaAllowed,
                 Comments = this.Comments
             };
 
