@@ -31,6 +31,9 @@
     <Color x:Key="OpenSkySimBriefText">White</Color>
     <SolidColorBrush x:Key="OpenSkySimBriefTextBrush" Color="{StaticResource OpenSkySimBriefText}" />
 
+    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+    <Style TargetType="controls:ScrollingListBox" BasedOn="{StaticResource DefaultListBoxStyle}" />
+
     <Style x:Key="OpenSkyRedButtonStyle" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Background" Value="{StaticResource OpenSkyRedBrush}" />
