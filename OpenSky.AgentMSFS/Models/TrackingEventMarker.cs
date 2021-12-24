@@ -288,7 +288,7 @@ namespace OpenSky.AgentMSFS.Models
         {
             if (runway.RunwayEnds.Count == 2)
             {
-                this.SetValue(ZIndexProperty, 998);
+                this.SetValue(ZIndexProperty, 997);
                 var leftEnd = runway.RunwayEnds.First().Longitude <= runway.RunwayEnds.Last().Longitude ? runway.RunwayEnds.First() : runway.RunwayEnds.Last();
                 var rightEnd = runway.RunwayEnds.First().Longitude <= runway.RunwayEnds.Last().Longitude ? runway.RunwayEnds.Last() : runway.RunwayEnds.First();
                 var color = leftEnd.HasClosedMarkings && rightEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal;
@@ -316,7 +316,7 @@ namespace OpenSky.AgentMSFS.Models
                 this.Children.Add(line);
 
                 {
-                    var runwayEnd = runway.RunwayEnds.First();
+                    var runwayEnd = leftEnd;
                     var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(runwayEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
                     this.Children.Add(textBorder);
                     textBorder.Child = new TextBlock
@@ -342,7 +342,7 @@ namespace OpenSky.AgentMSFS.Models
                 }
 
                 {
-                    var runwayEnd = runway.RunwayEnds.Last();
+                    var runwayEnd = rightEnd;
                     var textBorder = new Border { BorderBrush = null, Background = new SolidColorBrush(runwayEnd.HasClosedMarkings ? OpenSkyColors.OpenSkyRed : OpenSkyColors.OpenSkyTeal), CornerRadius = new CornerRadius(1.5) };
                     this.Children.Add(textBorder);
                     textBorder.Child = new TextBlock

@@ -417,7 +417,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                         this.DiscordRpcClient.SetPresence(new RichPresence
                         {
-                            State = $"Paused, {SimConnect.Instance.Flight?.FlightPhase}",
+                            State = $"Paused, {SimConnect.Instance.FlightPhase}",
                             Details = $"Tracking flight {SimConnect.Instance.Flight?.FullFlightNumber}",
                             Assets = new Assets
                             {
@@ -436,7 +436,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                         this.DiscordRpcClient.SetPresence(new RichPresence
                         {
-                            State = $"Recording, {SimConnect.Instance.Flight?.FlightPhase}",
+                            State = $"Recording, {SimConnect.Instance.FlightPhase}",
                             Details = $"Tracking flight {SimConnect.Instance.Flight?.FullFlightNumber}",
                             Assets = new Assets
                             {
