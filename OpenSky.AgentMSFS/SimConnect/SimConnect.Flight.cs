@@ -31,7 +31,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSkyApi;
 
     using PositionReport = OpenSkyApi.PositionReport;
-    using TrackingEventMarker = OpenSky.AgentMSFS.Models.TrackingEventMarker;
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -504,7 +504,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.TrackingStatus = TrackingStatus.GroundOperations;
                 this.trackingStarted = DateTime.UtcNow;
                 this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
-                this.Speech.SpeakAsync("Tracking started. But ground handling is still in progress. You can set up your plane but don't turn on the engines or start pushing back.");
+                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStartedGroundHandling);
             }
             else
             {
@@ -514,7 +514,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking starting...");
-                        this.Speech.SpeakAsync("Flight tracking started.");
+                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStarted);
                         this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                     }
 
@@ -522,7 +522,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking resuming...");
-                        this.Speech.SpeakAsync("Flight tracking resumed");
+                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingResumed);
                         this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
 
                         // Check if we just resumed a save that failed to upload
@@ -638,7 +638,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
                 this.SaveFlight();
-                this.Speech.SpeakAsync("Flight saved and paused.");
+                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightSavedPaused);
                 this.UploadPositionReport();
                 this.UploadAutoSave();
 

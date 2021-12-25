@@ -307,7 +307,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             this.fuelLoadingCompleteSoundPlayed = true;
                             if (this.TrackingStatus == TrackingStatus.GroundOperations)
                             {
-                                this.Speech.Speak("Fuel loading complete captain.");
+                                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FuelLoadingComplete, false);
                             }
                         }
                     }
@@ -331,7 +331,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             this.payloadLoadingCompleteSoundPlayed = true;
                             if (this.TrackingStatus == TrackingStatus.GroundOperations)
                             {
-                                this.Speech.Speak("Payload is ready, here is the load sheet.");
+                                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.PayloadSetLoadsheet, false);
                             }
                         }
                     }
@@ -359,20 +359,20 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         if (!this.fuelLoadingCompleteSoundPlayed)
                         {
-                            this.Speech.Speak("Fuel loading complete captain.");
-                            Thread.Sleep(5000);
+                            SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FuelLoadingComplete, false);
+                            Thread.Sleep(1000);
                         }
 
                         if (!this.payloadLoadingCompleteSoundPlayed)
                         {
-                            this.Speech.Speak("Payload is ready, here is the load sheet.");
-                            Thread.Sleep(5000);
+                            SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.PayloadSetLoadsheet, false);
+                            Thread.Sleep(1000);
                         }
 
                         // Report all done and move tracking status to tracking
                         this.GroundHandlingComplete = true;
                         this.TrackingStatus = TrackingStatus.Tracking;
-                        this.Speech.SpeakAsync("All ground operations complete, we are ready for push and start.");
+                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.ReadyPushStart);
                     }
                     else
                     {

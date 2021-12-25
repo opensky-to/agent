@@ -191,6 +191,7 @@
     <Compile Include="SimConnect\SimConnect.Simbrief.cs" />
     <Compile Include="SimConnect\Structs\SlewPlaneIntoPosition.cs" />
     <Compile Include="SimConnect\Structs\WeightAndBalance.cs" />
+    <Compile Include="SpeechSoundPacks.cs" />
     <Compile Include="Tools\AssemblyVersionExtension.cs" />
     <Compile Include="Tools\ColorExtensions.cs" />
     <Compile Include="Tools\DateTimeTextWriterTraceListener.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Views\Models\NewFlightNotificationViewModel.cs" />
     <Compile Include="Views\Models\AircraftTypesViewModel.cs" />
     <Compile Include="Views\Models\SettingsViewModel.cs" />
+    <Compile Include="Views\Models\SoundPackTesterViewModel.cs" />
     <Compile Include="Views\Models\StartupViewModel.cs" />
     <Compile Include="Views\Models\TrackingDebugViewModel.cs" />
     <Compile Include="Views\Models\AutoUpdateViewModel.cs" />
@@ -232,6 +234,9 @@
     </Compile>
     <Compile Include="Views\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SoundPackTester.xaml.cs">
+      <DependentUpon>SoundPackTester.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Startup.xaml.cs">
       <DependentUpon>Startup.xaml</DependentUpon>
@@ -276,6 +281,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SoundPackTester.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

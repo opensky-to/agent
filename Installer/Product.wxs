@@ -18,6 +18,7 @@
         <Feature Id="ProductFeature" Title="OpenSky.AgentMSFS" Level="1">
             <ComponentGroupRef Id="OpenSky.AgentMSFS" />
             <ComponentGroupRef Id="OpenSky.AgentMSFS.Libraries" />
+            <ComponentGroupRef Id="OpenSky.SoundPacks" />
         </Feature>
 
         <util:CloseApplication Id="CloseOpenSky.AgentMSFS" Target="OpenSky.AgentMSFS.exe" TerminateProcess="1" RebootPrompt="no" PromptToContinue="no" />
@@ -31,7 +32,7 @@
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder">
-                <Directory Id="ApplicationProgramsFolder" Name="OpenSky"/>
+                <Directory Id="ApplicationProgramsFolder" Name="OpenSky" />
             </Directory>
             <Directory Id="DesktopFolder" SourceName="Desktop" />
         </Directory>
@@ -44,6 +45,13 @@
                     <Shortcut Id="OpenSky.AgentMSFS.Shortcut" Directory="ApplicationProgramsFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
                     <Shortcut Id="OpenSky.AgentMSFS.DeskShortcut" Directory="DesktopFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
                 </File>
+	            <RegistryKey Root="HKCR" Key="opensky-agent-msfs">
+		            <RegistryValue Type="string" Value="URL:opensky-agent-msfs" />
+		            <RegistryValue Type="string" Name="URL Protocol" Value="" />
+		            <RegistryKey Key="shell\open\command">
+			            <RegistryValue Type="string" Value="&quot;[#OpenSkyAgentExeFile]&quot; &quot;%1&quot;" />
+		            </RegistryKey>
+	            </RegistryKey>
                 <RemoveFolder Id="RemoveProgramMenuDir" Directory="ApplicationProgramsFolder" On="uninstall" />
             </Component>
             <Component Guid="{F58EF8AF-5D4E-4005-8D90-5A83F0D26CFF}" Win64="yes">
@@ -56,15 +64,6 @@
                 <File Source="Resources\SimConnect.cfg" KeyPath="yes">
                     <util:PermissionEx User="Users" GenericAll="yes" />
                 </File>
-            </Component>
-            <Component Id="RegistryEntries" Guid="{044C023F-9639-4370-866F-EE5AD4E30A86}" Win64="yes">
-                <RegistryKey Root="HKCR" Key="opensky-agent-msfs" Action="createAndRemoveOnUninstall">
-                    <RegistryValue Type="string" Value="URL:opensky-agent-msfs" />
-                    <RegistryValue Type="string" Name="URL Protocol" Value="" />
-                    <RegistryKey Key="shell\open\command">
-                        <RegistryValue Type="string" Value="&quot;[#OpenSkyAgentExeFile]&quot; &quot;%1&quot;" />
-                    </RegistryKey>
-                </RegistryKey>
             </Component>
         </ComponentGroup>
     </Fragment>

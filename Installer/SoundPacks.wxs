@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Directory Id="SoundPacks" Name="SoundPacks">
+                <Directory Id="FemaleUS" Name="FemaleUS">
+                    <Component Id="abort_aircraft.wav" Guid="{237F04CF-07EC-4271-AE19-BF4318CF30BA}" Win64="yes">
+                        <File Id="abort_aircraft.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\abort_aircraft.wav" />
+                    </Component>
+                    <Component Id="abort_payload.wav" Guid="{897217F4-B5DC-4A25-849F-CAD0744C2F59}" Win64="yes">
+                        <File Id="abort_payload.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\abort_payload.wav" />
+                    </Component>
+                    <Component Id="abort_sim_main.wav" Guid="{8DCC579F-1A13-4E82-9F68-D31E1193C4DC}" Win64="yes">
+                        <File Id="abort_sim_main.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\abort_sim_main.wav" />
+                    </Component>
+                    <Component Id="abort_slew.wav" Guid="{4F06BD75-0F62-42DF-BA51-68E2DD1C4A16}" Win64="yes">
+                        <File Id="abort_slew.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\abort_slew.wav" />
+                    </Component>
+                    <Component Id="abort_teleport.wav" Guid="{D619ABE2-AFA0-4890-B599-D2BA52060715}" Win64="yes">
+                        <File Id="abort_teleport.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\abort_teleport.wav" />
+                    </Component>
+                    <Component Id="fuel_loading.wav" Guid="{E4F3D607-0E58-4CEB-950C-E8698CD675A0}" Win64="yes">
+                        <File Id="fuel_loading.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\fuel_loading.wav" />
+                    </Component>
+                    <Component Id="lostsim_saving_stop.wav" Guid="{BD0C90A5-0EF7-4CBB-868D-503330C6090C}" Win64="yes">
+                        <File Id="lostsim_saving_stop.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\lostsim_saving_stop.wav" />
+                    </Component>
+                    <Component Id="number1.wav" Guid="{91A3A1D2-71CC-4AC3-A79C-1F4EEA31BFD0}" Win64="yes">
+                        <File Id="number1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number1.wav" />
+                    </Component>
+                    <Component Id="number2.wav" Guid="{C80E3119-B671-432D-B61E-30D33BD1B3BE}" Win64="yes">
+                        <File Id="number2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number2.wav" />
+                    </Component>
+                    <Component Id="number3.wav" Guid="{708CC47C-0437-4A07-BFA1-6D12A18B6997}" Win64="yes">
+                        <File Id="number3.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number3.wav" />
+                    </Component>
+                    <Component Id="number4.wav" Guid="{E1696C89-AE78-4326-9B3A-D5F37ABEC478}" Win64="yes">
+                        <File Id="number4.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number4.wav" />
+                    </Component>
+                    <Component Id="number5.wav" Guid="{CAFE685C-11C1-4646-B22A-B3F82CF51080}" Win64="yes">
+                        <File Id="number5.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number5.wav" />
+                    </Component>
+                    <Component Id="number6.wav" Guid="{6E4FE237-85E6-40B7-87EC-3D705E16FC60}" Win64="yes">
+                        <File Id="number6.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number6.wav" />
+                    </Component>
+                    <Component Id="number7.wav" Guid="{A268E98B-341F-4123-BDC9-C26278192D89}" Win64="yes">
+                        <File Id="number7.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number7.wav" />
+                    </Component>
+                    <Component Id="number8.wav" Guid="{9C1BFE20-F2FB-49C0-9A89-96FFB46AB302}" Win64="yes">
+                        <File Id="number8.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number8.wav" />
+                    </Component>
+                    <Component Id="number9.wav" Guid="{E5C69CDB-C8B0-44AA-B84E-AE5AD91BB11A}" Win64="yes">
+                        <File Id="number9.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\number9.wav" />
+                    </Component>
+                    <Component Id="payload_loadsheet.wav" Guid="{1C2F9A90-12C4-4BEF-AF09-5A25C560881B}" Win64="yes">
+                        <File Id="payload_loadsheet.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\payload_loadsheet.wav" />
+                    </Component>
+                    <Component Id="ready_for_boarding_beginning.wav" Guid="{B9A7592A-45B4-465A-B287-BAF96DF863DF}" Win64="yes">
+                        <File Id="ready_for_boarding_beginning.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\ready_for_boarding_beginning.wav" />
+                    </Component>
+                    <Component Id="ready_for_boarding_end.wav" Guid="{0FAF275C-3E09-46AA-BD3A-92587B503F4D}" Win64="yes">
+                        <File Id="ready_for_boarding_end.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\ready_for_boarding_end.wav" />
+                    </Component>
+                    <Component Id="tracking_gh_started.wav" Guid="{6A6E2A9D-1672-49DC-9BFA-A09C2D6F7AE1}" Win64="yes">
+                        <File Id="tracking_gh_started.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\tracking_gh_started.wav" />
+                    </Component>
+                    <Component Id="tracking_started.wav" Guid="{49671F4E-46FC-4230-B9DA-50F1DEA1BD7E}" Win64="yes">
+                        <File Id="tracking_started.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\FemaleUS\tracking_started.wav" />
+                    </Component>
+                </Directory>
+                <Directory Id="MaleUK" Name="MaleUK">
+                    <Component Id="abort_aircraft1.wav" Guid="{05A7BC9B-AB9B-460E-B447-ED3E3FB5D8A8}" Win64="yes">
+                        <File Id="abort_aircraft1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_aircraft1.wav" />
+                    </Component>
+                    <Component Id="abort_aircraft2.wav" Guid="{95F30215-8C44-4FE7-813F-306903D88034}" Win64="yes">
+                        <File Id="abort_aircraft2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_aircraft2.wav" />
+                    </Component>
+                    <Component Id="abort_payload1.wav" Guid="{D5FFB93B-D2EE-4ECC-BEAA-2078230F361C}" Win64="yes">
+                        <File Id="abort_payload1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_payload1.wav" />
+                    </Component>
+                    <Component Id="abort_payload2.wav" Guid="{F1DABD62-F894-4E88-A719-C45471733C23}" Win64="yes">
+                        <File Id="abort_payload2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_payload2.wav" />
+                    </Component>
+                    <Component Id="abort_slew1.wav" Guid="{EF2D8CBD-8708-4D81-997D-ADB1FC4C7707}" Win64="yes">
+                        <File Id="abort_slew1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_slew1.wav" />
+                    </Component>
+                    <Component Id="abort_slew2.wav" Guid="{ABF1736F-8F0A-4DBC-AAE9-2601D6DD0474}" Win64="yes">
+                        <File Id="abort_slew2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_slew2.wav" />
+                    </Component>
+                    <Component Id="abort_teleport1.wav" Guid="{8C7D9FDC-4E47-49AA-917F-8D101ABF633D}" Win64="yes">
+                        <File Id="abort_teleport1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_teleport1.wav" />
+                    </Component>
+                    <Component Id="abort_teleport2.wav" Guid="{95F2378D-B016-4724-92BE-F327E493ADC6}" Win64="yes">
+                        <File Id="abort_teleport2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\abort_teleport2.wav" />
+                    </Component>
+                    <Component Id="fuel_loading1.wav" Guid="{0FF210D4-C736-45DC-989A-7C3AF7155360}" Win64="yes">
+                        <File Id="fuel_loading1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\fuel_loading1.wav" />
+                    </Component>
+                    <Component Id="fuel_loading2.wav" Guid="{F1FE9233-AEC4-4986-A603-4E0B87E6C9EC}" Win64="yes">
+                        <File Id="fuel_loading2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\fuel_loading2.wav" />
+                    </Component>
+                    <Component Id="lostsim_saving_stop1.wav" Guid="{E805818A-EE4D-4B74-9D96-A81D609D818A}" Win64="yes">
+                        <File Id="lostsim_saving_stop1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\lostsim_saving_stop1.wav" />
+                    </Component>
+                    <Component Id="lostsim_saving_stop2.wav" Guid="{01E0BA45-E40B-4AE3-916F-B02D785C0308}" Win64="yes">
+                        <File Id="lostsim_saving_stop2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\lostsim_saving_stop2.wav" />
+                    </Component>
+                    <Component Id="payload_loadsheet1.wav" Guid="{23A7B933-29B6-4182-9099-24B1BAF8E66C}" Win64="yes">
+                        <File Id="payload_loadsheet1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\payload_loadsheet1.wav" />
+                    </Component>
+                    <Component Id="payload_loadsheet2.wav" Guid="{2B5837AF-B82B-4B06-B147-BB90D3D131AA}" Win64="yes">
+                        <File Id="payload_loadsheet2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\payload_loadsheet2.wav" />
+                    </Component>
+                    <Component Id="ready_for_boarding_beginning.wav_1" Guid="{42511C64-E3B3-45BE-A422-A54F15E4DC69}" Win64="yes">
+                        <File Id="ready_for_boarding_beginning.wav_1" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\ready_for_boarding_beginning.wav" />
+                    </Component>
+                    <Component Id="ready_for_boarding_end.wav_1" Guid="{99157D8C-EA37-4309-AE23-6F19F1009EAC}" Win64="yes">
+                        <File Id="ready_for_boarding_end.wav_1" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\ready_for_boarding_end.wav" />
+                    </Component>
+                    <Component Id="tracking_gh_started1.wav" Guid="{24734BDC-1D29-436A-9630-B33FFD945C49}" Win64="yes">
+                        <File Id="tracking_gh_started1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\tracking_gh_started1.wav" />
+                    </Component>
+                    <Component Id="tracking_gh_started2.wav" Guid="{3205A4D4-6068-40E7-B837-2A290873F9B7}" Win64="yes">
+                        <File Id="tracking_gh_started2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\tracking_gh_started2.wav" />
+                    </Component>
+                    <Component Id="tracking_started1.wav" Guid="{1DBA8B6F-5BBC-4F37-A163-D536E64C6DB1}" Win64="yes">
+                        <File Id="tracking_started1.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\tracking_started1.wav" />
+                    </Component>
+                    <Component Id="tracking_started2.wav" Guid="{151DC9B3-ABC2-40F8-B70D-B80758714796}" Win64="yes">
+                        <File Id="tracking_started2.wav" KeyPath="yes" Source="$(var.SoundPackSourceFolder)\MaleUK\tracking_started2.wav" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="OpenSky.SoundPacks">
+            <ComponentRef Id="abort_aircraft.wav" />
+            <ComponentRef Id="abort_payload.wav" />
+            <ComponentRef Id="abort_sim_main.wav" />
+            <ComponentRef Id="abort_slew.wav" />
+            <ComponentRef Id="abort_teleport.wav" />
+            <ComponentRef Id="fuel_loading.wav" />
+            <ComponentRef Id="lostsim_saving_stop.wav" />
+            <ComponentRef Id="number1.wav" />
+            <ComponentRef Id="number2.wav" />
+            <ComponentRef Id="number3.wav" />
+            <ComponentRef Id="number4.wav" />
+            <ComponentRef Id="number5.wav" />
+            <ComponentRef Id="number6.wav" />
+            <ComponentRef Id="number7.wav" />
+            <ComponentRef Id="number8.wav" />
+            <ComponentRef Id="number9.wav" />
+            <ComponentRef Id="payload_loadsheet.wav" />
+            <ComponentRef Id="ready_for_boarding_beginning.wav" />
+            <ComponentRef Id="ready_for_boarding_end.wav" />
+            <ComponentRef Id="tracking_gh_started.wav" />
+            <ComponentRef Id="tracking_started.wav" />
+            <ComponentRef Id="abort_aircraft1.wav" />
+            <ComponentRef Id="abort_aircraft2.wav" />
+            <ComponentRef Id="abort_payload1.wav" />
+            <ComponentRef Id="abort_payload2.wav" />
+            <ComponentRef Id="abort_slew1.wav" />
+            <ComponentRef Id="abort_slew2.wav" />
+            <ComponentRef Id="abort_teleport1.wav" />
+            <ComponentRef Id="abort_teleport2.wav" />
+            <ComponentRef Id="fuel_loading1.wav" />
+            <ComponentRef Id="fuel_loading2.wav" />
+            <ComponentRef Id="lostsim_saving_stop1.wav" />
+            <ComponentRef Id="lostsim_saving_stop2.wav" />
+            <ComponentRef Id="payload_loadsheet1.wav" />
+            <ComponentRef Id="payload_loadsheet2.wav" />
+            <ComponentRef Id="ready_for_boarding_beginning.wav_1" />
+            <ComponentRef Id="ready_for_boarding_end.wav_1" />
+            <ComponentRef Id="tracking_gh_started1.wav" />
+            <ComponentRef Id="tracking_gh_started2.wav" />
+            <ComponentRef Id="tracking_started1.wav" />
+            <ComponentRef Id="tracking_started2.wav" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>
