@@ -310,8 +310,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
                             var assembly = Assembly.GetExecutingAssembly();
                             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                            player.Play();
-                            this.Speech.SpeakAsync("Tracking aborted, payload changed.");
+                            player.PlaySync();
+                            SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedPayloadChange);
                             this.StopTracking(false);
                             this.fsConnect.SetText("OpenSky Warning: Tracking aborted, payload changed.", 5);
                         }
@@ -342,8 +342,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                    player.Play();
-                    this.Speech.SpeakAsync("Tracking aborted, aircraft type was changed.");
+                    player.PlaySync();
+                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedAircraftType);
                     this.StopTracking(false);
                     this.fsConnect.SetText("OpenSky Warning: Tracking aborted, aircraft type was changed.", 5);
                 }
@@ -460,8 +460,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
                             var assembly = Assembly.GetExecutingAssembly();
                             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
-                            player.Play();
-                            this.Speech.SpeakAsync("Tracking aborted, fuel increased.");
+                            player.PlaySync();
+                            SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedFuelIncreased);
                             this.StopTracking(false);
                             this.fsConnect.SetText("OpenSky Warning: Tracking aborted, fuel increased.", 5);
                         }

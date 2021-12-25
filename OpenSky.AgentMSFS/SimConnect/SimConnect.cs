@@ -14,7 +14,6 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using System.Speech.Synthesis;
     using System.Threading;
     using System.Windows;
 
@@ -170,18 +169,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 { Requests.WeightAndBalance, 15000 },
                 { Requests.LandingAnalysis, 500 }
             };
-            this.Speech = new SpeechSynthesizer();
-            if (!string.IsNullOrEmpty(Settings.Default.TextToSpeechVoice))
-            {
-                try
-                {
-                    this.Speech.SelectVoice(Settings.Default.TextToSpeechVoice);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Error setting text-to-speech voice from settings: " + ex);
-                }
-            }
 
             this.LastReceivedTimes = new ObservableConcurrentDictionary<Requests, DateTime?>();
             foreach (Requests request in Enum.GetValues(typeof(Requests)))
@@ -422,13 +409,6 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.OnPropertyChanged();
             }
         }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the speech synthesizer.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public SpeechSynthesizer Speech { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -680,30 +660,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Sets the text-to-speech voice.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 02/04/2021.
-        /// </remarks>
-        /// <param name="voiceName">
-        /// Name of the voice.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        public void SetSpeechVoice(string voiceName)
-        {
-            try
-            {
-                this.Speech.SelectVoice(voiceName);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error setting text-to-speech voice: " + ex);
-                UpdateGUIDelegate showError = () => ModernWpf.MessageBox.Show(ex.Message, "Error setting voice", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Dispatcher.BeginInvoke(showError);
-            }
-        }
+        
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -846,7 +803,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("Lost connection to sim, saving flight and stopping tracking session...");
-                this.Speech.SpeakAsync("Lost connection to sim, saving flight and stopping tracking session.");
+                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.LostSimSavingStopTracking);
                 this.StopTracking(true);
             }
         }

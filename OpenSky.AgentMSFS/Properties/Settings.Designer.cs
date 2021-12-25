@@ -176,5 +176,17 @@ namespace OpenSky.AgentMSFS.Properties {
                 return ((string)(this["OpenSkyChangePasswordUrl"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SoundPack {
+            get {
+                return ((string)(this["SoundPack"]));
+            }
+            set {
+                this["SoundPack"] = value;
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Speech.Synthesis;
     using System.Windows;
     using System.Windows.Media.Imaging;
@@ -73,6 +74,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The selected sound pack.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string selectedSoundPack;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The selected text to speech voice.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -118,6 +126,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LogoutOpenSkyUserCommand = new AsynchronousCommand(this.LogoutOpenSkyUser, this.UserSession.IsUserLoggedIn);
             this.ChangePasswordCommand = new Command(this.ChangePassword, this.UserSession.IsUserLoggedIn);
             this.UpdateProfileImageCommand = new AsynchronousCommand(this.UpdateProfileImage, this.UserSession.IsUserLoggedIn);
+            this.ClearSoundPackCommand = new Command(this.ClearSoundPack);
 
             // Fetch available text to speech voices
             var speech = new SpeechSynthesizer();
@@ -137,6 +146,11 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Properties.Settings.Default.LandingReportNotification);
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.SoundPack))
+            {
+                this.SelectedSoundPack = Properties.Settings.Default.SoundPack;
+            }
+
             if (!string.IsNullOrEmpty(Properties.Settings.Default.TextToSpeechVoice))
             {
                 this.SelectedTextToSpeechVoice = Properties.Settings.Default.TextToSpeechVoice;
@@ -199,6 +213,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command ChangePasswordCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the clear sound pack command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command ClearSoundPackCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -325,6 +346,28 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the selected sound pack.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string SelectedSoundPack
+        {
+            get => this.selectedSoundPack;
+
+            set
+            {
+                if (Equals(this.selectedSoundPack, value))
+                {
+                    return;
+                }
+
+                this.selectedSoundPack = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the selected text to speech voice.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -413,6 +456,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the available sound packs.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public List<string> SoundPacks => SpeechSoundPacks.Instance.SoundPacks.Keys.ToList();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the test text to speech voice command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -450,6 +500,19 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void ChangePassword()
         {
             Process.Start(Properties.Settings.Default.OpenSkyChangePasswordUrl);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Clears the selected sound pack.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 24/12/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void ClearSoundPack()
+        {
+            this.SelectedSoundPack = null;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -550,10 +613,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 Properties.Settings.Default.SimulatorHostName = this.SimulatorHostName;
                 Properties.Settings.Default.SimulatorPort = this.SimulatorPort;
                 Properties.Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
+                Properties.Settings.Default.SoundPack = this.SelectedSoundPack;
+                SpeechSoundPacks.Instance.SelectedSoundPack = this.SelectedSoundPack;
                 Properties.Settings.Default.TextToSpeechVoice = this.SelectedTextToSpeechVoice;
                 if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))
                 {
-                    SimConnect.SimConnect.Instance.SetSpeechVoice(this.SelectedTextToSpeechVoice);
+                    SpeechSoundPacks.Instance.SetSpeechVoice(this.SelectedTextToSpeechVoice);
                 }
 
                 Properties.Settings.Default.Save();
