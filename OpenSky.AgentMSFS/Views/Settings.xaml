@@ -16,12 +16,17 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
                 xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+                xmlns:ui="http://schemas.modernwpf.com/2019"
+                xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
                 mc:Ignorable="d"
                 Title="Settings" Width="900" LoadingText="{Binding LoadingText}"
                 SizeToContent="Height" ShowMinMaxButtons="False" ResizeMode="NoResize" HorizontalScrollBar="False">
     <Window.DataContext>
         <models:SettingsViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <converters:NullItemToVisibilityConverter x:Key="NullItemToVisibilityConverter" />
+    </Window.Resources>
     <StackPanel Orientation="Vertical" Margin="20" Grid.IsSharedSizeScope="True">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -56,8 +61,8 @@
                         <Path Stroke="Black" StrokeThickness="1" Fill="Black" Opacity="0.8">
                             <Path.RenderTransform>
                                 <TransformGroup>
-                                <RotateTransform Angle="90" CenterX="50" CenterY="50" />
-                                <TranslateTransform Y="50" />
+                                    <RotateTransform Angle="90" CenterX="50" CenterY="50" />
+                                    <TranslateTransform Y="50" />
                                 </TransformGroup>
                             </Path.RenderTransform>
                             <Path.Data>
@@ -148,12 +153,18 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Landing report</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Text-To-Speech voice</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Voice sound pack</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Fallback Text-To-Speech voice</TextBlock>
                 <ComboBox Grid.Row="0" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding LandingReportNotifications}" SelectedItem="{Binding SelectedLandingReportNotification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <DockPanel Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
+                <Grid Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
+                    <ComboBox x:Name="SoundPackCombo" FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding SoundPacks}" SelectedItem="{Binding SelectedSoundPack, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Randomize" ui:ControlHelper.PlaceholderForeground="#666" />
+                    <Button Style="{StaticResource DeleteButtonStyle}" MinWidth="34" VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,2, 30,2" Padding="0" Visibility="{Binding SelectedItem, ElementName=SoundPackCombo, Converter={StaticResource NullItemToVisibilityConverter}}" Command="{Binding ClearSoundPackCommand}" />
+                </Grid>
+                <DockPanel Grid.Row="2" Grid.Column="1" Margin="10,5,0,5">
                     <Button DockPanel.Dock="Right" Margin="5,0,0,0" Command="{Binding TestTextToSpeechVoiceCommand}">Test</Button>
                     <ComboBox  FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding TextToSpeechVoices}" SelectedItem="{Binding SelectedTextToSpeechVoice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
