@@ -179,9 +179,17 @@ namespace OpenSky.AgentMSFS.Views.Models
             // Initialize commands
             this.FlightTrackingCommand = new Command(this.OpenFlightTracking);
             this.TrackingDebugCommand = new Command(this.OpenTrackingDebug);
+            this.SoundPackTesterCommand = new Command(this.OpenSoundPackTester);
             this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
+
+            // Initialize sound packs
+            var soundPacks = SpeechSoundPacks.Instance.SoundPacks;
+            foreach (var soundPack in soundPacks)
+            {
+                Debug.WriteLine($"Found sound pack: {soundPack.Key}, containing {soundPack.Value.Count} audio events");
+            }
 
             // Check for update
             UpdateGUIDelegate autoUpdate = () => new AutoUpdate().Show();
@@ -583,6 +591,14 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the sound pack tester command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [NotNull]
+        public Command SoundPackTesterCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the flight tracking command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -624,6 +640,22 @@ namespace OpenSky.AgentMSFS.Views.Models
 #if DEBUG
             Debug.WriteLine("Opening tracking debug view");
             TrackingDebug.Open();
+#endif
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Opens sound pack tester view.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 24/12/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void OpenSoundPackTester()
+        {
+#if DEBUG
+            Debug.WriteLine("Opening sound pack tester view");
+            SoundPackTester.Open();
 #endif
         }
 

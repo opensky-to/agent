@@ -57,6 +57,14 @@ namespace OpenSky.AgentMSFS.Views.Models
             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSannouncement.wav"));
             player.Play();
 
+            new Thread(
+                () =>
+                {
+                    Thread.Sleep(2000);
+                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.ReadyForBoarding, true, SimConnect.SimConnect.Instance.Flight?.FlightNumber.ToString());
+                })
+            { Name = "OpenSky.NewFlightNotificationViewModel.SpeechFlightNumber" }.Start();
+
             this.StartTrackingCommand = new Command(this.StartTracking);
             new Thread(this.NotificationTimeout) { Name = "OpenSky.NewFlightNotificationTimeout" }.Start();
         }

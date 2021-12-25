@@ -204,7 +204,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     var assembly = Assembly.GetExecutingAssembly();
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
                     player.Play();
-                    this.Speech.SpeakAsync("Tracking aborted, sim returned to main menu.");
+                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedSimMainMenu);
                     this.StopTracking(false);
                     this.fsConnect.SetText("Tracking aborted, sim returned to main menu.", 5);
                 }
@@ -290,7 +290,8 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Climb
-            if (distanceToDepartureAirport >= 10 && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
+            var approachDistance = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
+            if (distanceToDepartureAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -305,7 +306,6 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Cruise
-            var approachDistance = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
             if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
@@ -321,7 +321,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Descent
-            if (distanceToDestinationAirport >= 40 && distanceToAlternateAirport >= 40 && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTracking.OnGround)
+            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {

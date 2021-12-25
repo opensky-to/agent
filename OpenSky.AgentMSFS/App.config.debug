@@ -43,6 +43,9 @@
 			<setting name="OpenSkyRefreshTokenExpiration" serializeAs="String">
 				<value />
 			</setting>
+			<setting name="SoundPack" serializeAs="String">
+				<value />
+			</setting>
 		</OpenSky.AgentMSFS.Properties.Settings>
 	</userSettings>
 	<applicationSettings>
