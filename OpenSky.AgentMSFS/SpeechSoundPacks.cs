@@ -127,7 +127,7 @@ namespace OpenSky.AgentMSFS
                     if (packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingBeginning) && packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingEnd) && packDictionary.ContainsKey(SpeechEvent.Number1) &&
                         packDictionary.ContainsKey(SpeechEvent.Number2) && packDictionary.ContainsKey(SpeechEvent.Number3) && packDictionary.ContainsKey(SpeechEvent.Number4) && packDictionary.ContainsKey(SpeechEvent.Number5) &&
                         packDictionary.ContainsKey(SpeechEvent.Number6) && packDictionary.ContainsKey(SpeechEvent.Number7) && packDictionary.ContainsKey(SpeechEvent.Number8) && packDictionary.ContainsKey(SpeechEvent.Number9) &&
-                        packDictionary.ContainsKey(SpeechEvent.Number9)) // todo change last check back to 0!
+                        packDictionary.ContainsKey(SpeechEvent.Number0))
                     {
                         packDictionary.Add(SpeechEvent.ReadyForBoarding, null);
                     }
