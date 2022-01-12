@@ -341,4 +341,5 @@ healthchecksdb
 
 #OpenSky specific
 Installer/Libraries.wxs
+Installer/SoundPacks.wxs
 OpenSky.AgentMSFS/app.config
