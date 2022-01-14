@@ -8,9 +8,12 @@ namespace OpenSky.AgentMSFS.Views.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Speech.Synthesis;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
 
     /// -------------------------------------------------------------------------------------------------
@@ -157,7 +160,15 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 this.selectedTextToSpeechVoice = value;
                 this.NotifyPropertyChanged();
-                SpeechSoundPacks.Instance.SetSpeechVoice(value);
+                try
+                {
+                    SpeechSoundPacks.Instance.SetSpeechVoice(value);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error setting text-to-speech voice: " + ex);
+                    this.ViewReference.ShowMessageBox(new OpenSkyMessageBox(ex, "Error setting text-to-speech voice", ex.Message, ExtendedMessageBoxImage.Error, 30));
+                }
             }
         }
 

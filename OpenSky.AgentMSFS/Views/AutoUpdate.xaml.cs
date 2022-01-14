@@ -7,6 +7,9 @@
 namespace OpenSky.AgentMSFS.Views
 {
     using System;
+    using System.Windows;
+
+    using OpenSky.AgentMSFS.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -26,6 +29,28 @@ namespace OpenSky.AgentMSFS.Views
         public AutoUpdate()
         {
             this.InitializeComponent();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Automatic update on loaded.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/01/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void AutoUpdateOnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is AutoUpdateViewModel viewModel)
+            {
+                viewModel.ViewReference = this;
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------

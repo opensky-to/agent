@@ -155,6 +155,11 @@ namespace OpenSky.AgentMSFS.Views
         /// -------------------------------------------------------------------------------------------------
         private void FlightTrackingLoaded(object sender, RoutedEventArgs e)
         {
+            if (this.DataContext is FlightTrackingViewModel viewModelViewRef)
+            {
+                viewModelViewRef.ViewReference = this;
+            }
+
             // Configure map view
             this.MapView.CredentialsProvider = new ApplicationIdCredentialsProvider(UserSessionService.Instance.LinkedAccounts?.BingMapsKey);
             this.AddAircraftAndTrailsToMap();
@@ -189,10 +194,12 @@ namespace OpenSky.AgentMSFS.Views
             }
 
             // Replay past tracking markers to add to this view
-            var viewModel = (FlightTrackingViewModel)this.DataContext;
-            viewModel.SimConnect.ReplayMapMarkers();
-            viewModel.SimConnect.NextStepFlashingChanged += this.SimConnectNextStepFlashingChanged;
-            this.SimConnectNextStepFlashingChanged(this, viewModel.SimConnect.NextStepFlashing);
+            if (this.DataContext is FlightTrackingViewModel viewModel)
+            {
+                viewModel.SimConnect.ReplayMapMarkers();
+                viewModel.SimConnect.NextStepFlashingChanged += this.SimConnectNextStepFlashingChanged;
+                this.SimConnectNextStepFlashingChanged(this, viewModel.SimConnect.NextStepFlashing);
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------

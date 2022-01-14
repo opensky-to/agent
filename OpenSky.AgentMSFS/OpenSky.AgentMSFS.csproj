@@ -106,6 +106,15 @@
     <Compile Include="Controls\FuelTankControl.xaml.cs">
       <DependentUpon>FuelTankControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Models\ErrorDetails.cs" />
+    <Compile Include="Controls\Models\ExtendedMessageBoxImage.cs" />
+    <Compile Include="Controls\Models\ExtendedMessageBoxResult.cs" />
+    <Compile Include="Controls\OpenSkyMessageBox.xaml.cs">
+      <DependentUpon>OpenSkyMessageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OpenSkyNotification.xaml.cs">
+      <DependentUpon>OpenSkyNotification.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\OpenSkyWindow.cs" />
     <Compile Include="Controls\PayloadStationControl.xaml.cs">
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
@@ -248,6 +257,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\OpenSkyMessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\OpenSkyNotification.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\PayloadStationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -313,6 +330,7 @@
     <Page Remove="Properties\DesignTimeResources.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="SyncfusionLicenseRegister.bat" />
     <Resource Include="Fonts\Montserrat-Black.ttf" />
     <Resource Include="Fonts\Montserrat-BlackItalic.ttf" />
     <Resource Include="Fonts\Montserrat-Bold.ttf" />
@@ -431,6 +449,15 @@
     <PackageReference Include="OpenSky.FlightLogXML">
       <Version>0.1.4</Version>
     </PackageReference>
+    <PackageReference Include="Syncfusion.SfChart.WPF">
+      <Version>19.4.0.42</Version>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.SfProgressBar.WPF">
+      <Version>19.4.0.42</Version>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.Themes.MaterialDark.WPF">
+      <Version>19.4.0.42</Version>
+    </PackageReference>
     <PackageReference Include="TomsToolbox.Wpf">
       <Version>2.7.4</Version>
     </PackageReference>
@@ -466,8 +493,13 @@
   <ItemGroup>
     <Resource Include="Resources\profile200.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"</PreBuildEvent>
+    <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"
+call "$(ProjectDir)SyncfusionLicenseRegister.bat" PreBuild "$(ProjectDir)App.xaml.cs"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"$(ProjectDir)SyncfusionLicenseRegister.bat" PostBuild "$(ProjectDir)App.xaml.cs"</PostBuildEvent>
   </PropertyGroup>
 </Project>
