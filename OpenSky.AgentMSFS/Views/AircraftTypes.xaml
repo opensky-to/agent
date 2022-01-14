@@ -23,7 +23,7 @@
             xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
             xmlns:tools="clr-namespace:OpenSky.AgentMSFS.Tools"
             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-            mc:Ignorable="d" d:DesignWidth="2000"
+            mc:Ignorable="d" d:DesignWidth="2000" Loaded="AircraftTypesOnLoaded"
             Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False" VerticalScrollBar="False" LoadingText="{Binding LoadingText}">
     <Window.DataContext>
         <models:AircraftTypesViewModel />

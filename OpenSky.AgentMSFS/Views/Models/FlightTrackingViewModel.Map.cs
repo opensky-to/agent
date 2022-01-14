@@ -18,6 +18,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
@@ -271,7 +273,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
             catch (WebException ex)
             {
-                Debug.WriteLine("Web error received from simbrief api: " + ex);
+                Debug.WriteLine("Web error received from simBrief api: " + ex);
 
                 var responseStream = ex.Response.GetResponseStream();
                 if (responseStream != null)
@@ -293,8 +295,13 @@ namespace OpenSky.AgentMSFS.Views.Models
                         var status = ofp.Element("fetch")?.Element("status")?.Value;
                         if (!string.IsNullOrWhiteSpace(status))
                         {
-                            Debug.WriteLine("Error fetching flight plan from Simbrief: " + status);
-                            this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(status, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
+                            Debug.WriteLine("Error fetching flight plan from simBrief: " + status);
+                            this.ImportSimbriefCommand.ReportProgress(() =>
+                            {
+                                var notification = new OpenSkyNotification("Error fetching flight plan from simBrief", status, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                                notification.SetErrorColorStyle();
+                                this.ViewReference.ShowNotification(notification);
+                            });
                             return;
                         }
                     }
@@ -304,8 +311,13 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error fetching flight plan from Simbrief: " + ex);
-                this.ImportSimbriefCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error fetching flight plan from Simbrief", MessageBoxButton.OK, MessageBoxImage.Error));
+                Debug.WriteLine("Error fetching flight plan from simBrief: " + ex);
+                this.ImportSimbriefCommand.ReportProgress(() =>
+                {
+                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error fetching flight plan from simBrief", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                    notification.SetErrorColorStyle();
+                    this.ViewReference.ShowNotification(notification);
+                });
             }
         }
 

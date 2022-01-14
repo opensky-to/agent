@@ -10,6 +10,8 @@ namespace OpenSky.AgentMSFS.Views
 
     using DataGridExtensions;
 
+    using OpenSky.AgentMSFS.Views.Models;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Plane identity collector window.
@@ -63,6 +65,28 @@ namespace OpenSky.AgentMSFS.Views
             {
                 Instance.BringIntoView();
                 Instance.Activate();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Aircraft types on loaded.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/01/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void AircraftTypesOnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is AircraftTypesViewModel viewModel)
+            {
+                viewModel.ViewReference = this;
             }
         }
 
