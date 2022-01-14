@@ -6,6 +6,10 @@
 
 namespace OpenSky.AgentMSFS.Views
 {
+    using System.Windows;
+
+    using OpenSky.AgentMSFS.Views.Models;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Sound pack tester window.
@@ -53,6 +57,28 @@ namespace OpenSky.AgentMSFS.Views
             {
                 Instance.BringIntoView();
                 Instance.Activate();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Sound pack tester on loaded.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/01/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SoundPackTesterOnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is SoundPackTesterViewModel viewModel)
+            {
+                viewModel.ViewReference = this;
             }
         }
     }

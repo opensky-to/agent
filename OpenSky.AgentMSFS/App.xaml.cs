@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="OpenSky">
 // OpenSky project 2021
 // </copyright>
@@ -20,6 +20,8 @@ namespace OpenSky.AgentMSFS
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.Properties;
     using OpenSky.AgentMSFS.Tools;
+
+    using Syncfusion.SfSkinManager;
 
     using XDMessaging;
 
@@ -52,6 +54,20 @@ namespace OpenSky.AgentMSFS
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public static bool IsDesignMode => DesignerProperties.GetIsInDesignMode(new DependencyObject());
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Initializes a new instance of the <see cref="App"/> class.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 19/06/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public App()
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
+            SfSkinManager.ApplyStylesOnApplication = false;
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

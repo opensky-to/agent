@@ -9,8 +9,9 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Windows;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect.Enums;
 
@@ -119,7 +120,9 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
             catch (Exception ex)
             {
-                ModernWpf.MessageBox.Show(ex.Message, "Error setting payload!", MessageBoxButton.OK, MessageBoxImage.Error);
+                var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error setting payload", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                notification.SetErrorColorStyle();
+                this.ViewReference.ShowNotification(notification);
             }
         }
 

@@ -17,7 +17,7 @@
                         xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
                         xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
                         xmlns:mdXaml="clr-namespace:MdXaml;assembly=MdXaml"
-                        mc:Ignorable="d" SizeToContent="WidthAndHeight" ShowMinMaxButtons="False"
+                        mc:Ignorable="d" SizeToContent="WidthAndHeight" ShowMinMaxButtons="False" Loaded="AutoUpdateOnLoaded"
                         Title="Update available" Height="450" Width="800" ShowInTaskbar="{Binding ShowInTaskbar}" Opacity="{Binding WindowOpacity}">
     <Window.DataContext>
         <models:AutoUpdateViewModel Close="AutoUpdateViewModelOnClose" />

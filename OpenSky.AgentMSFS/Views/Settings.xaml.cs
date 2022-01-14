@@ -11,6 +11,8 @@ namespace OpenSky.AgentMSFS.Views
     using System.Windows.Input;
     using System.Windows.Navigation;
 
+    using OpenSky.AgentMSFS.Views.Models;
+
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     /// Settings window.
@@ -116,6 +118,28 @@ namespace OpenSky.AgentMSFS.Views
         private void ProfileImageOnMouseLeave(object sender, MouseEventArgs e)
         {
             this.CameraCanvas.Visibility = this.ProfileImage.IsMouseOver || this.CameraCanvas.IsMouseOver ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Settings on loaded.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/01/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SettingsOnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is SettingsViewModel viewModel)
+            {
+                viewModel.ViewReference = this;
+            }
         }
     }
 }

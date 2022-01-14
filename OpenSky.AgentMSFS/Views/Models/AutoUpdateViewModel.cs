@@ -16,6 +16,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Newtonsoft.Json;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
 
@@ -413,7 +415,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 Debug.WriteLine(e.Error);
                 UpdateGUIDelegate showError = () =>
                 {
-                    ModernWpf.MessageBox.Show("Error downloading update: " + e.Error.Message);
+                    this.ViewReference.ShowMessageBox(new OpenSkyMessageBox(e.Error, "Error downloading update", e.Error.Message, ExtendedMessageBoxImage.Error, 30));
                     this.DownloadUpdateCommand.CanExecute = true;
                 };
                 Application.Current.Dispatcher.BeginInvoke(showError);

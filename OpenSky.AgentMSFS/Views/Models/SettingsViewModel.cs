@@ -20,6 +20,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Microsoft.Win32;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
@@ -552,13 +554,15 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 Debug.WriteLine(result.ErrorDetails);
                             }
 
-                            ModernWpf.MessageBox.Show(result.Message, "Error revoking application token", MessageBoxButton.OK, MessageBoxImage.Error);
+                            var notification = new OpenSkyNotification("Error revoking application token", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
                         });
                 }
             }
             catch (Exception ex)
             {
-                ex.HandleApiCallException(this.LogoutOpenSkyUserCommand, "Error revoking application token", false);
+                ex.HandleApiCallException(this.ViewReference, this.LogoutOpenSkyUserCommand, "Error revoking application token", false);
             }
 
             this.UserSession.Logout();
@@ -585,13 +589,21 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void RestoreDefaults()
         {
-            var answer = ModernWpf.MessageBox.Show("Are you sure you want to restore all default settings except for keys and users?", "Restore settings?", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (answer == MessageBoxResult.Yes)
+            var messageBox = new OpenSkyMessageBox(
+                "Restore settings?",
+                "Are you sure you want to restore all default settings except for keys and users?",
+                MessageBoxButton.YesNo,
+                ExtendedMessageBoxImage.Question);
+            messageBox.Closed += (_, _) =>
             {
-                Debug.WriteLine("Resetting settings to defaults...");
-                this.SimulatorHostName = "localhost";
-                this.SimulatorPort = 500;
-            }
+                if (messageBox.Result == ExtendedMessageBoxResult.Yes)
+                {
+                    Debug.WriteLine("Resetting settings to defaults...");
+                    this.SimulatorHostName = "localhost";
+                    this.SimulatorPort = 500;
+                }
+            };
+            this.ViewReference.ShowMessageBox(messageBox);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -629,7 +641,11 @@ namespace OpenSky.AgentMSFS.Views.Models
                 Debug.WriteLine("Error saving settings: " + ex);
                 this.SaveSettingsCommand.ReportProgress(
                     () =>
-                        ModernWpf.MessageBox.Show(ex.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error));
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error saving settings", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
             }
 
             // Save server-side settings
@@ -645,6 +661,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 if (!result.IsError)
                 {
                     _ = UserSessionService.Instance.RefreshLinkedAccounts();
+                    this.SaveSettingsCommand.ReportProgress(
+                        () =>
+                        {
+                            var notification = new OpenSkyNotification("Saving settings", "Successfully saved settings.", MessageBoxButton.OK, ExtendedMessageBoxImage.Check, 10);
+                            this.ViewReference.ShowNotification(notification);
+                        });
                 }
                 else
                 {
@@ -657,13 +679,15 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 Debug.WriteLine(result.ErrorDetails);
                             }
 
-                            ModernWpf.MessageBox.Show(result.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                            var notification = new OpenSkyNotification("Error saving settings", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
                         });
                 }
             }
             catch (Exception ex)
             {
-                ex.HandleApiCallException(this.SaveSettingsCommand, "Error saving settings.");
+                ex.HandleApiCallException(this.ViewReference, this.SaveSettingsCommand, "Error saving settings.");
             }
 
             this.LoadingText = null;
@@ -689,8 +713,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("Error testing text to speech voice: " + ex);
-                    ModernWpf.MessageBox.Show(ex.Message, "Error testing voice", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error testing voice", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                    notification.SetErrorColorStyle();
+                    this.ViewReference.ShowNotification(notification);
                 }
             }
         }
@@ -744,7 +769,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 Debug.WriteLine(result.ErrorDetails);
                             }
 
-                            ModernWpf.MessageBox.Show(result.Message, "Error updating profile image", MessageBoxButton.OK, MessageBoxImage.Error);
+                            var notification = new OpenSkyNotification("Error updating profile image", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
                         });
                 }
                 else
@@ -776,7 +803,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
             catch (Exception ex)
             {
-                ex.HandleApiCallException(this.UpdateProfileImageCommand, "Error updating profile image.");
+                ex.HandleApiCallException(this.ViewReference, this.UpdateProfileImageCommand, "Error updating profile image.");
             }
         }
 
