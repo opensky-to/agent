@@ -20,20 +20,16 @@ Here are a few first screenshots showing off the design and most of the features
 
 <img src="https://raw.githubusercontent.com/opensky-to/agent-msfs/main/Screenshots/ready_for_takeoff.png" placeholder="Flight Planning" />
 
-<!--
 ## Syncfusion WPF
 
 This project uses several controls from Syncfusion's WPF libraries. Syncfusion was kind enough to support our open-source project with a special community license. You can check out their [WPF demos](https://github.com/syncfusion/wpf-demos) right here on Github.
--->
 
 ## License
 
 Original source code and assets and present in this repository are licensed under the MIT license.
 
-<!--
 IMPORTANT: This project also uses an open-source community license for Syncfusion WPF. To develop this software on your own computer you are required to obtain a free
 personal community, commercial or other license from [Syncfusion](https://www.syncfusion.com). You are required to accept this licensing agreement before you can legally obtain a copy of our code. Please refer to our [LICENSE](https://raw.githubusercontent.com/opensky-to/client/main/LICENSE) document for details about this.
--->
 
 [maintained-badge]: https://img.shields.io/badge/maintained-yes-brightgreen
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
