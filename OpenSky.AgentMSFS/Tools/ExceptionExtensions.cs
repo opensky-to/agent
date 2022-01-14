@@ -12,10 +12,11 @@ namespace OpenSky.AgentMSFS.Tools
     using System.Net;
     using System.Net.Http;
     using System.Net.Sockets;
-    using System.Windows;
 
     using Newtonsoft.Json;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.OpenAPIs;
     using OpenSky.AgentMSFS.Views;
@@ -42,6 +43,9 @@ namespace OpenSky.AgentMSFS.Tools
         /// <param name="ex">
         /// The exception to act on.
         /// </param>
+        /// <param name="window">
+        /// The OpenSky window where the exception originated (to show the custom notifications inside that window).
+        /// </param>
         /// <param name="command">
         /// The asynchronous command executing the API call.
         /// </param>
@@ -49,16 +53,17 @@ namespace OpenSky.AgentMSFS.Tools
         /// Friendly error messages describing what we were trying to do.
         /// </param>
         /// <param name="alert401">
-        /// (Optional) True to alert about HTTP 401 (unauthorized) errors - letting the user know to login again.
+        /// (Optional) True to alert about HTTP 401 (unauthorized) errors - letting the user know to
+        /// login again.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public static void HandleApiCallException(this Exception ex, AsynchronousCommand command, string friendlyErrorMessage, bool alert401 = true)
+        public static void HandleApiCallException(this Exception ex, OpenSkyWindow window, AsynchronousCommand command, string friendlyErrorMessage, bool alert401 = true)
         {
             if (ex is AggregateException aggregateException)
             {
                 foreach (var innerException in aggregateException.InnerExceptions)
                 {
-                    innerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                    innerException.HandleApiCallException(window, command, friendlyErrorMessage, alert401);
                 }
             }
             else if (ex is ApiException apiException)
@@ -75,7 +80,7 @@ namespace OpenSky.AgentMSFS.Tools
                                 () =>
                                 {
                                     Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
-                                    ModernWpf.MessageBox.Show("Authorization token was expired, please try again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                    window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = friendlyErrorMessage, Exception = ex }, "Authorization", "Authorization token was expired, please try again.", ExtendedMessageBoxImage.Error, 30));
                                 });
                         }
                     }
@@ -87,8 +92,8 @@ namespace OpenSky.AgentMSFS.Tools
                                 () =>
                                 {
                                     Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
-                                    ModernWpf.MessageBox.Show("Authorization token is invalid, please login with your OpenSky account again.", friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
-                                }, true);
+                                    window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = friendlyErrorMessage, Exception = ex }, "Authorization", "Authorization token is invalid, please login with your OpenSky account again.", ExtendedMessageBoxImage.Error, 30));
+                                });
                         }
 
                         command.ReportProgress(() => LoginNotification.Open());
@@ -109,7 +114,7 @@ namespace OpenSky.AgentMSFS.Tools
                                         () =>
                                         {
                                             Debug.WriteLine($"{friendlyErrorMessage}: {errorMessage}");
-                                            ModernWpf.MessageBox.Show(errorMessage, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                            window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = errorMessage, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                                         });
                                 }
                             }
@@ -120,7 +125,7 @@ namespace OpenSky.AgentMSFS.Tools
                                 () =>
                                 {
                                     Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Message}");
-                                    ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                    window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = apiException.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                                 });
                         }
                     }
@@ -130,7 +135,7 @@ namespace OpenSky.AgentMSFS.Tools
                             () =>
                             {
                                 Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Response}");
-                                ModernWpf.MessageBox.Show(new string(apiException.Response.Take(500).ToArray()), friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                                window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = new string(apiException.Response.Take(500).ToArray()), Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                             });
                     }
                 }
@@ -140,7 +145,7 @@ namespace OpenSky.AgentMSFS.Tools
                         () =>
                         {
                             Debug.WriteLine($"{friendlyErrorMessage}: {apiException.Message}");
-                            ModernWpf.MessageBox.Show(apiException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                            window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = apiException.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                         });
                 }
             }
@@ -148,7 +153,7 @@ namespace OpenSky.AgentMSFS.Tools
             {
                 if (httpRequestException.InnerException != null)
                 {
-                    httpRequestException.InnerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                    httpRequestException.InnerException.HandleApiCallException(window, command, friendlyErrorMessage, alert401);
                 }
                 else
                 {
@@ -156,7 +161,7 @@ namespace OpenSky.AgentMSFS.Tools
                         () =>
                         {
                             Debug.WriteLine($"{friendlyErrorMessage}: {httpRequestException.Message}");
-                            ModernWpf.MessageBox.Show(httpRequestException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                            window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = httpRequestException.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                         });
                 }
             }
@@ -165,7 +170,7 @@ namespace OpenSky.AgentMSFS.Tools
                 Debug.WriteLine(webException.Message);
                 if (webException.InnerException != null)
                 {
-                    webException.InnerException.HandleApiCallException(command, friendlyErrorMessage, alert401);
+                    webException.InnerException.HandleApiCallException(window, command, friendlyErrorMessage, alert401);
                 }
                 else
                 {
@@ -173,7 +178,8 @@ namespace OpenSky.AgentMSFS.Tools
                         () =>
                         {
                             Debug.WriteLine($"{friendlyErrorMessage}: {webException.Message}");
-                            ModernWpf.MessageBox.Show(webException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                            window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = webException.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
+
                         });
                 }
             }
@@ -183,7 +189,8 @@ namespace OpenSky.AgentMSFS.Tools
                     () =>
                     {
                         Debug.WriteLine($"{friendlyErrorMessage}: {socketException.Message}");
-                        ModernWpf.MessageBox.Show(socketException.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                        window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = socketException.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
+
                     });
             }
             else
@@ -192,7 +199,7 @@ namespace OpenSky.AgentMSFS.Tools
                     () =>
                     {
                         Debug.WriteLine($"{friendlyErrorMessage}: {ex.Message}");
-                        ModernWpf.MessageBox.Show(ex.Message, friendlyErrorMessage, MessageBoxButton.OK, MessageBoxImage.Error);
+                        window.ShowNotification(new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error", friendlyErrorMessage, ExtendedMessageBoxImage.Error, 30));
                     });
             }
         }

@@ -18,6 +18,8 @@ namespace OpenSky.AgentMSFS.MVVM
 
     using JetBrains.Annotations;
 
+    using OpenSky.AgentMSFS.Controls;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// Standard viewmodel class base, simply allows property change notifications to be sent.
@@ -75,6 +77,13 @@ namespace OpenSky.AgentMSFS.MVVM
                 return this.errors.Any(kv => kv.Value is { Count: > 0 });
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the view reference.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public OpenSkyWindow ViewReference { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

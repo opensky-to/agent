@@ -15,7 +15,6 @@ namespace OpenSky.AgentMSFS
     using System.Speech.Synthesis;
     using System.Text.RegularExpressions;
     using System.Threading;
-    using System.Windows;
 
     using OpenSky.AgentMSFS.Properties;
     using OpenSky.AgentMSFS.Tools;
@@ -406,16 +405,7 @@ namespace OpenSky.AgentMSFS
         /// -------------------------------------------------------------------------------------------------
         public void SetSpeechVoice(string voiceName)
         {
-            try
-            {
-                this.speech.SelectVoice(voiceName);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error setting text-to-speech voice: " + ex);
-                UpdateGUIDelegate showError = () => ModernWpf.MessageBox.Show(ex.Message, "Error setting voice", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Dispatcher.BeginInvoke(showError);
-            }
+            this.speech.SelectVoice(voiceName);
         }
     }
 

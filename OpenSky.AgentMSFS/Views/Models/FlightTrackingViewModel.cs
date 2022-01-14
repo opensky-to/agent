@@ -17,6 +17,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
+    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.SimConnect;
@@ -588,19 +590,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            MessageBoxResult? answer = MessageBoxResult.None;
+            ExtendedMessageBoxResult? answer = null;
             this.AbortFlightCommand.ReportProgress(
                 () =>
                 {
-                    answer = ModernWpf.MessageBox.Show(
-                        "Are you sure you want to cancel the current flight?\r\n\r\nYou will loose any saved progress and have to return the OpenSky client to start another flight.",
+                    var messageBox = new OpenSkyMessageBox(
                         "Cancel flight?",
+                        "Are you sure you want to cancel the current flight?\r\n\r\nYou will loose any saved progress and have to return the OpenSky client to start another flight.",
                         MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-                },
-                true);
+                        ExtendedMessageBoxImage.Hand);
+                    messageBox.SetWarningColorStyle();
+                    messageBox.Closed += (_, _) =>
+                    {
+                        answer = messageBox.Result;
+                    };
+                    this.ViewReference.ShowMessageBox(messageBox);
+                });
+            while (answer == null && !SleepScheduler.IsShutdownInProgress)
+            {
+                Thread.Sleep(500);
+            }
 
-            if (answer == MessageBoxResult.Yes)
+            if (answer == ExtendedMessageBoxResult.Yes)
             {
                 this.LoadingText = "Aborting flight...";
                 try
@@ -614,7 +625,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 }
                 catch (Exception ex)
                 {
-                    ex.HandleApiCallException(this.AbortFlightCommand, "Error aborting flight");
+                    ex.HandleApiCallException(this.ViewReference, this.AbortFlightCommand, "Error aborting flight");
                 }
                 finally
                 {
@@ -814,7 +825,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error slewing plane into position: " + ex);
-                this.SlewIntoPositionCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error slewing into position", MessageBoxButton.OK, MessageBoxImage.Error));
+                this.SlewIntoPositionCommand.ReportProgress(() =>
+                {
+                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error slewing into position", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                    notification.SetErrorColorStyle();
+                    this.ViewReference.ShowNotification(notification);
+                });
             }
         }
 
@@ -853,7 +869,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (!this.SimConnect.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
-                        this.StartTrackingCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Not all tracking conditions are met, please review, correct and try again.", "Start tracking", MessageBoxButton.OK, MessageBoxImage.Warning));
+                        this.StartTrackingCommand.ReportProgress(() =>
+                        {
+                            var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
+                            notification.SetWarningColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
                         this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                         return;
                     }
@@ -886,11 +907,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (this.SimConnect.WeightAndBalance.CgPercent < this.SimConnect.WeightAndBalance.CgFwdLimit || this.SimConnect.WeightAndBalance.CgPercent > this.SimConnect.WeightAndBalance.CgAftLimit)
                     {
                         Debug.WriteLine("CG outside limits, double checking with user...");
-                        MessageBoxResult? answer = MessageBoxResult.None;
+                        ExtendedMessageBoxResult? answer = null;
                         this.StartTrackingCommand.ReportProgress(
-                            () => answer = ModernWpf.MessageBox.Show("The current CG is outside of the limits specified for this plane, are you sure you want to continue?", "CG limit", MessageBoxButton.YesNo, MessageBoxImage.Warning),
-                            true);
-                        if (answer != MessageBoxResult.Yes)
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox(
+                                    "CG limit",
+                                    "The current CG is outside of the limits specified for this plane, are you sure you want to continue?",
+                                    MessageBoxButton.YesNo,
+                                    ExtendedMessageBoxImage.Warning);
+                                messageBox.SetWarningColorStyle();
+                                messageBox.Closed += (_, _) =>
+                                {
+                                    answer = messageBox.Result;
+                                };
+                                this.ViewReference.ShowMessageBox(messageBox);
+                            });
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -900,11 +938,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (Math.Abs(this.SimConnect.WeightAndBalance.CgPercentLateral) > 0.01)
                     {
                         Debug.WriteLine("Lateral CG outside limits, double checking with user...");
-                        MessageBoxResult? answer = MessageBoxResult.None;
+                        ExtendedMessageBoxResult? answer = null;
                         this.StartTrackingCommand.ReportProgress(
-                            () => answer = ModernWpf.MessageBox.Show("The current lateral CG is outside of the limits specified for this plane, are you sure you want to continue?", "CG limit", MessageBoxButton.YesNo, MessageBoxImage.Warning),
-                            true);
-                        if (answer != MessageBoxResult.Yes)
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox(
+                                    "CG limit",
+                                    "The current lateral CG is outside of the limits specified for this plane, are you sure you want to continue?",
+                                    MessageBoxButton.YesNo,
+                                    ExtendedMessageBoxImage.Warning);
+                                messageBox.SetWarningColorStyle();
+                                messageBox.Closed += (_, _) =>
+                                {
+                                    answer = messageBox.Result;
+                                };
+                                this.ViewReference.ShowMessageBox(messageBox);
+                            });
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -914,11 +969,28 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (this.SimConnect.WeightAndBalance.PayloadWeight > this.SimConnect.WeightAndBalance.MaxPayloadWeight)
                     {
                         Debug.WriteLine("Payload weight outside limits, double checking with user...");
-                        MessageBoxResult? answer = MessageBoxResult.None;
+                        ExtendedMessageBoxResult? answer = null;
                         this.StartTrackingCommand.ReportProgress(
-                            () => answer = ModernWpf.MessageBox.Show("The payload weight exceeds the limits specified for this plane, are you sure you want to continue?", "Payload weight limit", MessageBoxButton.YesNo, MessageBoxImage.Warning),
-                            true);
-                        if (answer != MessageBoxResult.Yes)
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox(
+                                    "Payload weight limit",
+                                    "The payload weight exceeds the limits specified for this plane, are you sure you want to continue?",
+                                    MessageBoxButton.YesNo,
+                                    ExtendedMessageBoxImage.Warning);
+                                messageBox.SetWarningColorStyle();
+                                messageBox.Closed += (_, _) =>
+                                {
+                                    answer = messageBox.Result;
+                                };
+                                this.ViewReference.ShowMessageBox(messageBox);
+                            });
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -928,11 +1000,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (this.SimConnect.WeightAndBalance.TotalWeight > this.SimConnect.WeightAndBalance.MaxGrossWeight)
                     {
                         Debug.WriteLine("Total weight outside limits, double checking with user...");
-                        MessageBoxResult? answer = MessageBoxResult.None;
+                        ExtendedMessageBoxResult? answer = null;
                         this.StartTrackingCommand.ReportProgress(
-                            () => answer = ModernWpf.MessageBox.Show("The total weight exceeds the limits specified for this plane, are you sure you want to continue?", "Total weight limit", MessageBoxButton.YesNo, MessageBoxImage.Warning),
-                            true);
-                        if (answer != MessageBoxResult.Yes)
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox(
+                                    "Total weight limit",
+                                    "The total weight exceeds the limits specified for this plane, are you sure you want to continue?",
+                                    MessageBoxButton.YesNo,
+                                    ExtendedMessageBoxImage.Question);
+                                messageBox.Closed += (_, _) =>
+                                {
+                                    answer = messageBox.Result;
+                                };
+                                this.ViewReference.ShowMessageBox(messageBox);
+                            });
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -942,11 +1030,27 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (!this.SimConnect.GroundHandlingComplete && this.SimConnect.SecondaryTracking.EngineRunning)
                     {
                         Debug.WriteLine("Ground handling not complete, ask the user about skipping...");
-                        MessageBoxResult? answer = MessageBoxResult.None;
+                        ExtendedMessageBoxResult? answer = null;
                         this.StartTrackingCommand.ReportProgress(
-                            () => answer = ModernWpf.MessageBox.Show("Ground handling not yet completed, do you want to skip it?", "Ground handling", MessageBoxButton.YesNo, MessageBoxImage.Warning),
-                            true);
-                        if (answer != MessageBoxResult.Yes)
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox(
+                                    "Ground handling",
+                                    "Ground handling not yet completed, do you want to skip it?",
+                                    MessageBoxButton.YesNo,
+                                    ExtendedMessageBoxImage.Question);
+                                messageBox.Closed += (_, _) =>
+                                {
+                                    answer = messageBox.Result;
+                                };
+                                this.ViewReference.ShowMessageBox(messageBox);
+                            });
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -969,7 +1073,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                     if (!this.SimConnect.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
-                        this.StartTrackingCommand.ReportProgress(() => ModernWpf.MessageBox.Show("Not all tracking conditions are met, please review, correct and try again.", "Start tracking", MessageBoxButton.OK, MessageBoxImage.Warning));
+                        this.StartTrackingCommand.ReportProgress(() =>
+                        {
+                            var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
+                            notification.SetWarningColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
                         this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                         return;
                     }
@@ -1018,7 +1127,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error starting/resuming tracking: " + ex);
-                this.StartTrackingCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error starting or resuming tracking", MessageBoxButton.OK, MessageBoxImage.Error));
+                this.StartTrackingCommand.ReportProgress(() =>
+                {
+                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error starting tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                    notification.SetErrorColorStyle();
+                    this.ViewReference.ShowNotification(notification);
+                });
                 this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
             }
         }
@@ -1034,20 +1148,33 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void StopTracking()
         {
             Debug.WriteLine("User wants to stop tracking, confirming...");
-            MessageBoxResult? answer = MessageBoxResult.None;
-            this.StopTrackingCommand.ReportProgress(
-                () => answer = ModernWpf.MessageBox.Show(
-                    "WARNING: You are about to stop tracking your OpenSky flight!\r\n\r\nDo you want to save your current progress so that you can resume the flight later?",
-                    "Stop tracking?",
-                    MessageBoxButton.YesNoCancel,
-                    MessageBoxImage.Hand),
-                true);
-            if (answer is MessageBoxResult.None or MessageBoxResult.Cancel)
+            ExtendedMessageBoxResult? answer = null;
+            this.StartTrackingCommand.ReportProgress(
+                () =>
+                {
+                    var messageBox = new OpenSkyMessageBox(
+                        "Stop tracking?",
+                        "WARNING: You are about to stop tracking your OpenSky flight!\r\n\r\nDo you want to save your current progress so that you can resume the flight later?",
+                        MessageBoxButton.YesNoCancel,
+                        ExtendedMessageBoxImage.Hand);
+                    messageBox.SetWarningColorStyle();
+                    messageBox.Closed += (_, _) =>
+                    {
+                        answer = messageBox.Result;
+                    };
+                    this.ViewReference.ShowMessageBox(messageBox);
+                });
+            while (answer == null && !SleepScheduler.IsShutdownInProgress)
+            {
+                Thread.Sleep(500);
+            }
+
+            if (answer is ExtendedMessageBoxResult.None or ExtendedMessageBoxResult.Cancel)
             {
                 return;
             }
 
-            if (answer == MessageBoxResult.Yes)
+            if (answer == ExtendedMessageBoxResult.Yes)
             {
                 try
                 {
@@ -1056,7 +1183,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error saving flight: " + ex);
-                    this.StopTrackingCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error saving flight", MessageBoxButton.OK, MessageBoxImage.Error));
+                    this.StopTrackingCommand.ReportProgress(() =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error saving flight", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 }
             }
             else
@@ -1073,7 +1205,12 @@ namespace OpenSky.AgentMSFS.Views.Models
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error stopping tracking: " + ex);
-                    this.StopTrackingCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error stopping tracking", MessageBoxButton.OK, MessageBoxImage.Error));
+                    this.StopTrackingCommand.ReportProgress(() =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error stopping tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 }
             }
         }
@@ -1110,7 +1247,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error pausing/resuming sim: " + ex);
-                this.ToggleFlightPauseCommand.ReportProgress(() => ModernWpf.MessageBox.Show(ex.Message, "Error pausing/resuming simulator", MessageBoxButton.OK, MessageBoxImage.Error));
+                this.ToggleFlightPauseCommand.ReportProgress(() =>
+                {
+                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error pausing/resuming simulator", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                    notification.SetErrorColorStyle();
+                    this.ViewReference.ShowNotification(notification);
+                });
 
             }
         }
