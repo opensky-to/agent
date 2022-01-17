@@ -3,6 +3,12 @@ OpenSky Agent for MSFS Changelog
 ======================================================================================
 
 --------------------------------------------------------------------------------------
+Version 0.3.6 (ALPHA3)
+--------------------------------------------------------------------------------------
+- Changed payload allowed difference from 1 lbs to 1kg (for A32NX MCDU W/B loading)
+- Trippled allowed fuel variance on resume for manually fuelled aircraft
+
+--------------------------------------------------------------------------------------
 Version 0.3.5 (ALPHA3)
 --------------------------------------------------------------------------------------
 - Fixed S2 cell IDs ulong conversion bug
