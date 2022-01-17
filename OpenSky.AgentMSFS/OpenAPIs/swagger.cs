@@ -915,6 +915,87 @@ namespace OpenSkyApi
             }
         }
     
+        /// <summary>Sell aircraft back to system.</summary>
+        /// <param name="registry">The registry of the aircraft to sell.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<StringApiResponse> SellAircraftToSystemAsync(string registry)
+        {
+            return SellAircraftToSystemAsync(registry, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Sell aircraft back to system.</summary>
+        /// <param name="registry">The registry of the aircraft to sell.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<StringApiResponse> SellAircraftToSystemAsync(string registry, System.Threading.CancellationToken cancellationToken)
+        {
+            if (registry == null)
+                throw new System.ArgumentNullException("registry");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Aircraft/sellToSystem/{registry}");
+            urlBuilder_.Replace("{registry}", System.Uri.EscapeDataString(ConvertToString(registry, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "text/plain");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<StringApiResponse>(response_, headers_).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+    
         /// <summary>Updates the specified aircraft (user editable properties only)</summary>
         /// <param name="body">The update aircraft.</param>
         /// <returns>Success</returns>
@@ -5630,6 +5711,98 @@ namespace OpenSkyApi
             }
         }
     
+        /// <summary>Gets the available jobs at the specified airport for the specified aircraft type category.</summary>
+        /// <param name="icao">The ICAO code of the airport.</param>
+        /// <param name="direction">The direction of the jobs to return. 0 = From, 1 = To, 2 = RoundTrip</param>
+        /// <param name="category">The aircraft type category to return jobs for (recommended category). 0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = JET, 5 = REG, 6 = NBA, 7 = WBA, 8 = HEL</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportForCategoryAsync(string icao, JobDirection direction, AircraftTypeCategory category)
+        {
+            return GetJobsAtAirportForCategoryAsync(icao, direction, category, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Gets the available jobs at the specified airport for the specified aircraft type category.</summary>
+        /// <param name="icao">The ICAO code of the airport.</param>
+        /// <param name="direction">The direction of the jobs to return. 0 = From, 1 = To, 2 = RoundTrip</param>
+        /// <param name="category">The aircraft type category to return jobs for (recommended category). 0 = SEP, 1 = MEP, 2 = SET, 3 = MET, 4 = JET, 5 = REG, 6 = NBA, 7 = WBA, 8 = HEL</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<JobIEnumerableApiResponse> GetJobsAtAirportForCategoryAsync(string icao, JobDirection direction, AircraftTypeCategory category, System.Threading.CancellationToken cancellationToken)
+        {
+            if (icao == null)
+                throw new System.ArgumentNullException("icao");
+    
+            if (direction == null)
+                throw new System.ArgumentNullException("direction");
+    
+            if (category == null)
+                throw new System.ArgumentNullException("category");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Job/atAirport/{icao}/{direction}/{category}");
+            urlBuilder_.Replace("{icao}", System.Uri.EscapeDataString(ConvertToString(icao, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{direction}", System.Uri.EscapeDataString(ConvertToString(direction, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{category}", System.Uri.EscapeDataString(ConvertToString(category, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<JobIEnumerableApiResponse>(response_, headers_).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+    
         /// <summary>Get "my" jobs, both personal and airline (active only)</summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -6730,31 +6903,31 @@ namespace OpenSkyApi
     
         /// <summary>S2 geometry cell ID for level 3.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell3", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell3 { get; set; }
+        public string S2Cell3 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 4.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell4", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell4 { get; set; }
+        public string S2Cell4 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 5.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell5", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell5 { get; set; }
+        public string S2Cell5 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 6.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell6", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell6 { get; set; }
+        public string S2Cell6 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 7.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell7", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell7 { get; set; }
+        public string S2Cell7 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 8.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell8", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell8 { get; set; }
+        public string S2Cell8 { get; set; }
     
         /// <summary>S2 geometry cell ID for level 9.</summary>
         [Newtonsoft.Json.JsonProperty("s2Cell9", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long S2Cell9 { get; set; }
+        public string S2Cell9 { get; set; }
     
         /// <summary>Gets or sets the size of the airport (from -1 to 6, NULL means size isn't calculated yet).</summary>
         [Newtonsoft.Json.JsonProperty("size", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]

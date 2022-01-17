@@ -136,6 +136,7 @@
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\AircraftType.cs" />
+    <Compile Include="OpenAPIs\ModelExtensions\Airport.cs" />
     <Compile Include="OpenAPIs\OpenSkyService.cs" />
     <Compile Include="OpenAPIs\OpenSkyServiceBase.cs" />
     <Compile Include="OpenAPIs\swagger.cs" />
