@@ -225,6 +225,7 @@
     </Compile>
     <Compile Include="Views\Models\FlightTrackingViewModel.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.FuelTanks.cs" />
+    <Compile Include="Views\Models\FlightTrackingViewModel.Graphs.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.Map.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.PayloadStations.cs" />
     <Compile Include="Views\Models\LandingReportViewModel.cs" />
