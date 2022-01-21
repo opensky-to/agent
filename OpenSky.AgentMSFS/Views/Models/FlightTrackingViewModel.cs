@@ -1149,7 +1149,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             Debug.WriteLine("User wants to stop tracking, confirming...");
             ExtendedMessageBoxResult? answer = null;
-            this.StartTrackingCommand.ReportProgress(
+            this.StopTrackingCommand.ReportProgress(
                 () =>
                 {
                     var messageBox = new OpenSkyMessageBox(
