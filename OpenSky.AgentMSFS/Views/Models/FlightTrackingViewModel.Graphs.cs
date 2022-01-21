@@ -21,10 +21,10 @@ namespace OpenSky.AgentMSFS.Views.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True if chart airspeed is checked.
+        /// True if chart ground speed is checked.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private bool chartAirspeedChecked = true;
+        private bool chartGroundSpeedChecked = true;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -42,20 +42,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True if chart ground speed is checked.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool chartGroundSpeedChecked = true;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// True if chart radio altitude is checked.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool chartRadioAltChecked = true;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// True if chart simulation rate is checked.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -63,45 +49,37 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the airspeed series visibility.
+        /// Gets the ground speed series visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Visibility AirspeedSeriesVisibility => this.ChartAirspeedChecked ? Visibility.Visible : Visibility.Collapsed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the altitude axis visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility AltitudeAxisVisibility => this.ChartAltitudeChecked || this.ChartRadioAltChecked ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GroundSpeedAxisAndSeriesVisibility => this.ChartGroundSpeedChecked ? Visibility.Visible : Visibility.Collapsed;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Gets the altitude series visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Visibility AltitudeSeriesVisibility => this.ChartAltitudeChecked ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility AltitudeAxisAndSeriesVisibility => this.ChartAltitudeChecked ? Visibility.Visible : Visibility.Collapsed;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets a value indicating whether the chart airspeed is checked.
+        /// Gets or sets a value indicating whether the chart ground speed is checked.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool ChartAirspeedChecked
+        public bool ChartGroundSpeedChecked
         {
-            get => this.chartAirspeedChecked;
+            get => this.chartGroundSpeedChecked;
 
             set
             {
-                if (Equals(this.chartAirspeedChecked, value))
+                if (Equals(this.chartGroundSpeedChecked, value))
                 {
                     return;
                 }
 
-                this.chartAirspeedChecked = value;
+                this.chartGroundSpeedChecked = value;
                 this.NotifyPropertyChanged();
-                this.NotifyPropertyChanged(nameof(this.AirspeedSeriesVisibility));
-                this.NotifyPropertyChanged(nameof(this.SpeedAxisVisibility));
+                this.NotifyPropertyChanged(nameof(this.GroundSpeedAxisAndSeriesVisibility));
             }
         }
 
@@ -123,8 +101,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 this.chartAltitudeChecked = value;
                 this.NotifyPropertyChanged();
-                this.NotifyPropertyChanged(nameof(this.AltitudeSeriesVisibility));
-                this.NotifyPropertyChanged(nameof(this.AltitudeAxisVisibility));
+                this.NotifyPropertyChanged(nameof(this.AltitudeAxisAndSeriesVisibility));
             }
         }
 
@@ -147,52 +124,6 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.chartFuelChecked = value;
                 this.NotifyPropertyChanged();
                 this.NotifyPropertyChanged(nameof(this.FuelAxisAndSeriesVisibility));
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether the chart ground speed is checked.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool ChartGroundSpeedChecked
-        {
-            get => this.chartGroundSpeedChecked;
-
-            set
-            {
-                if (Equals(this.chartGroundSpeedChecked, value))
-                {
-                    return;
-                }
-
-                this.chartGroundSpeedChecked = value;
-                this.NotifyPropertyChanged();
-                this.NotifyPropertyChanged(nameof(this.GroundSpeedSeriesVisibility));
-                this.NotifyPropertyChanged(nameof(this.SpeedAxisVisibility));
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether the chart radio altitude is checked.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool ChartRadioAltChecked
-        {
-            get => this.chartRadioAltChecked;
-
-            set
-            {
-                if (Equals(this.chartRadioAltChecked, value))
-                {
-                    return;
-                }
-
-                this.chartRadioAltChecked = value;
-                this.NotifyPropertyChanged();
-                this.NotifyPropertyChanged(nameof(this.RadioAltSeriesVisibility));
-                this.NotifyPropertyChanged(nameof(this.AltitudeAxisVisibility));
             }
         }
 
@@ -227,30 +158,9 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the ground speed series visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility GroundSpeedSeriesVisibility => this.ChartGroundSpeedChecked ? Visibility.Visible : Visibility.Collapsed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the radio altitude series visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility RadioAltSeriesVisibility => this.ChartRadioAltChecked ? Visibility.Visible : Visibility.Collapsed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets the simulation rate axis and series visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Visibility SimRateAxisAndSeriesVisibility => this.ChartSimRateChecked ? Visibility.Visible : Visibility.Collapsed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the speed axis visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility SpeedAxisVisibility => this.ChartAirspeedChecked || this.chartGroundSpeedChecked ? Visibility.Visible : Visibility.Collapsed;
     }
 }
