@@ -5,7 +5,8 @@
                     xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:toms="urn:TomsToolbox"
-                    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
+                    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                    xmlns:syncfusion="http://schemas.syncfusion.com/wpf">
 
     <!-- OPENSKY COLOR STYLE DEFINITIONS -->
     <Color x:Key="OpenSkyTeal">#05826c</Color>
@@ -30,6 +31,33 @@
     <SolidColorBrush x:Key="OpenSkySimBriefBrush" Color="{StaticResource OpenSkySimBrief}" />
     <Color x:Key="OpenSkySimBriefText">White</Color>
     <SolidColorBrush x:Key="OpenSkySimBriefTextBrush" Color="{StaticResource OpenSkySimBriefText}" />
+
+    <syncfusion:ChartColorModel x:Key="OpenSkyTealChartColors">
+        <syncfusion:ChartColorModel.CustomBrushes>
+            <SolidColorBrush Color="#0aa88c" />
+            <SolidColorBrush Color="#05826c" />
+            <SolidColorBrush Color="#047762" />
+            <SolidColorBrush Color="#046957" />
+            <SolidColorBrush Color="#045849" />
+            <SolidColorBrush Color="#034c3f" />
+            <SolidColorBrush Color="#023b31" />
+            <SolidColorBrush Color="#012c25" />
+            <SolidColorBrush Color="#011d18" />
+        </syncfusion:ChartColorModel.CustomBrushes>
+    </syncfusion:ChartColorModel>
+
+    <syncfusion:ChartColorModel x:Key="DarkChartColors">
+        <syncfusion:ChartColorModel.CustomBrushes>
+            <SolidColorBrush Color="#05826c" />
+            <SolidColorBrush Color="DarkGreen" />
+            <SolidColorBrush Color="DarkSlateBlue" />
+            <SolidColorBrush Color="DarkRed" />
+            <SolidColorBrush Color="DodgerBlue" />
+            <SolidColorBrush Color="DarkOrange" />
+            <SolidColorBrush Color="DarkCyan" />
+            <SolidColorBrush Color="DarkMagenta" />
+        </syncfusion:ChartColorModel.CustomBrushes>
+    </syncfusion:ChartColorModel>
 
     <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
     <Style TargetType="controls:ScrollingListBox" BasedOn="{StaticResource DefaultListBoxStyle}" />

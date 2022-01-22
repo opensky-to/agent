@@ -7,10 +7,12 @@
 namespace OpenSky.AgentMSFS.SimConnect
 {
     using System;
+    using System.Device.Location;
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Windows;
+    using System.Windows.Media;
     using System.Xml.Linq;
 
     using Microsoft.Maps.MapControl.WPF;
@@ -106,6 +108,49 @@ namespace OpenSky.AgentMSFS.SimConnect
                 lock (this.trackingEventMarkers)
                 {
                     this.trackingEventMarkers.Clear();
+
+                    // Add airport markers, we don't save them
+                    if (this.Flight != null)
+                    {
+                        var alternateMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Alternate.Latitude, this.Flight.Alternate.Longitude), this.Flight.Alternate.Icao, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                        this.trackingEventMarkers.Add(alternateMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, alternateMarker);
+                        var originMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Origin.Latitude, this.Flight.Origin.Longitude), this.Flight.Origin.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
+                        this.trackingEventMarkers.Add(originMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, originMarker);
+                        var destinationMarker = new TrackingEventMarker(new GeoCoordinate(this.Flight.Destination.Latitude, this.Flight.Destination.Longitude), this.Flight.Destination.Icao, OpenSkyColors.OpenSkyTeal, Colors.White);
+                        this.trackingEventMarkers.Add(destinationMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, destinationMarker);
+
+                        var alternateDetailMarker = new TrackingEventMarker(this.Flight.Alternate, OpenSkyColors.OpenSkyWarningOrange, Colors.Black);
+                        this.trackingEventMarkers.Add(alternateDetailMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, alternateDetailMarker);
+                        var originDetailMarker = new TrackingEventMarker(this.Flight.Origin, OpenSkyColors.OpenSkyTeal, Colors.White);
+                        this.trackingEventMarkers.Add(originDetailMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, originDetailMarker);
+                        var destinationDetailMarker = new TrackingEventMarker(this.Flight.Destination, OpenSkyColors.OpenSkyTeal, Colors.White);
+                        this.trackingEventMarkers.Add(destinationDetailMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, destinationDetailMarker);
+
+                        foreach (var runway in this.Flight.Alternate.Runways)
+                        {
+                            var runwayMarker = new TrackingEventMarker(runway);
+                            this.trackingEventMarkers.Add(runwayMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
+                        }
+                        foreach (var runway in this.Flight.Origin.Runways)
+                        {
+                            var runwayMarker = new TrackingEventMarker(runway);
+                            this.trackingEventMarkers.Add(runwayMarker);
+                            this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
+                        }
+                        foreach (var runway in this.Flight.Destination.Runways)
+                        {
+                            var runwayMarker = new TrackingEventMarker(runway);
+                            this.trackingEventMarkers.Add(runwayMarker);
+                        }
+                    }
+
                     foreach (var marker in log.TrackingEventMarkers)
                     {
                         this.trackingEventMarkers.Add(new TrackingEventMarker(marker));
