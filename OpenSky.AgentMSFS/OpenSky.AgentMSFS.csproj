@@ -452,13 +452,13 @@
       <Version>0.1.4</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
-      <Version>19.4.0.42</Version>
+      <Version>19.4.0.43</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfProgressBar.WPF">
-      <Version>19.4.0.42</Version>
+      <Version>19.4.0.43</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.Themes.MaterialDark.WPF">
-      <Version>19.4.0.42</Version>
+      <Version>19.4.0.43</Version>
     </PackageReference>
     <PackageReference Include="TomsToolbox.Wpf">
       <Version>2.7.4</Version>
