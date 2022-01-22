@@ -606,7 +606,7 @@
                             </sf:FastLineSeries>
                             <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.FuelOnBoard" EnableAnimation="True" Visibility="{Binding FuelAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkOrange" Label="Fuel">
                                 <sf:FastLineSeries.YAxis>
-                                    <sf:NumericalAxis OpposedPosition="True" ShowGridLines="False" Header="Fuel [Gallons]" Visibility="{Binding FuelAxisAndSeriesVisibility}" />
+                                    <sf:NumericalAxis OpposedPosition="True" ShowGridLines="False" Header="Fuel [Gallons]" Visibility="{Binding FuelAxisAndSeriesVisibility}" Minimum="0" />
                                 </sf:FastLineSeries.YAxis>
                             </sf:FastLineSeries>
                             <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.SimulationRate" EnableAnimation="True" Visibility="{Binding SimRateAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkRed" Label="SimRate">
