@@ -115,8 +115,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                 payloadStations.Weight20 = this.PayloadStationWeights[19];
 
                 this.Simulator.SetPayloadStations(payloadStations);
-                this.Simulator.RefreshStructNow(Requests.PayloadStations);
-                this.Simulator.RefreshStructNow(Requests.WeightAndBalance);
+                this.Simulator.RefreshModelNow(Requests.PayloadStations);
+                this.Simulator.RefreshModelNow(Requests.WeightAndBalance);
             }
             catch (Exception ex)
             {

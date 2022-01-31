@@ -9,9 +9,9 @@ namespace OpenSky.AgentMSFS.Views
     using System;
     using System.Windows;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Native;
     using OpenSky.AgentMSFS.Native.PInvoke.Enums;
-    using OpenSky.AgentMSFS.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>

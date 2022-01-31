@@ -23,8 +23,6 @@ namespace OpenSky.AgentMSFS.Views
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Converters;
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.Tools;
     using OpenSky.AgentMSFS.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------

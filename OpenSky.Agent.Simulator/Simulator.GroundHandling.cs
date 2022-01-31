@@ -1,27 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.GroundHandling.cs" company="OpenSky">
+// <copyright file="Simulator.GroundHandling.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Diagnostics;
     using System.Threading;
 
-    using OpenSky.Agent.Simulator;
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.FlightLogXML;
 
     using TomsToolbox.Essentials;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Simconnect client - ground handling code.
+    /// Simulator interface - ground handling.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -214,7 +214,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.timeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate.AddSeconds(secondsToSkip);
                 this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.SkippedGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped ground handling");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.SkippedGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped ground handling");
                 return true;
             }
 
@@ -244,7 +244,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
                 this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(fuelSecondsLeft / 2);
                 this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(payloadSecondsLeft / 2);
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.SkippedHalfGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped half ground handling");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.SkippedHalfGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped half ground handling");
                 return true;
             }
 
@@ -353,7 +353,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     this.FuelLoadingComplete = true;
                     this.PayloadLoadingComplete = true;
-                    this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.GroundHandlingComplete, OpenSkyColors.OpenSkyTealLight, "Ground handling complete");
+                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.GroundHandlingComplete, OpenSkyColors.OpenSkyTealLight, "Ground handling complete");
 
                     if (this.TrackingStatus == TrackingStatus.GroundOperations)
                     {

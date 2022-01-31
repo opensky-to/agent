@@ -9,6 +9,7 @@ namespace OpenSky.AgentMSFS.Views
     using System;
     using System.Windows;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Tools;
     using OpenSky.AgentMSFS.Views.Models;
 

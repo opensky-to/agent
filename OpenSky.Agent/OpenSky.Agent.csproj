@@ -135,10 +135,7 @@
     <Compile Include="Converters\PayloadStationsVisibilityConverter.cs" />
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
-    <Compile Include="Models\SimbriefWaypointMarker.cs" />
-    <Compile Include="Models\TrackingEventMarker.cs" />
     <Compile Include="OpenAPIs\AgentOpenSkyService.cs" />
-    <Compile Include="OpenSkyColors.cs" />
     <Compile Include="Models\LandingReportNotification.cs" />
     <Compile Include="MVVM\AsynchronousCommand.cs" />
     <Compile Include="MVVM\CancelCommandEventArgs.cs" />
@@ -163,7 +160,6 @@
     <Compile Include="Tools\ExceptionExtensions.cs" />
     <Compile Include="Tools\MultiSelectExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
-    <Compile Include="Tools\UpdateGUIDelegate.cs" />
     <Compile Include="Tools\VisibilityAnimation.cs" />
     <Compile Include="Tools\WindowExtensions.cs" />
     <Compile Include="UserSessionService.cs" />
@@ -394,7 +390,7 @@
       <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="OpenSky.FlightLogXML">
-      <Version>0.1.4</Version>
+      <Version>0.1.5</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
       <Version>19.4.0.48</Version>

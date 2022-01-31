@@ -18,8 +18,8 @@
             xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
             xmlns:viewModels="clr-namespace:OpenSky.AgentMSFS.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
-            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Models"
             xmlns:sf="http://schemas.syncfusion.com/wpf"
+            xmlns:simulator="clr-namespace:OpenSky.Agent.Simulator.Models;assembly=OpenSky.Agent.Simulator"
             mc:Ignorable="d" LoadingText="{Binding LoadingText}"
             Title="Flight Tracking" Height="1000" Width="1300" Loaded="FlightTrackingLoaded" Unloaded="FlightTrackingOnUnloaded" FontSize="14" HorizontalScrollBar="False" VerticalScrollBar="False">
     <Window.DataContext>
@@ -546,7 +546,7 @@
                 </GroupBox.Header>
                 <controls:ScrollingListBox x:Name="EventLog" FontFamily="Consolas" ItemsSource="{Binding Simulator.TrackingEventLogEntries, Mode=OneWay}" MouseDoubleClick="EventLogMouseDoubleClick" BorderThickness="0" Background="#1a1e22">
                     <ListBox.ItemTemplate>
-                        <DataTemplate DataType="models:TrackingEventLogEntry">
+                        <DataTemplate DataType="simulator:TrackingEventLogEntry">
                             <StackPanel Orientation="Horizontal" Margin="-5">
                                 <Rectangle Width="15" Height="15" Fill="{Binding EventColorBrush, Mode=OneWay}" RadiusX="2" RadiusY="2" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding EventTime, StringFormat=HH:mm:ss}" Margin="5,0, 5, 0" VerticalAlignment="Center" FontSize="13" />

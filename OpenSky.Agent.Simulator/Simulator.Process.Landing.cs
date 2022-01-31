@@ -1,29 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Process.Landing.cs" company="OpenSky">
+// <copyright file="Simulator.Process.Landing.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Windows;
 
-    using OpenSky.Agent.SimConnectMSFS.Helpers;
-    using OpenSky.AgentMSFS.Properties;
-
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Helpers;
+    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
     using OpenSky.FlightLogXML;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Simconnect client - landing analysis code.
+    /// Simulator interface - landing processing.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -70,14 +66,15 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (this.LandingReports.Count == 1)
                 {
                     // First landing for this flight
-                    this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
+                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
 
                     // Show landing report notification now?
-                    if (LandingReportNotification.AsSoonAsPossible.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
-                    {
-                        UpdateGUIDelegate showNotification = () => new Views.LandingReport().Show();
-                        Application.Current.Dispatcher.BeginInvoke(showNotification);
-                    }
+                    // todo RESTORE THIS, via event to agent main project
+                    //if (LandingReportNotification.AsSoonAsPossible.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
+                    //{
+                    //    UpdateGUIDelegate showNotification = () => new Views.LandingReport().Show();
+                    //    Application.Current.Dispatcher.BeginInvoke(showNotification);
+                    //}
                 }
             }
         }

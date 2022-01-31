@@ -1,36 +1,41 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessPrimaryTracking.cs" company="OpenSky">
+// <copyright file="FlightLoadingTempModels.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Helpers
+namespace OpenSky.Agent.Simulator.Models
 {
-    using OpenSky.Agent.SimConnectMSFS.Structs;
-    using OpenSky.AgentMSFS.SimConnect.Structs;
-
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Process primary tracking (for queue processing)
+    /// Flight loading temporary models (loaded from flight save and kept here until the user clicks
+    /// resume tracking.
     /// </summary>
     /// <remarks>
-    /// sushi.at, 15/03/2021.
+    /// sushi.at, 31/01/2022.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public class ProcessPrimaryTracking
+    public class FlightLoadingTempModels
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the new SimConnect primary tracking struct.
+        /// Gets or sets the fuel tanks model.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public PrimaryTracking New { get; set; }
+        public FuelTanks FuelTanks { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the old SimConnect primary tracking struct.
+        /// Gets or sets the payload stations model.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public PrimaryTracking Old { get; set; }
+        public PayloadStations PayloadStations { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the slew aircraft into position model.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public SlewAircraftIntoPosition SlewAircraftIntoPosition { get; set; }
     }
 }

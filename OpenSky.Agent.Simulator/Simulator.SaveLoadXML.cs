@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.SaveLoadXML.cs" company="OpenSky">
+// <copyright file="Simulator.SaveLoadXML.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Device.Location;
@@ -17,22 +17,22 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
     using TrackingEventLogEntry = OpenSky.Agent.Simulator.Models.TrackingEventLogEntry;
-    using TrackingEventMarker = Models.TrackingEventMarker;
+    using TrackingEventMarker = OpenSky.Agent.Simulator.Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Simconnect client - flight save/load code.
+    /// Simulator interface - save/load.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -40,6 +40,87 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private const string AgentIdentifier = "OpenSky.AgentMSFS";
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Generates a XML save file for the current flight.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 22/03/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private XElement GenerateSaveFile()
+        {
+            if ((this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations) || this.Flight == null)
+            {
+                Debug.WriteLine("Not generating save file cause we are either not tracking or there is no active flight");
+                return null;
+            }
+
+            try
+            {
+                Debug.WriteLine("Generating flight save XML file...");
+                var log = new FlightLogXML.FlightLog
+                {
+                    Agent = AgentIdentifier,
+                    AgentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    OpenSkyUser = "TODO", //UserSessionService.Instance.Username, TODO restore/workaround
+                    LocalTimeZone = TimeZoneInfo.Local.BaseUtcOffset.TotalHours,
+                    TrackingStarted = this.trackingStarted ?? DateTime.MinValue,
+                    TrackingStopped = DateTime.UtcNow,
+                    WasAirborne = this.WasAirborne,
+                    TimeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate,
+                    TotalPaused = this.totalPaused,
+
+                    FlightID = this.Flight.Id,
+                    AircraftRegistry = this.Flight.Aircraft.Registry,
+                    UtcOffset = this.Flight.UtcOffset,
+
+                    Origin = new FlightLogAirport
+                    {
+                        Icao = this.Flight.Origin.Icao,
+                        Name = this.Flight.Origin.Name,
+                        Latitude = this.Flight.Origin.Latitude,
+                        Longitude = this.Flight.Origin.Longitude
+                    },
+                    Destination = new FlightLogAirport
+                    {
+                        Icao = this.Flight.Destination.Icao,
+                        Name = this.Flight.Destination.Name,
+                        Latitude = this.Flight.Destination.Latitude,
+                        Longitude = this.Flight.Destination.Longitude
+                    },
+                    Alternate = new FlightLogAirport
+                    {
+                        Icao = this.Flight.Alternate.Icao,
+                        Name = this.Flight.Alternate.Name,
+                        Latitude = this.Flight.Alternate.Latitude,
+                        Longitude = this.Flight.Alternate.Longitude
+                    },
+
+                    FuelGallons = this.Flight.FuelGallons ?? 0,
+                    Payload = this.Flight.PayloadSummary,
+                    PayloadPounds = this.Flight.PayloadPounds
+                };
+
+                log.TrackingEventLogEntries.AddRange(this.TrackingEventLogEntries);
+                lock (this.trackingEventMarkers)
+                {
+                    log.TrackingEventMarkers.AddRange(this.trackingEventMarkers.Select(m => m.Marker));
+                }
+
+                log.PositionReports.AddRange(this.AircraftTrailLocations.Cast<AircraftTrailLocation>().Select(loc => loc.Position));
+                log.TouchDowns.AddRange(this.LandingReports);
+                log.NavLogWaypoints.AddRange(this.simbriefWaypointMarkers.Select(w => w.WayPoint));
+
+                return log.GenerateFlightLog();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Flight save file creation failed: " + ex);
+                throw;
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -139,12 +220,14 @@ namespace OpenSky.AgentMSFS.SimConnect
                             this.trackingEventMarkers.Add(runwayMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
                         }
+
                         foreach (var runway in this.Flight.Origin.Runways)
                         {
                             var runwayMarker = new TrackingEventMarker(runway);
                             this.trackingEventMarkers.Add(runwayMarker);
                             this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
                         }
+
                         foreach (var runway in this.Flight.Destination.Runways)
                         {
                             var runwayMarker = new TrackingEventMarker(runway);
@@ -200,94 +283,6 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             // Now that everything has been loaded, replay any and all map markers
             this.ReplayMapMarkers();
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The flight loading temporary structs.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private FlightLoadingTempStructs flightLoadingTempStructs;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Generates a XML save file for the current flight.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 22/03/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private XElement GenerateSaveFile()
-        {
-            if ((this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations) || this.Flight == null)
-            {
-                Debug.WriteLine("Not generating save file cause we are either not tracking or there is no active flight");
-                return null;
-            }
-
-            try
-            {
-                Debug.WriteLine("Generating flight save XML file...");
-                var log = new FlightLogXML.FlightLog
-                {
-                    Agent = AgentIdentifier,
-                    AgentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    OpenSkyUser = UserSessionService.Instance.Username,
-                    LocalTimeZone = TimeZoneInfo.Local.BaseUtcOffset.TotalHours,
-                    TrackingStarted = this.trackingStarted ?? DateTime.MinValue,
-                    TrackingStopped = DateTime.UtcNow,
-                    WasAirborne = this.WasAirborne,
-                    TimeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate,
-                    TotalPaused = this.totalPaused,
-
-                    FlightID = this.Flight.Id,
-                    AircraftRegistry = this.Flight.Aircraft.Registry,
-                    UtcOffset = this.Flight.UtcOffset,
-
-                    Origin = new FlightLogAirport
-                    {
-                        Icao = this.Flight.Origin.Icao,
-                        Name = this.Flight.Origin.Name,
-                        Latitude = this.Flight.Origin.Latitude,
-                        Longitude = this.Flight.Origin.Longitude
-                    },
-                    Destination = new FlightLogAirport
-                    {
-                        Icao = this.Flight.Destination.Icao,
-                        Name = this.Flight.Destination.Name,
-                        Latitude = this.Flight.Destination.Latitude,
-                        Longitude = this.Flight.Destination.Longitude
-                    },
-                    Alternate = new FlightLogAirport
-                    {
-                        Icao = this.Flight.Alternate.Icao,
-                        Name = this.Flight.Alternate.Name,
-                        Latitude = this.Flight.Alternate.Latitude,
-                        Longitude = this.Flight.Alternate.Longitude
-                    },
-
-                    FuelGallons = this.Flight.FuelGallons ?? 0,
-                    Payload = this.Flight.PayloadSummary,
-                    PayloadPounds = this.Flight.PayloadPounds
-                };
-
-                log.TrackingEventLogEntries.AddRange(this.TrackingEventLogEntries);
-                lock (this.trackingEventMarkers)
-                {
-                    log.TrackingEventMarkers.AddRange(this.trackingEventMarkers.Select(m => m.Marker));
-                }
-
-                log.PositionReports.AddRange(this.AircraftTrailLocations.Cast<AircraftTrailLocation>().Select(loc => loc.Position));
-                log.TouchDowns.AddRange(this.LandingReports);
-                log.NavLogWaypoints.AddRange(this.simbriefWaypointMarkers.Select(w => w.WayPoint));
-
-                return log.GenerateFlightLog();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Flight save file creation failed: " + ex);
-                throw;
-            }
         }
     }
 }

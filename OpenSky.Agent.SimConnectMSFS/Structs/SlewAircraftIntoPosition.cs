@@ -1,23 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SlewPlaneIntoPosition.cs" company="OpenSky">
+// <copyright file="SlewAircraftIntoPosition.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
-    using System.Device.Location;
     using System.Runtime.InteropServices;
 
     using CTrue.FsConnect;
 
     using Microsoft.FlightSimulator.SimConnect;
-
-    using System.Device.Location;
-    using System.Runtime.InteropServices;
-
-    using OpenSky.Agent.SimConnectMSFS.Structs;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -28,7 +22,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
-    public struct SlewPlaneIntoPosition
+    public struct SlewAircraftIntoPosition
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -92,59 +86,88 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public bool OnGround { get; set; }
+    }
 
-        // ==================================================================================================
-        // END OF STRUCT PROPERTIES - BELOW ARE GET-ONLY COMPUTED PROPERTIES FOR OPENSKY
-        // ==================================================================================================
-
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Slew aircraft into position converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class SlewAircraftIntoPositionConverter
+    {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the geo coordinate.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public GeoCoordinate GeoCoordinate => new(this.Latitude, this.Longitude, this.RadioHeight);
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Initializes this object from the given from primary tracking struct.
+        /// A SlewAircraftIntoPosition extension method that converts the given slew aircraft into position struct.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 02/04/2021.
+        /// sushi.at, 31/01/2022.
         /// </remarks>
-        /// <param name="primary">
-        /// The primary tracking struct.
+        /// <param name="position">
+        /// The position to act on.
         /// </param>
         /// <returns>
-        /// A SlewPlaneIntoPosition struct.
+        /// The simulator model slew aircraft into position.
         /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public static SlewPlaneIntoPosition FromPrimaryTracking(PrimaryTracking primary)
+        public static Agent.Simulator.Models.SlewAircraftIntoPosition Convert(this SlewAircraftIntoPosition position)
         {
-            var slew = new SlewPlaneIntoPosition
+            return new Agent.Simulator.Models.SlewAircraftIntoPosition
             {
-                Latitude = primary.Latitude,
-                Longitude = primary.Longitude,
-                RadioHeight = primary.RadioHeight,
-                Heading = primary.Heading,
-                AirspeedTrue = primary.AirspeedTrue,
-                PitchAngle = primary.PitchAngle,
-                BankAngle = primary.BankAngle,
-                VerticalSpeedSeconds = primary.VerticalSpeedSeconds,
-                OnGround = primary.OnGround
+                Latitude = position.Latitude,
+                Longitude = position.Longitude,
+                RadioHeight = position.RadioHeight,
+                Heading = position.Heading,
+                AirspeedTrue = position.AirspeedTrue,
+                PitchAngle = position.PitchAngle,
+                BankAngle = position.BankAngle,
+                VerticalSpeedSeconds = position.VerticalSpeedSeconds,
+                OnGround = position.OnGround
             };
-            return slew;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// An SlewAircraftIntoPosition extension method that converts the given slew aircraft into position model.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="position">
+        /// The position to act on.
+        /// </param>
+        /// <returns>
+        /// The simConnect slew aircraft into position struct.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static SlewAircraftIntoPosition ConvertBack(this Agent.Simulator.Models.SlewAircraftIntoPosition position)
+        {
+            return new SlewAircraftIntoPosition
+            {
+                Latitude = position.Latitude,
+                Longitude = position.Longitude,
+                RadioHeight = position.RadioHeight,
+                Heading = position.Heading,
+                AirspeedTrue = position.AirspeedTrue,
+                PitchAngle = position.PitchAngle,
+                BankAngle = position.BankAngle,
+                VerticalSpeedSeconds = position.VerticalSpeedSeconds,
+                OnGround = position.OnGround
+            };
         }
     }
 
     /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The slew plane into position struct SimConnect properties definition.
+        /// The slew aircraft into position struct SimConnect properties definition.
         /// </summary>
         /// <remarks>
         /// sushi.at, 13/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public static class SlewPlaneIntoPositionDefinition
+        public static class SlewAircraftIntoPositionDefinition
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

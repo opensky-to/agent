@@ -18,7 +18,8 @@ namespace OpenSky.AgentMSFS
     using JetBrains.Annotations;
 
     using OpenSky.Agent.Simulator;
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Properties;
     using OpenSky.AgentMSFS.Tools;
 

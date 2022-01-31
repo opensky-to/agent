@@ -10,7 +10,7 @@ namespace OpenSky.AgentMSFS.Converters
     using System.Globalization;
     using System.Windows.Data;
 
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.Agent.Simulator.Enums;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

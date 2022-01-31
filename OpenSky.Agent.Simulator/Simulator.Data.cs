@@ -1,177 +1,242 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PrimaryTracking.cs" company="OpenSky">
+// <copyright file="Simulator.Data.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.Agent.Simulator.Models
+namespace OpenSky.Agent.Simulator
 {
-    using System.Device.Location;
-
-    using Microsoft.Maps.MapControl.WPF;
+    using OpenSky.Agent.Simulator.Models;
 
     /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Primary flight tracking model (checked often).
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 31/01/2022.
-    /// </remarks>
+    /// <content>
+    /// Simulator interface - data structures.
+    /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public class PrimaryTracking
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The indicated airspeed in knots.
+        /// The last aircraft identity data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double AirspeedIndicated { get; set; }
+        private AircraftIdentity aircraftIdentity;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// True airspeed in knots.
+        /// The last fuel tanks data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double AirspeedTrue { get; set; }
+        private FuelTanks fuelTanks;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The altitude in feet.
+        /// The last landing analysis data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double Altitude { get; set; }
+        private LandingAnalysis landingAnalysis;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The bank angle in degrees.
+        /// The last payload stations data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double BankAngle { get; set; }
+        private PayloadStations payloadStations;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets a value indicating whether the aircraft crashed.
+        /// The last primary tracking data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool Crash { get; set; }
+        private PrimaryTracking primaryTracking;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the geo coordinate.
+        /// The last secondary tracking data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public GeoCoordinate GeoCoordinate => new(this.Latitude, this.Longitude, this.Altitude);
+        private SecondaryTracking secondaryTracking;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The g-force.
+        /// The last slew aircraft into position data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double GForce { get; set; }
+        private SlewAircraftIntoPosition slewAircraftIntoPosition;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Ground speed in knots.
+        /// The last weight and balance data received from the simulator.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double GroundSpeed { get; set; }
+        private WeightAndBalance weightAndBalance;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The magnetic heading.
+        /// Gets the aircraft identity data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double Heading { get; set; }
+        public AircraftIdentity AircraftIdentity
+        {
+            get => this.aircraftIdentity;
+
+            set
+            {
+                if (Equals(this.aircraftIdentity, value))
+                {
+                    return;
+                }
+
+                this.aircraftIdentity = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The indicated altitude in feet.
+        /// Gets the fuel tanks data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double IndicatedAltitude { get; set; }
+        public FuelTanks FuelTanks
+        {
+            get => this.fuelTanks;
+
+            set
+            {
+                if (Equals(this.fuelTanks, value))
+                {
+                    return;
+                }
+
+                this.fuelTanks = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The latitude in degrees.
+        /// Gets the landing analysis data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double Latitude { get; set; }
+        public LandingAnalysis LandingAnalysis
+        {
+            get => this.landingAnalysis;
+
+            set
+            {
+                if (Equals(this.landingAnalysis, value))
+                {
+                    return;
+                }
+
+                this.landingAnalysis = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The longitude in degrees.
+        /// Gets the payload stations data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double Longitude { get; set; }
+        public PayloadStations PayloadStations
+        {
+            get => this.payloadStations;
+
+            set
+            {
+                if (Equals(this.payloadStations, value))
+                {
+                    return;
+                }
+
+                this.payloadStations = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The current map location.
+        /// Gets the primary tracking data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public Location MapLocation => new(this.Latitude, this.Longitude, this.Altitude);
+        public PrimaryTracking PrimaryTracking
+        {
+            get => this.primaryTracking;
+
+            set
+            {
+                if (Equals(this.primaryTracking, value))
+                {
+                    return;
+                }
+
+                this.primaryTracking = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Is the plane on the ground?
+        /// Gets the secondary tracking data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool OnGround { get; set; }
+        public SecondaryTracking SecondaryTracking
+        {
+            get => this.secondaryTracking;
+
+            set
+            {
+                if (Equals(this.secondaryTracking, value))
+                {
+                    return;
+                }
+
+                this.secondaryTracking = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The over-speed warning.
+        /// Gets the slew aircraft into position data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool OverspeedWarning { get; set; }
+        public SlewAircraftIntoPosition SlewAircraftIntoPosition
+        {
+            get => this.slewAircraftIntoPosition;
+
+            protected set
+            {
+                if (Equals(this.slewAircraftIntoPosition, value))
+                {
+                    return;
+                }
+
+                this.slewAircraftIntoPosition = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The pitch angle in degrees.
+        /// Gets the weight and balance data.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public double PitchAngle { get; set; }
+        public WeightAndBalance WeightAndBalance
+        {
+            get => this.weightAndBalance;
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The radio height in feet.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double RadioHeight { get; set; }
+            set
+            {
+                if (Equals(this.weightAndBalance, value))
+                {
+                    return;
+                }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The simulation rate.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double SimulationRate { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Is slew mode active?
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool SlewActive { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The stall warning.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool StallWarning { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The vertical speed in feet per minute.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double VerticalSpeed => this.VerticalSpeedSeconds * 60;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The vertical speed in feet per second.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public double VerticalSpeedSeconds { get; set; }
+                this.weightAndBalance = value;
+                this.OnPropertyChanged();
+            }
+        }
     }
 }

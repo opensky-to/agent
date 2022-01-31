@@ -24,10 +24,9 @@ namespace OpenSky.AgentMSFS.Views.Models
     using JetBrains.Annotations;
 
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
 

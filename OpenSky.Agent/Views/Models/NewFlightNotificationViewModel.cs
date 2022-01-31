@@ -14,7 +14,6 @@ namespace OpenSky.AgentMSFS.Views.Models
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -52,8 +51,8 @@ namespace OpenSky.AgentMSFS.Views.Models
         public NewFlightNotificationViewModel()
         {
             this.Timeout = 60 * 1000;
-            this.FlightNumber = $"{SimConnect.SimConnect.Instance.Flight?.FullFlightNumber}";
-            this.Airports = $"{SimConnect.SimConnect.Instance.Flight?.Origin.Icao} - {SimConnect.SimConnect.Instance.Flight?.Destination.Icao}";
+            this.FlightNumber = $"{Simulator.Instance.Flight?.FullFlightNumber}";
+            this.Airports = $"{Simulator.Instance.Flight?.Origin.Icao} - {Simulator.Instance.Flight?.Destination.Icao}";
 
             var assembly = Assembly.GetExecutingAssembly();
             var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSannouncement.wav"));
@@ -63,7 +62,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 () =>
                 {
                     Thread.Sleep(2000);
-                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.ReadyForBoarding, true, SimConnect.SimConnect.Instance.Flight?.FlightNumber.ToString());
+                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.ReadyForBoarding, true, Simulator.Instance.Flight?.FlightNumber.ToString());
                 })
             { Name = "OpenSky.NewFlightNotificationViewModel.SpeechFlightNumber" }.Start();
 

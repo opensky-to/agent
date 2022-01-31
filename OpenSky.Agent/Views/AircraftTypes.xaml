@@ -17,12 +17,12 @@
             xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
             xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
-            xmlns:openSkyApi="clr-namespace:OpenSkyApi"
             xmlns:system="clr-namespace:System;assembly=mscorlib"
             xmlns:ui="http://schemas.modernwpf.com/2019"
             xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
             xmlns:tools="clr-namespace:OpenSky.AgentMSFS.Tools"
             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+            xmlns:openSkyApi="clr-namespace:OpenSkyApi;assembly=OpenSky.Agent.Simulator"
             mc:Ignorable="d" d:DesignWidth="2000" Loaded="AircraftTypesOnLoaded"
             Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False" VerticalScrollBar="False" LoadingText="{Binding LoadingText}">
     <Window.DataContext>
@@ -505,17 +505,17 @@
                 <TextBlock Grid.Column="0" Grid.Row="25" VerticalAlignment="Center" Margin="0,0,5,0">Max payload Δ lbs</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="26" VerticalAlignment="Center" Margin="0,0,5,0">Comments</TextBlock>
 
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Simulator.PlaneIdentity.TypeProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Simulator.PlaneIdentity.AtcTypeProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Simulator.PlaneIdentity.AtcModelProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Simulator.PlaneIdentity.EngineType}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Simulator.PlaneIdentity.EngineCount}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Simulator.AircraftIdentity.Type}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Simulator.AircraftIdentity.AtcType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Simulator.AircraftIdentity.AtcModel}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Simulator.AircraftIdentity.EngineType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Simulator.AircraftIdentity.EngineCount}" Margin="5,2" />
                 <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Simulator.WeightAndBalance.FuelTotalCapacity}" Margin="5,2" />
                 <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding Simulator.WeightAndBalance.FuelWeightPerGallon}" Margin="5,2" />
                 <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding Simulator.WeightAndBalance.EmptyWeight}" Margin="5,2" />
                 <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding Simulator.WeightAndBalance.MaxGrossWeight}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding Simulator.PlaneIdentity.FlapsAvailable}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding Simulator.PlaneIdentity.GearRetractable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding Simulator.AircraftIdentity.FlapsAvailable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding Simulator.AircraftIdentity.GearRetractable}" Margin="5,2" />
                 <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Name of the aircraft" ui:ControlHelper.PlaceholderForeground="#666" />
                 <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding VersionNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Version number" ui:ControlHelper.PlaceholderForeground="#666" />
                 <TextBox Grid.Column="1" Grid.Row="13" Text="{Binding Manufacturer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Manufacturer name" ui:ControlHelper.PlaceholderForeground="#666" />

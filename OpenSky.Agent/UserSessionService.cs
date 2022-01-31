@@ -261,7 +261,7 @@ namespace OpenSky.AgentMSFS
 
             try
             {
-                var result = await OpenSkyService.Instance.GetUserRolesAsync();
+                var result = await AgentOpenSkyService.Instance.GetUserRolesAsync();
                 return !result.IsError;
             }
             catch (Exception ex)
@@ -313,7 +313,7 @@ namespace OpenSky.AgentMSFS
         {
             try
             {
-                var result = await OpenSkyService.Instance.GetLinkedAccountsAsync();
+                var result = await AgentOpenSkyService.Instance.GetLinkedAccountsAsync();
                 if (!result.IsError)
                 {
                     this.LinkedAccounts = result.Data;
@@ -344,7 +344,7 @@ namespace OpenSky.AgentMSFS
         {
             try
             {
-                var result = await OpenSkyService.Instance.GetAccountOverviewAsync();
+                var result = await AgentOpenSkyService.Instance.GetAccountOverviewAsync();
                 if (!result.IsError)
                 {
                     this.AccountOverview = result.Data;
@@ -400,7 +400,7 @@ namespace OpenSky.AgentMSFS
         {
             try
             {
-                var result = await OpenSkyService.Instance.GetUserRolesAsync();
+                var result = await AgentOpenSkyService.Instance.GetUserRolesAsync();
                 if (!result.IsError)
                 {
                     this.userRoles.Clear();

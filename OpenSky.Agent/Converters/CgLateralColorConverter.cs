@@ -11,6 +11,8 @@ namespace OpenSky.AgentMSFS.Converters
     using System.Windows.Data;
     using System.Windows.Media;
 
+    using OpenSky.Agent.Simulator;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// Center of gravity lateral to color converter (green within limits, red outside the limits)

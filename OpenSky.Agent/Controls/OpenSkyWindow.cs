@@ -19,8 +19,8 @@ namespace OpenSky.AgentMSFS.Controls
     using System.Windows.Interop;
     using System.Windows.Shapes;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.Tools;
 
     using Button = System.Windows.Controls.Button;
     using Cursors = System.Windows.Input.Cursors;

@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\OpenSky.Agent.Simulator.xml</DocumentationFile>
     <LangVersion>latest</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -47,8 +48,8 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OpenSky.FlightLogXML, Version=0.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.4\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
+    <Reference Include="OpenSky.FlightLogXML, Version=0.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.5\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
     </Reference>
     <Reference Include="ParallelExtensionsExtras, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
@@ -61,12 +62,18 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Speech" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TomsToolbox.Essentials, Version=2.7.4.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
+      <HintPath>..\packages\TomsToolbox.Essentials.2.7.4\lib\net45\TomsToolbox.Essentials.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
     <Reference Include="XDMessaging.Lite, Version=5.0.6.0, Culture=neutral, PublicKeyToken=737bc70442f2c4af, processorArchitecture=MSIL">
       <HintPath>..\packages\XDMessaging.Lite.5.0.6\lib\net452\XDMessaging.Lite.dll</HintPath>
     </Reference>
@@ -75,17 +82,25 @@
     <Compile Include="Enums\FuelTank.cs" />
     <Compile Include="Enums\Pushback.cs" />
     <Compile Include="Enums\Requests.cs" />
+    <Compile Include="Models\AircraftTrailLocation.cs" />
+    <Compile Include="Models\FlightLoadingTempModels.cs" />
     <Compile Include="Models\FuelTanks.cs" />
     <Compile Include="Models\LandingAnalysis.cs" />
     <Compile Include="Models\MapPositionUpdate.cs" />
     <Compile Include="Models\AircraftIdentity.cs" />
     <Compile Include="Models\PayloadStations.cs" />
     <Compile Include="Models\PrimaryTracking.cs" />
+    <Compile Include="Models\ProcessLandingAnalysis.cs" />
+    <Compile Include="Models\ProcessPrimaryTracking.cs" />
+    <Compile Include="Models\ProcessSecondaryTracking.cs" />
     <Compile Include="Models\SecondaryTracking.cs" />
+    <Compile Include="Models\SimbriefWaypointMarker.cs" />
+    <Compile Include="Models\SlewAircraftIntoPosition.cs" />
     <Compile Include="Models\TrackingCondition.cs" />
     <Compile Include="Models\TrackingConditions.cs" />
     <Compile Include="Models\TrackingEventLogEntry.cs" />
-    <Compile Include="Models\TrackingStatus.cs" />
+    <Compile Include="Enums\TrackingStatus.cs" />
+    <Compile Include="Models\TrackingEventMarker.cs" />
     <Compile Include="Models\VerticalProfile.cs" />
     <Compile Include="Models\WeightAndBalance.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\AircraftType.cs" />
@@ -95,13 +110,27 @@
     <Compile Include="OpenAPIs\OpenSkyServiceBase.cs" />
     <Compile Include="OpenAPIs\swagger.cs" />
     <Compile Include="OpenAPIs\ValidationProblemDetails.cs" />
+    <Compile Include="OpenSkyColors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulator.cs" />
+    <Compile Include="Simulator.Data.cs" />
+    <Compile Include="Simulator.Flight.cs" />
+    <Compile Include="Simulator.GroundHandling.cs" />
+    <Compile Include="Simulator.Process.FlightPhases.cs" />
+    <Compile Include="Simulator.Markers.cs" />
+    <Compile Include="Simulator.Process.ChangeOverTime.cs" />
+    <Compile Include="Simulator.Process.cs" />
+    <Compile Include="Simulator.Process.Landing.cs" />
+    <Compile Include="Simulator.Process.Lights.cs" />
+    <Compile Include="Simulator.Process.Systems.cs" />
+    <Compile Include="Simulator.SaveLoadXML.cs" />
+    <Compile Include="Simulator.simBrief.cs" />
     <Compile Include="SpeechSoundPacks.cs" />
     <Compile Include="Tools\ColorExtensions.cs" />
     <Compile Include="Tools\SleepScheduler.cs" />
     <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
+    <Compile Include="Tools\UpdateGUIDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenAPIs\swagger.json">
@@ -117,7 +146,12 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.NetAnalyzers.6.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.NetAnalyzers.6.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.NetAnalyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Page Include="OpenSkyColors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

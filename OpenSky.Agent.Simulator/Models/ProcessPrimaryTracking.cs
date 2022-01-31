@@ -1,36 +1,33 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessSecondaryTracking.cs" company="OpenSky">
+// <copyright file="ProcessPrimaryTracking.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Helpers
+namespace OpenSky.Agent.Simulator.Models
 {
-    using OpenSky.Agent.SimConnectMSFS.Structs;
-    using OpenSky.AgentMSFS.SimConnect.Structs;
-
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Process secondary tracking (for queue processing)
+    /// Process primary tracking (for queue processing)
     /// </summary>
     /// <remarks>
     /// sushi.at, 15/03/2021.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public class ProcessSecondaryTracking
+    public class ProcessPrimaryTracking
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the new SimConnect secondary tracking struct.
+        /// Gets or sets the new SimConnect primary tracking struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public SecondaryTracking New { get; set; }
+        public PrimaryTracking New { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the old SimConnect secondary tracking struct.
+        /// Gets or sets the old SimConnect primary tracking struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public SecondaryTracking Old { get; set; }
+        public PrimaryTracking Old { get; set; }
     }
 }

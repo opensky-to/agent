@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Simbrief.cs" company="OpenSky">
+// <copyright file="Simulator.simBrief.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Collections.Generic;
@@ -15,14 +15,15 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Simconnect client - simbrief flight plan import code.
+    /// Simulator interface - simBrief.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

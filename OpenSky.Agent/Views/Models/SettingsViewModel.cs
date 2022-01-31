@@ -21,6 +21,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     using Microsoft.Win32;
 
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Models;
@@ -543,7 +544,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             try
             {
-                var result = OpenSkyService.Instance.RevokeTokenAsync(new RevokeToken { Token = this.UserSession.RefreshToken }).Result;
+                var result = AgentOpenSkyService.Instance.RevokeTokenAsync(new RevokeToken { Token = this.UserSession.RefreshToken }).Result;
                 if (result.IsError)
                 {
                     this.LogoutOpenSkyUserCommand.ReportProgress(
@@ -658,7 +659,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     SimbriefUsername = this.SimBriefUsername
                 };
 
-                var result = OpenSkyService.Instance.UpdateLinkedAccountsAsync(linkedAccounts).Result;
+                var result = AgentOpenSkyService.Instance.UpdateLinkedAccountsAsync(linkedAccounts).Result;
                 if (!result.IsError)
                 {
                     _ = UserSessionService.Instance.RefreshLinkedAccounts();
@@ -758,7 +759,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             try
             {
-                var result = OpenSkyService.Instance.UploadProfileImageAsync(new FileParameter(File.OpenRead(fileName), fileName, fileName.ToLowerInvariant().EndsWith(".png") ? "image/png" : "image/jpeg")).Result;
+                var result = AgentOpenSkyService.Instance.UploadProfileImageAsync(new FileParameter(File.OpenRead(fileName), fileName, fileName.ToLowerInvariant().EndsWith(".png") ? "image/png" : "image/jpeg")).Result;
                 if (result.IsError)
                 {
                     this.UpdateProfileImageCommand.ReportProgress(

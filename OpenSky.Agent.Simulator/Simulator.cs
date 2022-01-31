@@ -8,27 +8,140 @@ namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using System.Threading;
 
     using JetBrains.Annotations;
 
+    using Microsoft.Maps.MapControl.WPF;
+
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
-    using OpenSky.AgentMSFS.Models;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
+    using TrackingEventLogEntry = OpenSky.Agent.Simulator.Models.TrackingEventLogEntry;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Simulator interface class.
+    /// Simulator interface.
     /// </summary>
     /// <remarks>
     /// sushi.at, 30/01/2022.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public abstract class Simulator : INotifyPropertyChanged
+    public abstract partial class Simulator : INotifyPropertyChanged
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Set to true to close the simulator client.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        protected bool close;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The flight loading temporary models.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        protected FlightLoadingTempModels flightLoadingTempModels;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The time the last pause started.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        protected DateTime? pauseStarted;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The total paused timespan.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        protected TimeSpan totalPaused = TimeSpan.Zero;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The OpenSky service instance.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly OpenSkyService openSkyServiceInstance;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if we are connected to the simulator.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool connected;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The pause info string.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string pauseInfo;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Simulator"/> class.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="openSkyServiceInstance">
+        /// The OpenSky service instance.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        protected Simulator(OpenSkyService openSkyServiceInstance)
+        {
+            this.openSkyServiceInstance = openSkyServiceInstance;
+            this.primaryTrackingProcessingQueue = new ConcurrentQueue<ProcessPrimaryTracking>();
+            this.secondaryTrackingProcessingQueue = new ConcurrentQueue<ProcessSecondaryTracking>();
+            this.landingAnalysisProcessingQueue = new ConcurrentQueue<ProcessLandingAnalysis>();
+            this.TrackingEventLogEntries = new ObservableCollection<TrackingEventLogEntry>();
+            this.AircraftTrailLocations = new LocationCollection();
+            this.SimbriefRouteLocations = new LocationCollection();
+            this.LandingReports = new ObservableCollection<TouchDown>();
+
+            // Default values and init data structures
+            this.SampleRates = new ObservableConcurrentDictionary<Requests, int>
+            {
+                { Requests.Primary, 50 },
+                { Requests.Secondary, 500 },
+                { Requests.FuelTanks, 15000 },
+                { Requests.PayloadStations, 15000 },
+                { Requests.PlaneIdentity, 15000 },
+                { Requests.WeightAndBalance, 15000 },
+                { Requests.LandingAnalysis, 500 }
+            };
+
+            this.LastReceivedTimes = new ObservableConcurrentDictionary<Requests, DateTime?>();
+            foreach (Requests request in Enum.GetValues(typeof(Requests)))
+            {
+                this.LastReceivedTimes.Add(request, null);
+            }
+
+            this.TrackingConditions = new Dictionary<int, TrackingCondition>
+            {
+                { (int)Agent.Simulator.Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.PlaneModel, new TrackingCondition() },
+                { (int)Agent.Simulator.Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1" } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Location, new TrackingCondition() }
+            };
+
+            // Start our worker threads
+            new Thread(this.ProcessPrimaryTracking) { Name = "Simulator.ProcessPrimaryTracking" }.Start();
+            new Thread(this.ProcessSecondaryTracking) { Name = "Simulator.ProcessSecondaryTracking" }.Start();
+            new Thread(this.ProcessLandingAnalysis) { Name = "Simulator.ProcessLandingAnalysis" }.Start();
+        }
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Occurs when a property value changes.
@@ -45,31 +158,24 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the aircraft identity data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract AircraftIdentity AircraftIdentity { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets a value indicating whether the simulator is connected.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public abstract bool Connected { get; protected set; }
+        public bool Connected
+        {
+            get => this.connected;
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the flight phase.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract FlightPhase FlightPhase { get; }
+            protected set
+            {
+                if (Equals(this.connected, value))
+                {
+                    return;
+                }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the fuel tanks data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract FuelTanks FuelTanks { get; }
+                this.connected = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -81,122 +187,31 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets a value indicating whether the aircraft is currently turning.
+        /// Gets the pause info string.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public abstract bool IsTurning { get; }
+        public string PauseInfo
+        {
+            get => this.pauseInfo;
+
+            protected set
+            {
+                if (Equals(this.pauseInfo, value))
+                {
+                    return;
+                }
+
+                this.pauseInfo = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the landing analysis data.
+        /// Gets the tracking conditions.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public abstract LandingAnalysis LandingAnalysis { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the length of the landing analysis processing queue.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract int LandingAnalysisProcessingQueueLength { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the last distance position report.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract string LastDistancePositionReport { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets information describing the pause status.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract string PauseInfo { get; protected set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the payload stations data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract PayloadStations PayloadStations { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the primary tracking data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract PrimaryTracking PrimaryTracking { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the length of the primary tracking processing queue.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract int PrimaryTrackingProcessingQueueLength { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the sample rates.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract ObservableConcurrentDictionary<Requests, int> SampleRates { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the secondary tracking data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract SecondaryTracking SecondaryTracking { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the length of the secondary tracking processing queue.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract int SecondaryTrackingProcessingQueueLength { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets information about the tracking duration.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract string TrackingDuration { get; protected set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the tracking status.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract TrackingStatus TrackingStatus { get; protected set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the vertical profile.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract VerticalProfile VerticalProfile { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets information describing the warp status.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract string WarpInfo { get; protected set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets a value indicating whether the aircraft was airborne.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract bool WasAirborne { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the weight and balance data.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract WeightAndBalance WeightAndBalance { get; }
+        public Dictionary<int, TrackingCondition> TrackingConditions { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -219,10 +234,19 @@ namespace OpenSky.Agent.Simulator
         /// Close all connections and dispose the simulator client.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 31/01/2022.
+        /// sushi.at, 13/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        public abstract void Close();
+        public void Close()
+        {
+            Debug.WriteLine("SimConnect simulator interface closing down...");
+            if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
+            {
+                this.StopTracking(false);
+            }
+
+            this.close = true;
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -236,29 +260,6 @@ namespace OpenSky.Agent.Simulator
         /// </param>
         /// -------------------------------------------------------------------------------------------------
         public abstract void Pause(bool pause);
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Refresh the request-associated data model object NOW, don't wait for normal refresh interval.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 31/01/2022.
-        /// </remarks>
-        /// <param name="request">
-        /// The request ID type to refresh.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract void RefreshModelNow(Requests request);
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Starts flight tracking.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 31/01/2022.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        public abstract void StartTracking();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

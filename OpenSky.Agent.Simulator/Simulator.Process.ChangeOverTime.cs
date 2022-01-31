@@ -1,29 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Process.ChangeOverTime.cs" company="OpenSky">
+// <copyright file="Simulator.Process.ChangeOverTime.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
 
-    using OpenSky.Agent.SimConnectMSFS.Structs;
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Structs;
+    using OpenSky.Agent.Simulator.Models;
 
     /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Simconnect client - change over time tracking code.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 17/03/2021.
-    /// </remarks>
+    /// <content>
+    /// Simulator interface - change over time processing.
+    /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

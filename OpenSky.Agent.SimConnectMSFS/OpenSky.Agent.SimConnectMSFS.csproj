@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\OpenSky.Agent.SimConnectMSFS.xml</DocumentationFile>
     <LangVersion>latest</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,8 +51,8 @@
     <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
     </Reference>
-    <Reference Include="OpenSky.FlightLogXML, Version=0.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.4\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
+    <Reference Include="OpenSky.FlightLogXML, Version=0.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.5\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
     </Reference>
     <Reference Include="ParallelExtensionsExtras, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
@@ -72,24 +73,8 @@
   <ItemGroup>
     <Compile Include="Enums\ClientEvents.cs" />
     <Compile Include="Enums\CrashSequence.cs" />
-    <Compile Include="Helpers\ProcessLandingAnalysis.cs" />
-    <Compile Include="Helpers\ProcessPrimaryTracking.cs" />
-    <Compile Include="Helpers\ProcessSecondaryTracking.cs" />
-    <Compile Include="Models\AircraftTrailLocation.cs" />
-    <Compile Include="Models\FlightLoadingTempStructs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimConnect.cs" />
-    <Compile Include="SimConnect.Flight.cs" />
-    <Compile Include="SimConnect.GroundHandling.cs" />
-    <Compile Include="SimConnect.Process.ChangeOverTime.cs" />
-    <Compile Include="SimConnect.Process.cs" />
-    <Compile Include="SimConnect.Process.FlightPhases.cs" />
-    <Compile Include="SimConnect.Process.Landing.cs" />
-    <Compile Include="SimConnect.Process.Lights.cs" />
-    <Compile Include="SimConnect.Process.PositionReports.cs" />
-    <Compile Include="SimConnect.Process.Systems.cs" />
-    <Compile Include="SimConnect.SaveLoadXML.cs" />
-    <Compile Include="SimConnect.Simbrief.cs" />
     <Compile Include="Structs\FuelTanks.cs" />
     <Compile Include="Structs\LandingAnalysis.cs" />
     <Compile Include="Structs\PayloadStations.cs" />
@@ -97,7 +82,7 @@
     <Compile Include="Structs\PlaneRegistry.cs" />
     <Compile Include="Structs\PrimaryTracking.cs" />
     <Compile Include="Structs\SecondaryTracking.cs" />
-    <Compile Include="Structs\SlewPlaneIntoPosition.cs" />
+    <Compile Include="Structs\SlewAircraftIntoPosition.cs" />
     <Compile Include="Structs\WeightAndBalance.cs" />
   </ItemGroup>
   <ItemGroup>

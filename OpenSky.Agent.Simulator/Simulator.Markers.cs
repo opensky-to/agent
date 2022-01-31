@@ -1,35 +1,47 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Process.PositionReports.cs" company="OpenSky">
+// <copyright file="Simulator.Markers.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Device.Location;
+    using System.Diagnostics;
     using System.Windows;
+    using System.Windows.Media;
 
     using JetBrains.Annotations;
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Structs;
+    using OpenSky.Agent.Simulator.Tools;
+    using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
+    using TrackingEventLogEntry = OpenSky.Agent.Simulator.Models.TrackingEventLogEntry;
+    using TrackingEventMarker = OpenSky.Agent.Simulator.Models.TrackingEventMarker;
+
     /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Simconnect client - position reports code.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 17/03/2021.
-    /// </remarks>
+    /// <content>
+    /// Simulator interface - map markers.
+    /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The tracking event markers.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly List<TrackingEventMarker> trackingEventMarkers = new();
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last distance comparison used for a position report.
@@ -52,6 +64,20 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         [CanBeNull]
         private GeoCoordinate lastPositionReport;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Occurs when the plane's location changed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public event EventHandler<Location> LocationChanged;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Occurs when SimConnect adds a new tracking event marker.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public event EventHandler<TrackingEventMarker> TrackingEventMarkerAdded;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -83,6 +109,96 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the tracking event log entries.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<TrackingEventLogEntry> TrackingEventLogEntries { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Replay simbrief waypoint and tracking event markers (new tracking view was opened).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 18/03/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public void ReplayMapMarkers()
+        {
+            Debug.WriteLine("SimConnect is replaying map markers to listeners...");
+
+            UpdateGUIDelegate restoreMarkers = () =>
+            {
+                foreach (var waypointMarker in this.simbriefWaypointMarkers)
+                {
+                    this.SimbriefWaypointMarkerAdded?.Invoke(this, waypointMarker);
+                }
+
+                lock (this.trackingEventMarkers)
+                {
+                    foreach (var trackingEventMarker in this.trackingEventMarkers)
+                    {
+                        this.TrackingEventMarkerAdded?.Invoke(this, trackingEventMarker);
+                    }
+                }
+            };
+            Application.Current.Dispatcher.BeginInvoke(restoreMarkers);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Add a tracking event to the map and log.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="primary">
+        /// The primary Simconnect tracking data.
+        /// </param>
+        /// <param name="secondary">
+        /// The secondary Simconnect tracking data.
+        /// </param>
+        /// <param name="type">
+        /// The flight tracking event type.
+        /// </param>
+        /// <param name="color">
+        /// The color to use for the marker.
+        /// </param>
+        /// <param name="text">
+        /// The event text (what happened?).
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, FlightTrackingEventType type, Color color, string text)
+        {
+            if (this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations)
+            {
+                return;
+            }
+
+            UpdateGUIDelegate addTrackingEvent = () =>
+            {
+                Debug.WriteLine($"Adding tracking event: {text}");
+                if (this.lastNonPositionReportMarker == null || this.lastNonPositionReportMarker.GetDistanceTo(primary) >= 20)
+                {
+                    lock (this.trackingEventMarkers)
+                    {
+                        var newMarker = new TrackingEventMarker(primary, secondary, this.WeightAndBalance.FuelTotalQuantity, 16, color, text);
+                        this.lastNonPositionReportMarker = newMarker;
+                        this.trackingEventMarkers.Add(newMarker);
+                        this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
+                    }
+                }
+                else
+                {
+                    this.lastNonPositionReportMarker.AddEventToMarker(DateTime.UtcNow, text);
+                }
+
+                this.TrackingEventLogEntries.Add(new TrackingEventLogEntry(type, DateTime.UtcNow, color, text, primary.MapLocation));
+            };
+            Application.Current.Dispatcher.BeginInvoke(addTrackingEvent);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Adds a position report to the map if needed (poly line point and position report point if requested).
         /// </summary>
         /// <remarks>
@@ -108,8 +224,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     lock (this.trackingEventMarkers)
                     {
-                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity));
-                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
+                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity));
+                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
                         this.trackingEventMarkers.Add(newMarker);
                         this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
                     }
@@ -139,7 +255,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                var radioHeight = this.AircraftIdentityStruct.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
+                var radioHeight = this.AircraftIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
                 if (primary.RadioHeight < radioHeight)
                 {
                     if (this.IsTurning)
@@ -180,8 +296,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     lock (this.trackingEventMarkers)
                     {
-                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity));
-                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
+                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity));
+                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
                         this.trackingEventMarkers.Add(newMarker);
                         this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
                     }

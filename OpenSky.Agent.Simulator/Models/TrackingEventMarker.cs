@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Models
+namespace OpenSky.Agent.Simulator.Models
 {
     using System;
     using System.Device.Location;
@@ -19,9 +19,7 @@ namespace OpenSky.AgentMSFS.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
 
@@ -200,7 +198,8 @@ namespace OpenSky.AgentMSFS.Models
             {
                 this.SetValue(ZIndexProperty, 998);
 
-                var outerBorder = new Border { BorderBrush = new SolidColorBrush(markerColor), CornerRadius = new CornerRadius(1.5), BorderThickness = new Thickness(5), HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
+                var outerBorder = new Border
+                    { BorderBrush = new SolidColorBrush(markerColor), CornerRadius = new CornerRadius(1.5), BorderThickness = new Thickness(5), HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
                 this.Children.Add(outerBorder);
                 var widthBinding = new Binding { Source = this, Path = new PropertyPath("ActualWidth"), Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(outerBorder, WidthProperty, widthBinding);
@@ -386,17 +385,17 @@ namespace OpenSky.AgentMSFS.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets a value indicating whether this is an airport marker (we don't save those).
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool IsAirportMarker => this.marker.IsAirportMarker;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets a value indicating whether this is an airport detail marker (box or runways - we don't save those and they have a different zoom level setting).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public bool IsAirportDetailMarker { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether this is an airport marker (we don't save those).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IsAirportMarker => this.marker.IsAirportMarker;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

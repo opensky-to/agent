@@ -13,17 +13,13 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Threading;
     using System.Windows;
 
-    using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.OpenAPIs;
     using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
-
-    using Simulator = OpenSkyApi.Simulator;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

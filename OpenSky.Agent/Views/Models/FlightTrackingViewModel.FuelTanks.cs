@@ -135,8 +135,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                 fuelTanks.UpdateQuantitiesFromDictionary(quantities);
 
                 this.Simulator.SetFuelTanks(fuelTanks);
-                this.Simulator.RefreshStructNow(Requests.FuelTanks);
-                this.Simulator.RefreshStructNow(Requests.WeightAndBalance);
+                this.Simulator.RefreshModelNow(Requests.FuelTanks);
+                this.Simulator.RefreshModelNow(Requests.WeightAndBalance);
             }
             catch (Exception ex)
             {

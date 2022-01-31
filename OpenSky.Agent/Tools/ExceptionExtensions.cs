@@ -15,11 +15,10 @@ namespace OpenSky.AgentMSFS.Tools
 
     using Newtonsoft.Json;
 
-    using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.OpenAPIs;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.OpenAPIs;
     using OpenSky.AgentMSFS.Views;
 
     using OpenSkyApi;

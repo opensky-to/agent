@@ -16,9 +16,9 @@
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
                xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
-               xmlns:agentMsfs="clr-namespace:OpenSky.AgentMSFS"
                xmlns:ui="http://schemas.modernwpf.com/2019"
                xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
+               xmlns:simulator="clr-namespace:OpenSky.Agent.Simulator;assembly=OpenSky.Agent.Simulator"
                mc:Ignorable="d" Loaded="SoundPackTesterOnLoaded"
                Title="Sound Pack Tester" Height="450" Width="1200" ResizeMode="CanResize" ShowMinMaxButtons="True" FontSize="14" HorizontalScrollBar="False" VerticalScrollBar="False"
                SizeToContent="Height">
@@ -43,7 +43,7 @@
         </StackPanel>
         <ListBox ItemsSource="{Binding SpeechEvents}">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="agentMsfs:SpeechEvent">
+                <DataTemplate DataType="simulator:SpeechEvent">
                     <Button Content="{Binding .}" Command="{Binding ElementName=ViewModel, Path=PlaySpeechEventCommand}" CommandParameter="{Binding .}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>

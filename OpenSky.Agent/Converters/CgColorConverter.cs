@@ -11,6 +11,7 @@ namespace OpenSky.AgentMSFS.Converters
     using System.Windows.Data;
     using System.Windows.Media;
 
+    using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Models;
 
     /// -------------------------------------------------------------------------------------------------

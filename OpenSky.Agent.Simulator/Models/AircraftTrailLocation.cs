@@ -10,7 +10,6 @@ namespace OpenSky.Agent.Simulator.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.FlightLogXML;
 
     /// -------------------------------------------------------------------------------------------------

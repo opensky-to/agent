@@ -17,7 +17,6 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
     using OpenSky.FlightLogXML;
 
     using OpenSkyApi;

@@ -18,12 +18,11 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
-    using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
 

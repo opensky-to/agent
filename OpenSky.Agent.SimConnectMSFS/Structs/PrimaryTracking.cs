@@ -13,7 +13,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
 
     using Microsoft.FlightSimulator.SimConnect;
 
-    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.SimConnectMSFS.Enums;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -88,6 +88,13 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public double GroundSpeed { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The indicated airspeed in knots.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double AirspeedIndicated { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -190,6 +197,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 Heading = primary.Heading,
                 AirspeedTrue = primary.AirspeedTrue,
                 GroundSpeed = primary.GroundSpeed,
+                AirspeedIndicated = primary.AirspeedIndicated,
                 PitchAngle = primary.PitchAngle,
                 BankAngle = primary.BankAngle,
                 VerticalSpeedSeconds = primary.VerticalSpeedSeconds,
@@ -230,6 +238,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 new SimVar("PLANE HEADING DEGREES MAGNETIC", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("AIRSPEED TRUE", "Knots", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("GROUND VELOCITY", "Knots", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("AIRSPEED INDICATED", "Knots", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE PITCH DEGREES", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE BANK DEGREES", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("VERTICAL SPEED", "Feet per second", SIMCONNECT_DATATYPE.FLOAT64),

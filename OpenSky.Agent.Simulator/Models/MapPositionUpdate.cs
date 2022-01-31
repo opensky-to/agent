@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Models
+namespace OpenSky.Agent.Simulator.Models
 {
     using Microsoft.Maps.MapControl.WPF;
 

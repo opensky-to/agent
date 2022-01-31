@@ -1,19 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Flight.cs" company="OpenSky">
+// <copyright file="Simulator.Flight.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.Agent.SimConnectMSFS
+namespace OpenSky.Agent.Simulator
 {
     using System;
-    using System.Collections.Generic;
     using System.Device.Location;
     using System.Diagnostics;
     using System.IO;
     using System.IO.Compression;
     using System.Text;
     using System.Threading;
+    using System.Windows;
+    using System.Windows.Media;
 
     using JetBrains.Annotations;
 
@@ -21,24 +22,20 @@ namespace OpenSky.Agent.SimConnectMSFS
 
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Helpers;
-    using OpenSky.AgentMSFS.SimConnect.Structs;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
     using PositionReport = OpenSkyApi.PositionReport;
+    using TrackingEventMarker = OpenSky.Agent.Simulator.Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Simconnect client - flight tracking code.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 17/03/2021.
-    /// </remarks>
+    /// <content>
+    /// Simulator interface - flight.
+    /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -111,13 +108,6 @@ namespace OpenSky.Agent.SimConnectMSFS
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private DateTime lastPositionReportUpload = DateTime.MinValue;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The pause info string.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string pauseInfo;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -254,12 +244,14 @@ namespace OpenSky.Agent.SimConnectMSFS
                                 this.trackingEventMarkers.Add(runwayMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
                             }
+
                             foreach (var runway in value.Origin.Runways)
                             {
                                 var runwayMarker = new TrackingEventMarker(runway);
                                 this.trackingEventMarkers.Add(runwayMarker);
                                 this.TrackingEventMarkerAdded?.Invoke(this, runwayMarker);
                             }
+
                             foreach (var runway in value.Destination.Runways)
                             {
                                 var runwayMarker = new TrackingEventMarker(runway);
@@ -269,7 +261,8 @@ namespace OpenSky.Agent.SimConnectMSFS
                         }
                     };
 
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected =
+                        $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
                     this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
 
@@ -279,7 +272,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                     if (!value.Resume)
                     {
                         Debug.WriteLine("Preparing to track new flight");
-                        this.flightLoadingTempStructs = null;
+                        this.flightLoadingTempModels = null;
                         this.TrackingStatus = TrackingStatus.Preparing;
                         Application.Current.Dispatcher.BeginInvoke(addAirports);
 
@@ -313,7 +306,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                         this.CheckCloudSave();
                         this.LoadFlight();
 
-                        this.flightLoadingTempStructs = new FlightLoadingTempStructs
+                        this.flightLoadingTempModels = new FlightLoadingTempModels
                         {
                             FuelTanks = new FuelTanks
                             {
@@ -330,7 +323,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                                 FuelTankExternal2Quantity = value.FuelTankExternal2Quantity ?? 0
                             },
                             PayloadStations = new PayloadStations(), // todo restore payload stations once we have that, all 0s for now
-                            SlewPlaneIntoPosition = new SlewPlaneIntoPosition
+                            SlewAircraftIntoPosition = new SlewAircraftIntoPosition
                             {
                                 Latitude = value.Latitude ?? 0,
                                 Longitude = value.Longitude ?? 0,
@@ -344,13 +337,14 @@ namespace OpenSky.Agent.SimConnectMSFS
                             }
                         };
 
-                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected = $"{this.flightLoadingTempStructs.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected =
+                            $"{this.flightLoadingTempModels.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempModels.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempModels.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempModels.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     }
                 }
                 else
                 {
                     Debug.WriteLine("Flight set to NULL, stopping tracking");
-                    this.flightLoadingTempStructs = null;
+                    this.flightLoadingTempModels = null;
                     this.StopTracking(false);
                     this.lastFlightLogAutoSave = DateTime.MinValue;
                     this.simbriefOfpLoaded = false;
@@ -369,40 +363,11 @@ namespace OpenSky.Agent.SimConnectMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the pause info string.
-        /// </summary>
-        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.PauseInfo"/>
-        /// -------------------------------------------------------------------------------------------------
-        public override string PauseInfo
-        {
-            get => this.pauseInfo;
-
-            protected set
-            {
-                if (Equals(this.pauseInfo, value))
-                {
-                    return;
-                }
-
-                this.pauseInfo = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the tracking conditions.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Dictionary<int, TrackingCondition> TrackingConditions { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets the duration of the tracking session.
         /// </summary>
         /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.TrackingDuration"/>
         /// -------------------------------------------------------------------------------------------------
-        public override string TrackingDuration
+        public string TrackingDuration
         {
             get => this.trackingDuration;
 
@@ -423,7 +388,7 @@ namespace OpenSky.Agent.SimConnectMSFS
         /// Gets the current tracking status.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public override TrackingStatus TrackingStatus
+        public TrackingStatus TrackingStatus
         {
             get => this.trackingStatus;
 
@@ -459,7 +424,7 @@ namespace OpenSky.Agent.SimConnectMSFS
         /// Gets the warp info string.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public override string WarpInfo
+        public string WarpInfo
         {
             get => this.warpInfo;
 
@@ -487,9 +452,9 @@ namespace OpenSky.Agent.SimConnectMSFS
         /// </exception>
         /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.StartTracking()"/>
         /// -------------------------------------------------------------------------------------------------
-        public override void StartTracking()
+        public void StartTracking()
         {
-            Debug.WriteLine("SimConnect asked to start/resume tracking...");
+            Debug.WriteLine("Simulator asked to start/resume tracking...");
             if (!this.CanStartTracking)
             {
                 throw new Exception("Not all tracking conditions met, cannot start tracking.");
@@ -506,7 +471,7 @@ namespace OpenSky.Agent.SimConnectMSFS
 
                 this.TrackingStatus = TrackingStatus.GroundOperations;
                 this.trackingStarted = DateTime.UtcNow;
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStartedGroundHandling);
             }
             else
@@ -518,7 +483,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking starting...");
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStarted);
-                        this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                     }
 
                     if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -526,7 +491,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking resuming...");
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingResumed);
-                        this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
+                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
 
                         // Check if we just resumed a save that failed to upload
                         if (this.FlightPhase == FlightPhase.PostFlight)
@@ -589,7 +554,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                     // Abort flight
                     try
                     {
-                        var result = OpenSkyService.Instance.AbortFlightAsync(this.Flight.Id).Result;
+                        var result = this.openSkyServiceInstance.AbortFlightAsync(this.Flight.Id).Result;
                         if (result.IsError)
                         {
                             Debug.WriteLine("Error aborting flight on OpenSky: " + result.Message + "\r\n" + result.ErrorDetails);
@@ -639,7 +604,7 @@ namespace OpenSky.Agent.SimConnectMSFS
             }
             else
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
                 this.SaveFlight();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightSavedPaused);
                 this.UploadPositionReport();
@@ -654,11 +619,11 @@ namespace OpenSky.Agent.SimConnectMSFS
 
                     this.PauseFlight();
 
-                    this.flightLoadingTempStructs = new FlightLoadingTempStructs
+                    this.flightLoadingTempModels = new FlightLoadingTempModels
                     {
                         FuelTanks = this.FuelTanks,
-                        PayloadStations = this.PayloadStationsStruct,
-                        SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTrackingStruct)
+                        PayloadStations = this.PayloadStations,
+                        SlewAircraftIntoPosition = SlewAircraftIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
                     };
                 }
                 catch (Exception ex)
@@ -675,6 +640,89 @@ namespace OpenSky.Agent.SimConnectMSFS
                     {
                         // Ignore
                     }
+                }
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Check if there is a (newer) cloud save for this flight.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 14/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CheckCloudSave()
+        {
+            Debug.WriteLine($"Checking if cloud-save for flight {this.Flight?.Id} is more recent than local save...");
+            try
+            {
+                if (this.Flight == null)
+                {
+                    throw new Exception("No flight loaded that could be restored!");
+                }
+
+                if (!this.Flight.HasAutoSaveLog || !this.Flight.LastAutoSave.HasValue)
+                {
+                    // Flight has no cloud-save
+                    return;
+                }
+
+                if (!this.flightSaveMutex.WaitOne(30 * 1000))
+                {
+                    throw new Exception("Timeout waiting for save flight mutex.");
+                }
+
+                var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
+                flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
+                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
+
+                var downloadCloudSave = false;
+                if (!File.Exists(saveFileName))
+                {
+                    downloadCloudSave = true;
+                }
+                else
+                {
+                    var localSaveTime = File.GetLastWriteTimeUtc(saveFileName);
+                    if (this.Flight.LastAutoSave.Value.UtcDateTime > localSaveTime)
+                    {
+                        downloadCloudSave = true;
+                    }
+                }
+
+                if (downloadCloudSave)
+                {
+                    var result = this.openSkyServiceInstance.DownloadFlightAutoSaveAsync(this.Flight.Id).Result;
+                    if (!result.IsError)
+                    {
+                        var base64 = result.Data;
+                        if (base64 != null)
+                        {
+                            var binary = Convert.FromBase64String(base64);
+                            File.WriteAllBytes(saveFileName, binary);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Error downloading cloud save: " + result.Message + "\r\n" + result.ErrorDetails);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error downloading cloud save: " + ex);
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    this.flightSaveMutex.ReleaseMutex();
+                }
+                catch
+                {
+                    // Ignore
                 }
             }
         }
@@ -754,18 +802,18 @@ namespace OpenSky.Agent.SimConnectMSFS
                     var positionReport = new PositionReport
                     {
                         Id = this.Flight.Id,
-                        AirspeedTrue = this.PrimaryTrackingStruct.AirspeedTrue,
-                        Altitude = this.PrimaryTrackingStruct.Altitude,
-                        BankAngle = this.PrimaryTrackingStruct.BankAngle,
-                        FlightPhase = this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
-                        GroundSpeed = this.PrimaryTrackingStruct.GroundSpeed,
-                        Heading = this.PrimaryTrackingStruct.Heading,
-                        Latitude = this.PrimaryTrackingStruct.Latitude,
-                        Longitude = this.PrimaryTrackingStruct.Longitude,
-                        OnGround = this.PrimaryTrackingStruct.OnGround,
-                        PitchAngle = this.PrimaryTrackingStruct.PitchAngle,
-                        RadioHeight = this.PrimaryTrackingStruct.RadioHeight,
-                        VerticalSpeedSeconds = this.PrimaryTrackingStruct.VerticalSpeedSeconds,
+                        AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
+                        Altitude = this.PrimaryTracking.Altitude,
+                        BankAngle = this.PrimaryTracking.BankAngle,
+                        FlightPhase = this.PrimaryTracking.Crash ? FlightPhase.Crashed : this.FlightPhase,
+                        GroundSpeed = this.PrimaryTracking.GroundSpeed,
+                        Heading = this.PrimaryTracking.Heading,
+                        Latitude = this.PrimaryTracking.Latitude,
+                        Longitude = this.PrimaryTracking.Longitude,
+                        OnGround = this.PrimaryTracking.OnGround,
+                        PitchAngle = this.PrimaryTracking.PitchAngle,
+                        RadioHeight = this.PrimaryTracking.RadioHeight,
+                        VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
                         TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
 
                         FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
@@ -781,8 +829,8 @@ namespace OpenSky.Agent.SimConnectMSFS
                         FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
                     };
 
-                    this.RefreshStructNow(Requests.FuelTanks);
-                    this.RefreshStructNow(Requests.PayloadStations);
+                    this.RefreshModelNow(Requests.FuelTanks);
+                    this.RefreshModelNow(Requests.PayloadStations);
                     Thread.Sleep(500);
 
                     var saveFile = this.GenerateSaveFile();
@@ -808,10 +856,11 @@ namespace OpenSky.Agent.SimConnectMSFS
                             FlightLog = base64String
                         };
 
-                        var result = OpenSkyService.Instance.CompleteFlightAsync(finalReport).Result;
+                        var result = this.openSkyServiceInstance.CompleteFlightAsync(finalReport).Result;
                         if (result.IsError)
                         {
                             Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
+
                             // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
                         }
                         else
@@ -828,6 +877,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error submitting final flight report: " + ex);
+
                     // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
                 }
                 finally
@@ -854,89 +904,6 @@ namespace OpenSky.Agent.SimConnectMSFS
                 this.DeleteSaveFile();
                 this.Flight = null;
                 this.StopTracking(false);
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Check if there is a (newer) cloud save for this flight.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 14/11/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private void CheckCloudSave()
-        {
-            Debug.WriteLine($"Checking if cloud-save for flight {this.Flight?.Id} is more recent than local save...");
-            try
-            {
-                if (this.Flight == null)
-                {
-                    throw new Exception("No flight loaded that could be restored!");
-                }
-
-                if (!this.Flight.HasAutoSaveLog || !this.Flight.LastAutoSave.HasValue)
-                {
-                    // Flight has no cloud-save
-                    return;
-                }
-
-                if (!this.flightSaveMutex.WaitOne(30 * 1000))
-                {
-                    throw new Exception("Timeout waiting for save flight mutex.");
-                }
-
-                var flightSaveDirectory = "%localappdata%\\OpenSky\\Flights\\";
-                flightSaveDirectory = Environment.ExpandEnvironmentVariables(flightSaveDirectory);
-                var saveFileName = $"{flightSaveDirectory}\\opensky-flight-{this.Flight.Id}.save";
-
-                var downloadCloudSave = false;
-                if (!File.Exists(saveFileName))
-                {
-                    downloadCloudSave = true;
-                }
-                else
-                {
-                    var localSaveTime = File.GetLastWriteTimeUtc(saveFileName);
-                    if (this.Flight.LastAutoSave.Value.UtcDateTime > localSaveTime)
-                    {
-                        downloadCloudSave = true;
-                    }
-                }
-
-                if (downloadCloudSave)
-                {
-                    var result = OpenSkyService.Instance.DownloadFlightAutoSaveAsync(this.Flight.Id).Result;
-                    if (!result.IsError)
-                    {
-                        var base64 = result.Data;
-                        if (base64 != null)
-                        {
-                            var binary = Convert.FromBase64String(base64);
-                            File.WriteAllBytes(saveFileName, binary);
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Error downloading cloud save: " + result.Message + "\r\n" + result.ErrorDetails);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error downloading cloud save: " + ex);
-                throw;
-            }
-            finally
-            {
-                try
-                {
-                    this.flightSaveMutex.ReleaseMutex();
-                }
-                catch
-                {
-                    // Ignore
-                }
             }
         }
 
@@ -1007,6 +974,47 @@ namespace OpenSky.Agent.SimConnectMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Pause the current flight on OpenSky.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 15/11/2021.
+        /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
+        /// -------------------------------------------------------------------------------------------------
+        private void PauseFlight()
+        {
+            if (this.Flight == null)
+            {
+                throw new Exception("No flight loaded that could be paused.");
+            }
+
+            new Thread(
+                    () =>
+                    {
+                        try
+                        {
+                            var result = this.openSkyServiceInstance.PauseFlightAsync(this.Flight.Id).Result;
+                            if (result.IsError)
+                            {
+                                Debug.WriteLine("Error pausing flight: " + result.Message + "\r\n" + result.ErrorDetails);
+                            }
+                            else
+                            {
+                                this.Flight = null;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error pausing flight: " + ex);
+                        }
+                    })
+                { Name = "SimConnect.Flight.Pause" }.Start();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Saves the current flight.
         /// </summary>
         /// <remarks>
@@ -1035,8 +1043,8 @@ namespace OpenSky.Agent.SimConnectMSFS
                                 throw new Exception("Timeout waiting for save flight mutex.");
                             }
 
-                            this.RefreshStructNow(Requests.FuelTanks);
-                            this.RefreshStructNow(Requests.PayloadStations);
+                            this.RefreshModelNow(Requests.FuelTanks);
+                            this.RefreshModelNow(Requests.PayloadStations);
                             Thread.Sleep(500);
 
                             Debug.WriteLine($"Saving flight {this.Flight?.Id}");
@@ -1095,7 +1103,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                             }
                         }
                     })
-            { Name = "SimConnect.Flight.SaveFlight" }.Start();
+                { Name = "SimConnect.Flight.SaveFlight" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1126,7 +1134,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                 if (Math.Abs(ppt.Old.SimulationRate - ppt.New.SimulationRate) > 0)
                 {
                     Debug.WriteLine($"SimRate changed to {ppt.New.SimulationRate}");
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTrackingStruct, FlightTrackingEventType.SimRateChanged, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.SimRateChanged, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
 
                     // Was there an active simrate above 1?
                     if (this.lastActiveSimRate.HasValue && this.lastActiveSimRateActivated.HasValue)
@@ -1148,10 +1156,10 @@ namespace OpenSky.Agent.SimConnectMSFS
 
                 // todo Check if user has paused the sim (but didn't use the pause button we provide) ... check if lat/lon isn't changing while in flight
 
-                if (this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off)
+                if (this.PrimaryTracking.Crash)
                 {
                     // Plane crashed
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTrackingStruct, FlightTrackingEventType.Crashed, Colors.DarkRed, "Aircraft crashed");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Crashed, OpenSkyColors.OpenSkyRed, "Aircraft crashed");
 
                     // todo play some ELT sound? to be proper annoying :)
                     this.FinishUpFlightTracking();
@@ -1176,47 +1184,6 @@ namespace OpenSky.Agent.SimConnectMSFS
                     this.UploadAutoSave();
                 }
             }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Pause the current flight on OpenSky.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 15/11/2021.
-        /// </remarks>
-        /// <exception cref="Exception">
-        /// Thrown when an exception error condition occurs.
-        /// </exception>
-        /// -------------------------------------------------------------------------------------------------
-        private void PauseFlight()
-        {
-            if (this.Flight == null)
-            {
-                throw new Exception("No flight loaded that could be paused.");
-            }
-
-            new Thread(
-                () =>
-                {
-                    try
-                    {
-                        var result = OpenSkyService.Instance.PauseFlightAsync(this.Flight.Id).Result;
-                        if (result.IsError)
-                        {
-                            Debug.WriteLine("Error pausing flight: " + result.Message + "\r\n" + result.ErrorDetails);
-                        }
-                        else
-                        {
-                            this.Flight = null;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("Error pausing flight: " + ex);
-                    }
-                })
-            { Name = "SimConnect.Flight.Pause" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1263,7 +1230,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                             var bytes = File.ReadAllBytes(saveFileName);
                             var base64String = Convert.ToBase64String(bytes);
 
-                            var result = OpenSkyService.Instance.UploadFlightAutoSaveAsync(this.Flight.Id, base64String).Result;
+                            var result = this.openSkyServiceInstance.UploadFlightAutoSaveAsync(this.Flight.Id, base64String).Result;
                             if (!result.IsError)
                             {
                                 this.lastAutoSaveUpload = DateTime.UtcNow;
@@ -1302,7 +1269,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                             }
                         }
                     })
-            { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
+                { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1333,18 +1300,18 @@ namespace OpenSky.Agent.SimConnectMSFS
                             var positionReport = new PositionReport
                             {
                                 Id = this.Flight.Id,
-                                AirspeedTrue = this.PrimaryTrackingStruct.AirspeedTrue,
-                                Altitude = this.PrimaryTrackingStruct.Altitude,
-                                BankAngle = this.PrimaryTrackingStruct.BankAngle,
-                                FlightPhase = this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
-                                GroundSpeed = this.PrimaryTrackingStruct.GroundSpeed,
-                                Heading = this.PrimaryTrackingStruct.Heading,
-                                Latitude = this.PrimaryTrackingStruct.Latitude,
-                                Longitude = this.PrimaryTrackingStruct.Longitude,
-                                OnGround = this.PrimaryTrackingStruct.OnGround,
-                                PitchAngle = this.PrimaryTrackingStruct.PitchAngle,
-                                RadioHeight = this.PrimaryTrackingStruct.RadioHeight,
-                                VerticalSpeedSeconds = this.PrimaryTrackingStruct.VerticalSpeedSeconds,
+                                AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
+                                Altitude = this.PrimaryTracking.Altitude,
+                                BankAngle = this.PrimaryTracking.BankAngle,
+                                FlightPhase = this.PrimaryTracking.Crash ? FlightPhase.Crashed : this.FlightPhase,
+                                GroundSpeed = this.PrimaryTracking.GroundSpeed,
+                                Heading = this.PrimaryTracking.Heading,
+                                Latitude = this.PrimaryTracking.Latitude,
+                                Longitude = this.PrimaryTracking.Longitude,
+                                OnGround = this.PrimaryTracking.OnGround,
+                                PitchAngle = this.PrimaryTracking.PitchAngle,
+                                RadioHeight = this.PrimaryTracking.RadioHeight,
+                                VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
                                 TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
 
                                 FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
@@ -1360,7 +1327,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                                 FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
                             };
 
-                            var result = OpenSkyService.Instance.PositionReportAsync(positionReport).Result;
+                            var result = this.openSkyServiceInstance.PositionReportAsync(positionReport).Result;
 
                             if (!result.IsError)
                             {
@@ -1391,7 +1358,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                             }
                         }
                     })
-            { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
+                { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
         }
     }
 }

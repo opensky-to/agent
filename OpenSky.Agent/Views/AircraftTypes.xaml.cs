@@ -10,7 +10,6 @@ namespace OpenSky.AgentMSFS.Views
 
     using DataGridExtensions;
 
-    using OpenSky.Agent.Simulator;
     using OpenSky.AgentMSFS.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------

@@ -16,6 +16,7 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Newtonsoft.Json;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;

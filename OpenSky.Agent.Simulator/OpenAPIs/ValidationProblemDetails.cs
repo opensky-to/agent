@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.OpenAPIs
+namespace OpenSky.Agent.Simulator.OpenAPIs
 {
     using System;
     using System.Collections.Generic;

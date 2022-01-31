@@ -1,28 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimConnect.Process.Lights.cs" company="OpenSky">
+// <copyright file="Simulator.Process.Lights.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.Simulator
 {
     using System.Diagnostics;
 
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Helpers;
+    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
     using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
 
     /// -------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Simconnect client - lights monitoring code.
-    /// </summary>
-    /// <remarks>
-    /// sushi.at, 17/03/2021.
-    /// </remarks>
+    /// <content>
+    /// Simulator interface - lights.
+    /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect
+    public partial class Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -46,49 +43,47 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             if (pst.Old.LightBeacon != pst.New.LightBeacon)
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
 
                 // Engine running?
                 if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
                 {
-                    this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off while engine was running");
-                    this.fsConnect.SetText("OpenSky Warning: Beacon turned off while engine was running", 5);
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off while engine was running");
                 }
             }
 
             if (pst.Old.LightNav != pst.New.LightNav)
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.NavLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightNav ? "Nav lights on" : "Nav lights off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.NavLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightNav ? "Nav lights on" : "Nav lights off");
             }
 
             if (pst.Old.LightStrobe != pst.New.LightStrobe)
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.Strobe, OpenSkyColors.OpenSkyLightYellow, pst.New.LightStrobe ? "Strobe lights on" : "Strobe lights off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Strobe, OpenSkyColors.OpenSkyLightYellow, pst.New.LightStrobe ? "Strobe lights on" : "Strobe lights off");
             }
 
             if (pst.Old.LightTaxi != pst.New.LightTaxi)
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.TaxiLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightTaxi ? "Taxi lights on" : "Taxi lights off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TaxiLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightTaxi ? "Taxi lights on" : "Taxi lights off");
             }
 
             if (pst.Old.LightLanding != pst.New.LightLanding)
             {
-                this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.LandingLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightLanding ? "Landing lights on" : "Landing lights off");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightLanding ? "Landing lights on" : "Landing lights off");
             }
 
             if (this.TrackingStatus == TrackingStatus.Tracking)
             {
-                if (this.AircraftIdentityStruct.EngineType is EngineType.Jet or EngineType.Turboprop)
+                if (this.AircraftIdentity.EngineType is EngineType.Jet or EngineType.Turboprop)
                 {
                     // 10000 feet landing lights (give 500 feet spare)
-                    if (this.PrimaryTrackingStruct.IndicatedAltitude < 9500 && !this.PrimaryTrackingStruct.OnGround && !pst.New.LightLanding)
+                    if (this.PrimaryTracking.IndicatedAltitude < 9500 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
                     {
                         if (!this.landingLightWarningActive)
                         {
-                            Debug.WriteLine($"Landing lights 10K: indicated {this.PrimaryTrackingStruct.IndicatedAltitude}, alt {this.PrimaryTrackingStruct.Altitude}");
+                            Debug.WriteLine($"Landing lights 10K: indicated {this.PrimaryTracking.IndicatedAltitude}, alt {this.PrimaryTracking.Altitude}");
                             this.landingLightWarningActive = true;
-                            this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
-                            this.fsConnect.SetText("OpenSky Warning: Landing lights off below 10k feet", 5);
+                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
                         }
                     }
                     else
@@ -99,13 +94,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                 else
                 {
                     // 300 feet AGL landing lights
-                    if (this.PrimaryTrackingStruct.RadioHeight < 300 && !this.PrimaryTrackingStruct.OnGround && !pst.New.LightLanding)
+                    if (this.PrimaryTracking.RadioHeight < 300 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
                     {
                         if (!this.landingLightWarningActive)
                         {
                             this.landingLightWarningActive = true;
-                            this.AddTrackingEvent(this.PrimaryTrackingStruct, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
-                            this.fsConnect.SetText("OpenSky Warning: Landing lights off below 300 feet AGL", 5);
+                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
                         }
                     }
                     else

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS
+namespace OpenSky.Agent.Simulator
 {
     using System.Windows;
     using System.Windows.Media;
