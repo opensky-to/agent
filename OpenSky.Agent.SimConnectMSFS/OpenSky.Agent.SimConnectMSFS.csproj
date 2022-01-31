@@ -72,7 +72,6 @@
   <ItemGroup>
     <Compile Include="Enums\ClientEvents.cs" />
     <Compile Include="Enums\CrashSequence.cs" />
-    <Compile Include="Enums\TimeOfDay.cs" />
     <Compile Include="Helpers\ProcessLandingAnalysis.cs" />
     <Compile Include="Helpers\ProcessPrimaryTracking.cs" />
     <Compile Include="Helpers\ProcessSecondaryTracking.cs" />
@@ -94,7 +93,7 @@
     <Compile Include="Structs\FuelTanks.cs" />
     <Compile Include="Structs\LandingAnalysis.cs" />
     <Compile Include="Structs\PayloadStations.cs" />
-    <Compile Include="Structs\PlaneIdentity.cs" />
+    <Compile Include="Structs\AircraftIdentity.cs" />
     <Compile Include="Structs\PlaneRegistry.cs" />
     <Compile Include="Structs\PrimaryTracking.cs" />
     <Compile Include="Structs\SecondaryTracking.cs" />

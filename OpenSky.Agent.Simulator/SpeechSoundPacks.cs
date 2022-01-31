@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS
+namespace OpenSky.Agent.Simulator
 {
     using System;
     using System.Collections.Generic;
@@ -16,8 +16,7 @@ namespace OpenSky.AgentMSFS
     using System.Text.RegularExpressions;
     using System.Threading;
 
-    using OpenSky.AgentMSFS.Properties;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Simulator.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -34,7 +33,7 @@ namespace OpenSky.AgentMSFS
         /// The single static instance.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly SpeechSoundPacks Instance;
+        public static SpeechSoundPacks Instance { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -52,15 +51,21 @@ namespace OpenSky.AgentMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes static members of the <see cref="SpeechSoundPacks"/> class.
+        /// Initializes the speech sound packs.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 24/12/2021.
+        /// sushi.at, 31/01/2022.
         /// </remarks>
+        /// <param name="selectedSoundPack">
+        /// The selected sound pack.
+        /// </param>
+        /// <param name="textToSpeechVoice">
+        /// The text to speech voice.
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        static SpeechSoundPacks()
+        public static void InitializeSpeechSoundPacks(string selectedSoundPack, string textToSpeechVoice)
         {
-            Instance = new SpeechSoundPacks();
+            Instance = new SpeechSoundPacks(selectedSoundPack, textToSpeechVoice);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -70,21 +75,27 @@ namespace OpenSky.AgentMSFS
         /// <remarks>
         /// sushi.at, 24/12/2021.
         /// </remarks>
+        /// <param name="selectedSoundPack">
+        /// The selected sound pack.
+        /// </param>
+        /// <param name="textToSpeechVoice">
+        /// The text to speech voice.
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private SpeechSoundPacks()
+        private SpeechSoundPacks(string selectedSoundPack, string textToSpeechVoice)
         {
             try
             {
                 // Load the initial sound pack setting
-                this.SelectedSoundPack = Settings.Default.SoundPack;
+                this.SelectedSoundPack = selectedSoundPack;
 
                 // Initialize the speech synthesizer
                 this.speech = new SpeechSynthesizer();
-                if (!string.IsNullOrEmpty(Settings.Default.TextToSpeechVoice))
+                if (!string.IsNullOrEmpty(textToSpeechVoice))
                 {
                     try
                     {
-                        this.speech.SelectVoice(Settings.Default.TextToSpeechVoice);
+                        this.speech.SelectVoice(textToSpeechVoice);
                     }
                     catch (Exception ex)
                     {

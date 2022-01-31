@@ -22,6 +22,9 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.SimConnectMSFS.Helpers;
+    using OpenSky.Agent.SimConnectMSFS.Structs;
+    using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
@@ -29,7 +32,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.FlightLogXML;
 
-    using TrackingEventLogEntry = Models.TrackingEventLogEntry;
+    using TrackingEventLogEntry = OpenSky.Agent.Simulator.Models.TrackingEventLogEntry;
     using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
@@ -152,7 +155,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     lock (this.trackingEventMarkers)
                     {
-                        var newMarker = new TrackingEventMarker(primary, secondary, this.WeightAndBalance.FuelTotalQuantity, 16, color, text);
+                        var newMarker = new TrackingEventMarker(primary, secondary, this.WeightAndBalanceStruct.FuelTotalQuantity, 16, color, text);
                         this.lastNonPositionReportMarker = newMarker;
                         this.trackingEventMarkers.Add(newMarker);
                         this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
@@ -183,74 +186,74 @@ namespace OpenSky.AgentMSFS.SimConnect
         {
             if (this.Flight != null && this.TrackingStatus == TrackingStatus.Preparing || this.TrackingStatus == TrackingStatus.Resuming)
             {
-                this.TrackingConditions[(int)Models.TrackingConditions.DateTime].Expected = $"{DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0):HH:mm dd.MM.yyyy}";
-                this.TrackingConditions[(int)Models.TrackingConditions.DateTime].Current = $"{pst.New.UtcDateTime:HH:mm dd.MM.yyyy}";
-                this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Current = this.PlaneIdentity.Type;
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.DateTime].Expected = $"{DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0):HH:mm dd.MM.yyyy}";
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.DateTime].Current = $"{pst.New.UtcDateTime:HH:mm dd.MM.yyyy}";
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.PlaneModel].Current = this.AircraftIdentityStruct.Type;
 
-                this.TrackingConditions[(int)Models.TrackingConditions.DateTime].ConditionMet =
-                    this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - pst.New.UtcDateTime).TotalMinutes) < 1;
-                this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.Flight?.Aircraft.Type.MatchesAircraftInSimulator() ?? false;
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.DateTime].ConditionMet =
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - pst.New.UtcDateTime).TotalMinutes) < 1;
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.PlaneModel].ConditionMet = this.Flight?.Aircraft.Type.MatchesAircraftInSimulator() ?? false;
 
                 if (this.TrackingStatus == TrackingStatus.Preparing)
                 {
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = true;
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Enabled = true;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Enabled = true;
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F1} gal, {this.WeightAndBalance.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F1} lbs, {this.PayloadStations.TotalWeight * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalanceStruct.FuelTotalQuantity:F1} gal, {this.WeightAndBalanceStruct.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalanceStruct.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalanceStruct.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Current = $"{this.PayloadStationsStruct.TotalWeight:F1} lbs, {this.PayloadStationsStruct.TotalWeight * 0.453592:F1} kg";
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.Flight?.FuelGallons ?? 0) < 0.27; // Allow roughly 1 liter of margin
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].ConditionMet =
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalanceStruct.FuelTotalQuantity - this.Flight?.FuelGallons ?? 0) < 0.27; // Allow roughly 1 liter of margin
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds ?? 0) < 2.2; // Allow 1 kg of margin
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].ConditionMet =
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].AutoSet || Math.Abs(this.PayloadStationsStruct.TotalWeight - this.Flight?.PayloadPounds ?? 0) < 2.2; // Allow 1 kg of margin
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
-                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTracking.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].ConditionMet = !this.PrimaryTrackingStruct.SlewActive && !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTrackingStruct.SimulationRate - 1) == 0;
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].Current =
-                        $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTracking.OnGround ? "On ground" : "Airborne")}";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) < 5000;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Location].Current =
+                        $"{this.PrimaryTrackingStruct.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) / 1000:F2} km from starting location - {(this.PrimaryTrackingStruct.OnGround ? "On ground" : "Airborne")}";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Location].ConditionMet = this.PrimaryTrackingStruct.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0)) < 5000;
                 }
 
                 if (this.TrackingStatus == TrackingStatus.Resuming)
                 {
                     if (this.Flight?.Aircraft.Type.RequiresManualFuelling != true)
                     {
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = false;
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Enabled = false;
                     }
                     else
                     {
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Enabled = true;
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalance.FuelTotalQuantity:F1} gal, {this.WeightAndBalance.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalance.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
-                            this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.flightLoadingTempStructs.FuelTanks.TotalQuantity) < 0.81; // Allow roughly 3 liters of margin, as it can be very hard to get this right otherwise
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Enabled = true;
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Current = $"{this.WeightAndBalanceStruct.FuelTotalQuantity:F1} gal, {this.WeightAndBalanceStruct.FuelTotalQuantity * 3.78541:F1} liters ▶ {this.WeightAndBalanceStruct.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.WeightAndBalanceStruct.FuelTotalQuantity * this.Flight?.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].ConditionMet =
+                            this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].AutoSet || Math.Abs(this.WeightAndBalanceStruct.FuelTotalQuantity - this.flightLoadingTempStructs.FuelTanks.TotalQuantity) < 0.81; // Allow roughly 3 liters of margin, as it can be very hard to get this right otherwise
                     }
 
                     if (this.Flight?.Aircraft.Type.RequiresManualLoading != true)
                     {
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = false;
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Enabled = false;
                     }
                     else
                     {
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F1} lbs, {this.PayloadStations.TotalWeight * 0.453592:F1} kg";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
-                            this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs((double)(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds)) < 2.2; // Allow 1 kg of margin
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Enabled = true;
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Current = $"{this.PayloadStationsStruct.TotalWeight:F1} lbs, {this.PayloadStationsStruct.TotalWeight * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].ConditionMet =
+                            this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].AutoSet || Math.Abs((double)(this.PayloadStationsStruct.TotalWeight - this.Flight?.PayloadPounds)) < 2.2; // Allow 1 kg of margin
                     }
 
-                    var currentLocation = $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) / 1000:F2} km from resume location";
+                    var currentLocation = $"{this.PrimaryTrackingStruct.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) / 1000:F2} km from resume location";
                     currentLocation += $"\r\nLatitude: {this.flightLoadingTempStructs?.SlewPlaneIntoPosition.Latitude:F4}";
                     currentLocation += $"\r\nLongitude: {this.flightLoadingTempStructs?.SlewPlaneIntoPosition.Longitude:F4}";
                     currentLocation += $"\r\nAltitude (AGL): {this.flightLoadingTempStructs?.SlewPlaneIntoPosition.RadioHeight:F0}";
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No unlimited fuel,\r\nCrash detection, SimRate=1";
-                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTracking.SimulationRate - 1) == 0;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].Expected = "No unlimited fuel,\r\nCrash detection, SimRate=1";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].ConditionMet = !pst.New.UnlimitedFuel && pst.New.CrashDetection && Math.Abs(this.PrimaryTrackingStruct.SimulationRate - 1) == 0;
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].Current = currentLocation;
-                    this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet =
-                        (this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) < 100) &&
-                        Math.Abs(this.PrimaryTracking.RadioHeight - this.flightLoadingTempStructs?.SlewPlaneIntoPosition.RadioHeight ?? -1000) < 50;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Location].Current = currentLocation;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Location].ConditionMet =
+                        (this.PrimaryTrackingStruct.GeoCoordinate.GetDistanceTo(this.flightLoadingTempStructs?.SlewPlaneIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) < 100) &&
+                        Math.Abs(this.PrimaryTrackingStruct.RadioHeight - this.flightLoadingTempStructs?.SlewPlaneIntoPosition.RadioHeight ?? -1000) < 50;
                 }
             }
         }

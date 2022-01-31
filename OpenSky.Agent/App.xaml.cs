@@ -17,6 +17,7 @@ namespace OpenSky.AgentMSFS
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.Simulator;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.Properties;
     using OpenSky.AgentMSFS.Tools;
@@ -296,7 +297,7 @@ namespace OpenSky.AgentMSFS
         private void PerformShutdown()
         {
             // Check if we are currently tracking a flight
-            if (SimConnect.SimConnect.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
+            if (Simulator.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("User requested shutdown, but flight tracking is still in progress...");
                 MessageBoxResult? answer = MessageBoxResult.None;

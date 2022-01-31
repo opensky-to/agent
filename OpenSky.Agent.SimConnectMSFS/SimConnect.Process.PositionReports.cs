@@ -108,8 +108,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     lock (this.trackingEventMarkers)
                     {
-                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity));
-                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
+                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity));
+                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
                         this.trackingEventMarkers.Add(newMarker);
                         this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
                     }
@@ -139,7 +139,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                var radioHeight = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
+                var radioHeight = this.AircraftIdentityStruct.EngineType is EngineType.Jet or EngineType.Turboprop ? 2500 : 1000;
                 if (primary.RadioHeight < radioHeight)
                 {
                     if (this.IsTurning)
@@ -180,8 +180,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                 {
                     lock (this.trackingEventMarkers)
                     {
-                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity));
-                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
+                        this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity));
+                        var newMarker = new TrackingEventMarker(primary, this.SecondaryTrackingStruct, this.WeightAndBalanceStruct.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report");
                         this.trackingEventMarkers.Add(newMarker);
                         this.TrackingEventMarkerAdded?.Invoke(this, newMarker);
                     }

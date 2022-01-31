@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -13,11 +13,6 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using CTrue.FsConnect;
 
     using Microsoft.FlightSimulator.SimConnect;
-
-
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.InteropServices;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -337,10 +332,141 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public double Weight20 { get; set; }
+    }
 
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Payload station converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class PayloadStationsConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The PayloadStations extension method that converts the given payload stations struct.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="stations">
+        /// The stations to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model payload stations.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.PayloadStations Convert(this PayloadStations stations)
+        {
+            return new Simulator.Models.PayloadStations
+            {
+                Count = stations.Count,
+                Name1 = stations.Name1,
+                Name2 = stations.Name2,
+                Name3 = stations.Name3,
+                Name4 = stations.Name4,
+                Name5 = stations.Name5,
+                Name6 = stations.Name6,
+                Name7 = stations.Name7,
+                Name8 = stations.Name8,
+                Name9 = stations.Name9,
+                Name10 = stations.Name10,
+                Name11 = stations.Name11,
+                Name12 = stations.Name12,
+                Name13 = stations.Name13,
+                Name14 = stations.Name14,
+                Name15 = stations.Name15,
+                Name16 = stations.Name16,
+                Name17 = stations.Name17,
+                Name18 = stations.Name18,
+                Name19 = stations.Name19,
+                Name20 = stations.Name20,
+                Weight1 = stations.Weight1,
+                Weight2 = stations.Weight2,
+                Weight3 = stations.Weight3,
+                Weight4 = stations.Weight4,
+                Weight5 = stations.Weight5,
+                Weight6 = stations.Weight6,
+                Weight7 = stations.Weight7,
+                Weight8 = stations.Weight8,
+                Weight9 = stations.Weight9,
+                Weight10 = stations.Weight10,
+                Weight11 = stations.Weight11,
+                Weight12 = stations.Weight12,
+                Weight13 = stations.Weight13,
+                Weight14 = stations.Weight14,
+                Weight15 = stations.Weight15,
+                Weight16 = stations.Weight16,
+                Weight17 = stations.Weight17,
+                Weight18 = stations.Weight18,
+                Weight19 = stations.Weight19,
+                Weight20 = stations.Weight20,
+            };
+        }
 
-        
-
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The PayloadStations extension method that converts the given payload stations model.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="stations">
+        /// The stations to act on.
+        /// </param>
+        /// <returns>
+        /// The simConnect payload stations struct.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static PayloadStations ConvertBack(this Simulator.Models.PayloadStations stations)
+        {
+            return new PayloadStations
+            {
+                Count = stations.Count,
+                Name1 = stations.Name1,
+                Name2 = stations.Name2,
+                Name3 = stations.Name3,
+                Name4 = stations.Name4,
+                Name5 = stations.Name5,
+                Name6 = stations.Name6,
+                Name7 = stations.Name7,
+                Name8 = stations.Name8,
+                Name9 = stations.Name9,
+                Name10 = stations.Name10,
+                Name11 = stations.Name11,
+                Name12 = stations.Name12,
+                Name13 = stations.Name13,
+                Name14 = stations.Name14,
+                Name15 = stations.Name15,
+                Name16 = stations.Name16,
+                Name17 = stations.Name17,
+                Name18 = stations.Name18,
+                Name19 = stations.Name19,
+                Name20 = stations.Name20,
+                Weight1 = stations.Weight1,
+                Weight2 = stations.Weight2,
+                Weight3 = stations.Weight3,
+                Weight4 = stations.Weight4,
+                Weight5 = stations.Weight5,
+                Weight6 = stations.Weight6,
+                Weight7 = stations.Weight7,
+                Weight8 = stations.Weight8,
+                Weight9 = stations.Weight9,
+                Weight10 = stations.Weight10,
+                Weight11 = stations.Weight11,
+                Weight12 = stations.Weight12,
+                Weight13 = stations.Weight13,
+                Weight14 = stations.Weight14,
+                Weight15 = stations.Weight15,
+                Weight16 = stations.Weight16,
+                Weight17 = stations.Weight17,
+                Weight18 = stations.Weight18,
+                Weight19 = stations.Weight19,
+                Weight20 = stations.Weight20,
+            };
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

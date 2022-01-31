@@ -31,13 +31,9 @@ namespace OpenSkyApi
         /// <param name="httpClient">
         /// The HTTP client.
         /// </param>
-        /// <param name="baseUrl">
-        /// The base URL of the service.
-        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        protected OpenSkyService(HttpClient httpClient, string baseUrl) : base(httpClient)
+        protected OpenSkyService(HttpClient httpClient) : base(httpClient)
         {
-            this.BaseUrl = baseUrl;
             this._httpClient = httpClient;
             this._settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(this.CreateSerializerSettings);
         }

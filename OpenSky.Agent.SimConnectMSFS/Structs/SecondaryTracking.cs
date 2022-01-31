@@ -4,9 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
-    using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
 
@@ -14,15 +13,8 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
     using Microsoft.FlightSimulator.SimConnect;
 
-    using OpenSky.AgentMSFS.SimConnect.Enums;
-
-    using System;
-    using System.Runtime.InteropServices;
-
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.FlightLogXML;
-
-    using TimeOfDay = OpenSky.AgentMSFS.SimConnect.Enums.TimeOfDay;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -230,6 +222,66 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public bool NoSmokingSign { get; set; }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Secondary tracking converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class SecondaryTrackingConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// A SecondaryTracking extension method that converts the given secondary tracking.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="secondary">
+        /// The secondary to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model secondary tracking.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.SecondaryTracking Convert(this SecondaryTracking secondary)
+        {
+            return new Simulator.Models.SecondaryTracking
+            {
+                UtcTime = secondary.UtcTime,
+                UtcDay = secondary.UtcDay,
+                UtcMonth = secondary.UtcMonth,
+                UtcYear = secondary.UtcYear,
+                TimeOfDay = secondary.TimeOfDay,
+                CrashDetection = secondary.CrashDetection,
+                UnlimitedFuel = secondary.UnlimitedFuel,
+                ElectricalMasterBattery = secondary.ElectricalMasterBattery,
+                EngineCombustion1 = secondary.EngineCombustion1,
+                EngineCombustion2 = secondary.EngineCombustion2,
+                EngineCombustion3 = secondary.EngineCombustion3,
+                EngineCombustion4 = secondary.EngineCombustion4,
+                Pushback = secondary.Pushback,
+                ApuGenerator = secondary.ApuGenerator,
+                LightBeacon = secondary.LightBeacon,
+                LightNav = secondary.LightNav,
+                LightStrobe = secondary.LightStrobe,
+                LightTaxi = secondary.LightTaxi,
+                LightLanding = secondary.LightLanding,
+                FlapsHandle = secondary.FlapsHandle,
+                FlapsPercentage = secondary.FlapsPercentage,
+                GearHandle = secondary.GearHandle,
+                GearPercentage = secondary.GearPercentage,
+                AutoPilot = secondary.AutoPilot,
+                ParkingBrake = secondary.ParkingBrake,
+                SpoilersArmed = secondary.SpoilersArmed,
+                SeatBeltSign = secondary.SeatBeltSign,
+                NoSmokingSign = secondary.NoSmokingSign
+            };
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

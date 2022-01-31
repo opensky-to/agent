@@ -18,11 +18,12 @@ namespace OpenSky.AgentMSFS.Views.Models
     using JetBrains.Annotations;
 
     using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.SimConnect;
     using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
@@ -181,11 +182,11 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
 
             // Set up event log listeners
-            this.SimConnect.TrackingEventMarkerAdded += this.SimConnectTrackingEventMarkerAdded;
-            this.SimConnect.SimbriefWaypointMarkerAdded += this.SimConnectSimbriefWaypointMarkerAdded;
-            this.SimConnect.TrackingStatusChanged += this.SimConnectTrackingStatusChanged;
-            this.SimConnect.FlightChanged += this.SimConnectFlightChanged;
-            this.SimConnect.LocationChanged += this.SimConnectLocationChanged;
+            this.Simulator.TrackingEventMarkerAdded += this.SimConnectTrackingEventMarkerAdded;
+            this.Simulator.SimbriefWaypointMarkerAdded += this.SimConnectSimbriefWaypointMarkerAdded;
+            this.Simulator.TrackingStatusChanged += this.SimConnectTrackingStatusChanged;
+            this.Simulator.FlightChanged += this.SimConnectFlightChanged;
+            this.Simulator.LocationChanged += this.SimConnectLocationChanged;
 
             // Create commands
             this.SetFuelAndPayloadCommand = new Command(this.SetFuelAndPayload);
@@ -206,9 +207,9 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.SkipGroundHandlingCommand = new Command(this.SkipGroundHandling);
 
             // Are we already preparing/resuming/tracking?
-            this.SimConnectTrackingStatusChanged(this, this.SimConnect.TrackingStatus);
-            this.SimConnectFlightChanged(this, this.SimConnect.Flight);
-            if (this.SimConnect.SimbriefOfpLoaded)
+            this.SimConnectTrackingStatusChanged(this, this.Simulator.TrackingStatus);
+            this.SimConnectFlightChanged(this, this.Simulator.Flight);
+            if (this.Simulator.SimbriefOfpLoaded)
             {
                 this.ImportSimbriefVisibility = Visibility.Collapsed;
             }
@@ -406,11 +407,11 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the SimConnect instance.
+        /// Gets the simulator instance.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        public SimConnect SimConnect => SimConnect.Instance;
+        public Agent.Simulator.Simulator Simulator => Agent.Simulator.Simulator.Instance;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -585,7 +586,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void AbortFlight()
         {
             Debug.WriteLine("User clicked on abort flight, confirming...");
-            if (this.SimConnect.Flight == null)
+            if (this.Simulator.Flight == null)
             {
                 return;
             }
@@ -616,8 +617,8 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.LoadingText = "Aborting flight...";
                 try
                 {
-                    this.SimConnect.StopTracking(false);
-                    this.SimConnect.Flight = null;
+                    this.Simulator.StopTracking(false);
+                    this.Simulator.Flight = null;
                     this.IsFuelExpanded = false;
                     this.IsPayloadExpanded = false;
                     this.WeightAndBalancesVisibility = Visibility.Visible;
@@ -707,7 +708,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.TrackingConditionsVisibility = Visibility.Visible;
                 this.TrackingStatusVisibility = Visibility.Collapsed;
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
-                if (!this.SimConnect.SimbriefOfpLoaded)
+                if (!this.Simulator.SimbriefOfpLoaded)
                 {
                     this.ImportSimbriefVisibility = Visibility.Visible;
                 }
@@ -801,7 +802,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SkipGroundHandling()
         {
-            if (this.SimConnect.SkipGroundHandling(false))
+            if (this.Simulator.SkipGroundHandling(false))
             {
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
             }
@@ -820,7 +821,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             Debug.WriteLine("User requested slew into position");
             try
             {
-                this.SimConnect.SlewPlaneToFlightPosition();
+                this.Simulator.SlewPlaneToFlightPosition();
             }
             catch (Exception ex)
             {
@@ -844,7 +845,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SpeedUpGroundHandling()
         {
-            this.SimConnect.SpeedUpGroundHandling();
+            this.Simulator.SpeedUpGroundHandling();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -860,13 +861,13 @@ namespace OpenSky.AgentMSFS.Views.Models
             try
             {
                 // Start tracking a new flight
-                if (this.SimConnect.TrackingStatus == TrackingStatus.Preparing)
+                if (this.Simulator.TrackingStatus == TrackingStatus.Preparing)
                 {
                     Debug.WriteLine("User clicked on start tracking, performing checks");
                     this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = false);
 
                     // Check conditions met
-                    if (!this.SimConnect.CanStartTracking)
+                    if (!this.Simulator.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
                         this.StartTrackingCommand.ReportProgress(() =>
@@ -880,31 +881,31 @@ namespace OpenSky.AgentMSFS.Views.Models
                     }
 
                     // Set time in sim?
-                    if (this.SimConnect.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.SimConnect.Flight != null)
+                    if (this.Simulator.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.Simulator.Flight != null)
                     {
-                        this.SimConnect.SetTime(DateTime.UtcNow.AddHours(this.SimConnect.Flight.UtcOffset));
+                        this.Simulator.SetTime(DateTime.UtcNow.AddHours(this.Simulator.Flight.UtcOffset));
                     }
 
                     // Set fuel?
-                    if (this.SimConnect.TrackingConditions[(int)TrackingConditions.Fuel].AutoSet)
+                    if (this.Simulator.TrackingConditions[(int)TrackingConditions.Fuel].AutoSet)
                     {
                         this.StartTrackingCommand.ReportProgress(() => this.SetFuelTanksCommand.DoExecute(null), true);
                     }
 
                     // Set payload?
-                    if (this.SimConnect.TrackingConditions[(int)TrackingConditions.Payload].AutoSet)
+                    if (this.Simulator.TrackingConditions[(int)TrackingConditions.Payload].AutoSet)
                     {
                         this.StartTrackingCommand.ReportProgress(() => this.SetPayloadStationsCommand.DoExecute(null), true);
                     }
 
                     // Set the plane registration
-                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.Aircraft.Registry);
+                    this.Simulator.SetPlaneRegistry(this.Simulator.Flight?.Aircraft.Registry);
 
                     // Wait a bit to make sure all structs have updated, especially time in sim
-                    Thread.Sleep(this.SimConnect.SampleRates[Requests.Secondary] + 1000);
+                    Thread.Sleep(this.Simulator.SampleRates[Requests.Secondary] + 1000);
 
                     // Check weights and balance
-                    if (this.SimConnect.WeightAndBalance.CgPercent < this.SimConnect.WeightAndBalance.CgFwdLimit || this.SimConnect.WeightAndBalance.CgPercent > this.SimConnect.WeightAndBalance.CgAftLimit)
+                    if (this.Simulator.WeightAndBalance.CgPercent < this.Simulator.WeightAndBalance.CgFwdLimit || this.Simulator.WeightAndBalance.CgPercent > this.Simulator.WeightAndBalance.CgAftLimit)
                     {
                         Debug.WriteLine("CG outside limits, double checking with user...");
                         ExtendedMessageBoxResult? answer = null;
@@ -935,7 +936,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         }
                     }
 
-                    if (Math.Abs(this.SimConnect.WeightAndBalance.CgPercentLateral) > 0.01)
+                    if (Math.Abs(this.Simulator.WeightAndBalance.CgPercentLateral) > 0.01)
                     {
                         Debug.WriteLine("Lateral CG outside limits, double checking with user...");
                         ExtendedMessageBoxResult? answer = null;
@@ -966,7 +967,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         }
                     }
 
-                    if (this.SimConnect.WeightAndBalance.PayloadWeight > this.SimConnect.WeightAndBalance.MaxPayloadWeight)
+                    if (this.Simulator.WeightAndBalance.PayloadWeight > this.Simulator.WeightAndBalance.MaxPayloadWeight)
                     {
                         Debug.WriteLine("Payload weight outside limits, double checking with user...");
                         ExtendedMessageBoxResult? answer = null;
@@ -997,7 +998,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         }
                     }
 
-                    if (this.SimConnect.WeightAndBalance.TotalWeight > this.SimConnect.WeightAndBalance.MaxGrossWeight)
+                    if (this.Simulator.WeightAndBalance.TotalWeight > this.Simulator.WeightAndBalance.MaxGrossWeight)
                     {
                         Debug.WriteLine("Total weight outside limits, double checking with user...");
                         ExtendedMessageBoxResult? answer = null;
@@ -1027,7 +1028,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                         }
                     }
 
-                    if (!this.SimConnect.GroundHandlingComplete && this.SimConnect.SecondaryTracking.EngineRunning)
+                    if (!this.Simulator.GroundHandlingComplete && this.Simulator.SecondaryTracking.EngineRunning)
                     {
                         Debug.WriteLine("Ground handling not complete, ask the user about skipping...");
                         ExtendedMessageBoxResult? answer = null;
@@ -1056,21 +1057,21 @@ namespace OpenSky.AgentMSFS.Views.Models
                             return;
                         }
 
-                        this.SimConnect.SkipGroundHandling(true);
+                        this.Simulator.SkipGroundHandling(true);
                     }
 
-                    this.SimConnect.StartTracking();
+                    this.Simulator.StartTracking();
                     this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                 }
 
                 // Resume flight
-                if (this.SimConnect.TrackingStatus == TrackingStatus.Resuming)
+                if (this.Simulator.TrackingStatus == TrackingStatus.Resuming)
                 {
                     Debug.WriteLine("User clicked on resume tracking, performing checks");
                     this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = false);
 
                     // Check conditions met
-                    if (!this.SimConnect.CanStartTracking)
+                    if (!this.Simulator.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
                         this.StartTrackingCommand.ReportProgress(() =>
@@ -1084,19 +1085,19 @@ namespace OpenSky.AgentMSFS.Views.Models
                     }
 
                     // Set time in sim?
-                    if (this.SimConnect.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.SimConnect.Flight != null)
+                    if (this.Simulator.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.Simulator.Flight != null)
                     {
-                        this.SimConnect.SetTime(DateTime.UtcNow.AddHours(this.SimConnect.Flight.UtcOffset));
+                        this.Simulator.SetTime(DateTime.UtcNow.AddHours(this.Simulator.Flight.UtcOffset));
                     }
 
                     // Set fuel and payload back to what they were when we saved the flight
-                    this.SimConnect.SetFuelAndPayloadFromSave();
+                    this.Simulator.SetFuelAndPayloadFromSave();
 
                     // Set the plane registration
-                    this.SimConnect.SetPlaneRegistry(this.SimConnect.Flight?.Aircraft.Registry);
+                    this.Simulator.SetPlaneRegistry(this.Simulator.Flight?.Aircraft.Registry);
 
                     // Start five second countdown?
-                    if (this.SimConnect.PrimaryTracking.SlewActive)
+                    if (this.Simulator.PrimaryTracking.SlewActive)
                     {
                         Debug.WriteLine("Starting 5 second resume timer...");
                         var assembly = Assembly.GetExecutingAssembly();
@@ -1111,16 +1112,16 @@ namespace OpenSky.AgentMSFS.Views.Models
                             this.StartTrackingButtonText = secondsToGo > 0 ? $"Resuming in {secondsToGo}" : "Resuming now";
                         }
 
-                        this.SimConnect.SetSlew(false);
+                        this.Simulator.SetSlew(false);
                         Thread.Sleep(500);
                     }
                     else
                     {
                         // Wait a bit to make sure all structs have updated, especially time in sim
-                        Thread.Sleep(this.SimConnect.SampleRates[Requests.Secondary] + 1000);
+                        Thread.Sleep(this.Simulator.SampleRates[Requests.Secondary] + 1000);
                     }
 
-                    this.SimConnect.StartTracking();
+                    this.Simulator.StartTracking();
                     this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                 }
             }
@@ -1178,7 +1179,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 try
                 {
-                    this.SimConnect.StopTracking(true);
+                    this.Simulator.StopTracking(true);
                 }
                 catch (Exception ex)
                 {
@@ -1195,8 +1196,8 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 try
                 {
-                    this.SimConnect.StopTracking(false);
-                    this.SimConnect.Flight = null;
+                    this.Simulator.StopTracking(false);
+                    this.Simulator.Flight = null;
                     this.IsFuelExpanded = false;
                     this.IsPayloadExpanded = false;
                     this.WeightAndBalancesVisibility = Visibility.Visible;
@@ -1242,7 +1243,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             try
             {
                 Debug.WriteLine("Toggling simconnect flight pause");
-                this.SimConnect.Pause(!this.SimConnect.IsPaused);
+                this.Simulator.Pause(!this.Simulator.IsPaused);
             }
             catch (Exception ex)
             {

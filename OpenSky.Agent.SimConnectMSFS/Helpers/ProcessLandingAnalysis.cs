@@ -4,9 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Helpers
+namespace OpenSky.Agent.SimConnectMSFS.Helpers
 {
-    using OpenSky.AgentMSFS.SimConnect.Structs;
+    using OpenSky.Agent.SimConnectMSFS.Structs;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

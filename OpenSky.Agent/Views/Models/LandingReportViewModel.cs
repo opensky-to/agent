@@ -15,8 +15,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.SimConnect;
     using OpenSky.AgentMSFS.Tools;
     using OpenSky.FlightLogXML;
 
@@ -64,16 +64,16 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         public LandingReportViewModel()
         {
-            this.FlightNumberHeader = $"Flight #{this.SimConnect.Flight?.FullFlightNumber}\r\nLanding Report";
+            this.FlightNumberHeader = $"Flight #{this.Simulator.Flight?.FullFlightNumber}\r\nLanding Report";
 
             // Fetch the initial already existing landing report(s)
-            foreach (var item in this.SimConnect.LandingReports)
+            foreach (var item in this.Simulator.LandingReports)
             {
                 this.landingReports.Add(item);
             }
 
             // Subscribe to changes
-            this.SimConnect.LandingReports.CollectionChanged += this.LandingReportsCollectionChanged;
+            this.Simulator.LandingReports.CollectionChanged += this.LandingReportsCollectionChanged;
 
             // Create dismiss command and notification timeout thread
             this.DismissLandingReportCommand = new Command(this.DismissLandingReport);
@@ -261,14 +261,14 @@ namespace OpenSky.AgentMSFS.Views.Models
                     grade = "A";
                     desc = "Good landing";
 
-                    if (landingRateAbs <= 130 && this.SimConnect.PlaneIdentity.EngineType == EngineType.Jet)
+                    if (landingRateAbs <= 130 && this.Simulator.AircraftIdentity.EngineType == EngineType.Jet)
                     {
                         grade = "A+";
                         desc = "Perfect landing";
                     }
                 }
 
-                if (grade == "A+" && this.SimConnect.PlaneIdentity.EngineType == EngineType.Jet)
+                if (grade == "A+" && this.Simulator.AircraftIdentity.EngineType == EngineType.Jet)
                 {
                     grade = "A-";
                     desc = "Lading too soft";
@@ -370,11 +370,11 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the SimConnect instance.
+        /// Gets the simulator instance.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        public SimConnect SimConnect => SimConnect.Instance;
+        public Agent.Simulator.Simulator Simulator => Agent.Simulator.Simulator.Instance;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -423,7 +423,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 // New flight, unsubscribe from further changes
                 Debug.WriteLine("Landing reports reset in SimConnect class, unsubscribing from events for notification window");
-                this.SimConnect.LandingReports.CollectionChanged -= this.LandingReportsCollectionChanged;
+                this.Simulator.LandingReports.CollectionChanged -= this.LandingReportsCollectionChanged;
             }
 
             if (e.Action == NotifyCollectionChangedAction.Add)

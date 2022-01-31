@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;

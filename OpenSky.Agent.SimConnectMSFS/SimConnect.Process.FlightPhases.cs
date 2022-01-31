@@ -12,6 +12,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Media;
     using System.Reflection;
 
+    using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
@@ -182,19 +183,19 @@ namespace OpenSky.AgentMSFS.SimConnect
 
             var unknownFlightPhase = true;
             var newNextStepFlashing = false;
-            var currentPosition = this.PrimaryTracking.GeoCoordinate;
+            var currentPosition = this.PrimaryTrackingStruct.GeoCoordinate;
             var distanceToDepartureAirport = new GeoCoordinate(this.Flight?.Origin.Latitude ?? 0, this.Flight?.Origin.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
             var distanceToDestinationAirport = new GeoCoordinate(this.Flight?.Destination.Latitude ?? 0, this.Flight?.Destination.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
             var distanceToAlternateAirport = new GeoCoordinate(this.Flight?.Alternate.Latitude ?? 0, this.Flight?.Alternate.Longitude ?? 0).GetDistanceTo(currentPosition) / 1000 * 0.539957;
 
-            if (!this.WasAirborne && this.PrimaryTracking.RadioHeight >= 50)
+            if (!this.WasAirborne && this.PrimaryTrackingStruct.RadioHeight >= 50)
             {
                 this.WasAirborne = true;
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Airborne, OpenSkyColors.OpenSkyTeal, "Airborne");
+                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.Airborne, OpenSkyColors.OpenSkyTeal, "Airborne");
             }
 
             // InMenu
-            if (this.PrimaryTracking.OnGround && Math.Abs(Math.Round(this.PrimaryTracking.Latitude, 1)) < 0.5 && Math.Abs(Math.Round(this.PrimaryTracking.Longitude, 1)) < 0.5)
+            if (this.PrimaryTrackingStruct.OnGround && Math.Abs(Math.Round(this.PrimaryTrackingStruct.Latitude, 1)) < 0.5 && Math.Abs(Math.Round(this.PrimaryTrackingStruct.Longitude, 1)) < 0.5)
             {
                 this.FlightPhase = FlightPhase.Briefing;
                 this.NextFlightStep = string.Empty;
@@ -212,12 +213,12 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // PreFlight
-            if (!this.WasAirborne && this.PrimaryTracking.OnGround && !this.SecondaryTracking.EngineRunning && this.SecondaryTracking.Pushback == Pushback.NoPushback)
+            if (!this.WasAirborne && this.PrimaryTrackingStruct.OnGround && !this.SecondaryTrackingStruct.EngineRunning && this.SecondaryTrackingStruct.Pushback == Pushback.NoPushback)
             {
                 if (unknownFlightPhase)
                 {
                     this.FlightPhase = FlightPhase.PreFlight;
-                    this.NextFlightStep = this.TrackingStatus == TrackingStatus.GroundOperations ? "Next step: Wait for ground handling to complete" : $"Next step: Turn on the engine{(this.PlaneIdentity.EngineCount > 1 ? "s" : string.Empty)}";
+                    this.NextFlightStep = this.TrackingStatus == TrackingStatus.GroundOperations ? "Next step: Wait for ground handling to complete" : $"Next step: Turn on the engine{(this.AircraftIdentityStruct.EngineCount > 1 ? "s" : string.Empty)}";
                     newNextStepFlashing = this.TrackingStatus != TrackingStatus.GroundOperations;
                     unknownFlightPhase = false;
                 }
@@ -228,7 +229,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Pushback
-            if (this.SecondaryTracking.Pushback != Pushback.NoPushback)
+            if (this.SecondaryTrackingStruct.Pushback != Pushback.NoPushback)
             {
                 if (unknownFlightPhase)
                 {
@@ -244,7 +245,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // TaxiOut
-            if (!this.WasAirborne && this.SecondaryTracking.EngineRunning && this.PrimaryTracking.GroundSpeed < 40 && this.PrimaryTracking.OnGround && this.SecondaryTracking.Pushback == Pushback.NoPushback)
+            if (!this.WasAirborne && this.SecondaryTrackingStruct.EngineRunning && this.PrimaryTrackingStruct.GroundSpeed < 40 && this.PrimaryTrackingStruct.OnGround && this.SecondaryTrackingStruct.Pushback == Pushback.NoPushback)
             {
                 if (unknownFlightPhase)
                 {
@@ -260,8 +261,8 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Takeoff
-            var departureRadioHeight = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 1000 : 100;
-            if (!this.WasAirborne && this.PrimaryTracking.GroundSpeed > 40 && this.PrimaryTracking.RadioHeight <= departureRadioHeight)
+            var departureRadioHeight = this.AircraftIdentityStruct.EngineType is EngineType.Jet or EngineType.Turboprop ? 1000 : 100;
+            if (!this.WasAirborne && this.PrimaryTrackingStruct.GroundSpeed > 40 && this.PrimaryTrackingStruct.RadioHeight <= departureRadioHeight)
             {
                 if (unknownFlightPhase)
                 {
@@ -276,7 +277,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Departure
-            if (distanceToDepartureAirport < 10 && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
+            if (distanceToDepartureAirport < 10 && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTrackingStruct.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -291,8 +292,8 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Climb
-            var approachDistance = this.PlaneIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
-            if (distanceToDepartureAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
+            var approachDistance = this.AircraftIdentityStruct.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
+            if (distanceToDepartureAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTrackingStruct.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -307,7 +308,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Cruise
-            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTracking.OnGround)
+            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTrackingStruct.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -322,7 +323,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Descent
-            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTracking.OnGround)
+            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTrackingStruct.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -337,7 +338,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Approach
-            if ((distanceToDestinationAirport < approachDistance || distanceToAlternateAirport < approachDistance) && !this.PrimaryTracking.OnGround && this.PrimaryTracking.RadioHeight > 500)
+            if ((distanceToDestinationAirport < approachDistance || distanceToAlternateAirport < approachDistance) && !this.PrimaryTrackingStruct.OnGround && this.PrimaryTrackingStruct.RadioHeight > 500)
             {
                 if (unknownFlightPhase)
                 {
@@ -352,7 +353,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // Landing
-            if (this.WasAirborne && this.PrimaryTracking.RadioHeight <= 500 && this.PrimaryTracking.GroundSpeed >= 40 && this.SecondaryTracking.EngineRunning)
+            if (this.WasAirborne && this.PrimaryTrackingStruct.RadioHeight <= 500 && this.PrimaryTrackingStruct.GroundSpeed >= 40 && this.SecondaryTrackingStruct.EngineRunning)
             {
                 // Landing is allowed to override descent in case of return to origin airport or I guess landing anywhere but the destination/alternate
                 if (unknownFlightPhase || this.FlightPhase == FlightPhase.Descent)
@@ -371,7 +372,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             // GoAround todo
 
             // TaxiIn
-            if (this.WasAirborne && this.SecondaryTracking.EngineRunning && this.PrimaryTracking.GroundSpeed < 40 && this.PrimaryTracking.OnGround)
+            if (this.WasAirborne && this.SecondaryTrackingStruct.EngineRunning && this.PrimaryTrackingStruct.GroundSpeed < 40 && this.PrimaryTrackingStruct.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -393,7 +394,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
 
             // PostFlight
-            if (this.WasAirborne && this.PrimaryTracking.OnGround && !this.SecondaryTracking.EngineRunning)
+            if (this.WasAirborne && this.PrimaryTrackingStruct.OnGround && !this.SecondaryTrackingStruct.EngineRunning)
             {
                 if (unknownFlightPhase)
                 {
@@ -408,7 +409,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 }
             }
 
-            if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
+            if (this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off)
             {
                 // todo save pre-crash flight phase to submit as part of crash report? implement this in the systems section?
 

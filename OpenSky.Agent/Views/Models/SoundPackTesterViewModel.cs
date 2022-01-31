@@ -12,6 +12,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Linq;
     using System.Speech.Synthesis;
 
+    using OpenSky.Agent.Simulator;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;

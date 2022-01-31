@@ -505,17 +505,17 @@
                 <TextBlock Grid.Column="0" Grid.Row="25" VerticalAlignment="Center" Margin="0,0,5,0">Max payload Δ lbs</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="26" VerticalAlignment="Center" Margin="0,0,5,0">Comments</TextBlock>
 
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SimConnect.PlaneIdentity.TypeProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SimConnect.PlaneIdentity.AtcTypeProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding SimConnect.PlaneIdentity.AtcModelProperty}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding SimConnect.PlaneIdentity.EngineType}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding SimConnect.PlaneIdentity.EngineCount}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding SimConnect.WeightAndBalance.FuelTotalCapacity}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding SimConnect.WeightAndBalance.FuelWeightPerGallon}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding SimConnect.PlaneIdentity.FlapsAvailable}" Margin="5,2" />
-                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding SimConnect.PlaneIdentity.GearRetractable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Simulator.PlaneIdentity.TypeProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Simulator.PlaneIdentity.AtcTypeProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Simulator.PlaneIdentity.AtcModelProperty}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Simulator.PlaneIdentity.EngineType}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Simulator.PlaneIdentity.EngineCount}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Simulator.WeightAndBalance.FuelTotalCapacity}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding Simulator.WeightAndBalance.FuelWeightPerGallon}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding Simulator.WeightAndBalance.EmptyWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding Simulator.WeightAndBalance.MaxGrossWeight}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding Simulator.PlaneIdentity.FlapsAvailable}" Margin="5,2" />
+                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding Simulator.PlaneIdentity.GearRetractable}" Margin="5,2" />
                 <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Name of the aircraft" ui:ControlHelper.PlaceholderForeground="#666" />
                 <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding VersionNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Version number" ui:ControlHelper.PlaceholderForeground="#666" />
                 <TextBox Grid.Column="1" Grid.Row="13" Text="{Binding Manufacturer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Manufacturer name" ui:ControlHelper.PlaceholderForeground="#666" />

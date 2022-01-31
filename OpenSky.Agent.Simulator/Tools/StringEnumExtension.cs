@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Tools
+namespace OpenSky.Agent.Simulator.Tools
 {
     using System;
 

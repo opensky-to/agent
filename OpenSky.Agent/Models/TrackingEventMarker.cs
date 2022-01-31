@@ -20,6 +20,7 @@ namespace OpenSky.AgentMSFS.Models
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;

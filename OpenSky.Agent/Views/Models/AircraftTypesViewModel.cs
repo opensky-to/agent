@@ -14,10 +14,11 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Windows;
 
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.SimConnect;
+    using OpenSky.AgentMSFS.OpenAPIs;
     using OpenSky.AgentMSFS.Tools;
 
     using OpenSkyApi;
@@ -869,10 +870,10 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the SimConnect object.
+        /// Gets the simulator object.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public SimConnect SimConnect => SimConnect.Instance;
+        public Agent.Simulator.Simulator Simulator => Agent.Simulator.Simulator.Instance;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -919,7 +920,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void AddAircraftType()
         {
-            if (!this.SimConnect.Connected)
+            if (!this.Simulator.Connected)
             {
                 this.AddAircraftTypeCommand.ReportProgress(() =>
                 {
@@ -930,7 +931,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcModel) || string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcType))
+            if (string.IsNullOrEmpty(this.Simulator.AircraftIdentity.AtcModel) || string.IsNullOrEmpty(this.Simulator.AircraftIdentity.AtcType))
             {
                 ExtendedMessageBoxResult? answer = null;
                 this.AddAircraftTypeCommand.ReportProgress(
@@ -974,16 +975,16 @@ namespace OpenSky.AgentMSFS.Views.Models
             {
                 Id = Guid.Empty, // API will assign this
                 UploaderID = "OpenSkyUser", // API will assign this
-                AtcType = !string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcType) ? this.SimConnect.PlaneIdentity.AtcType : "MISSING",
-                AtcModel = !string.IsNullOrEmpty(this.SimConnect.PlaneIdentity.AtcModel) ? this.SimConnect.PlaneIdentity.AtcModel : "MISSING",
-                EngineType = this.SimConnect.PlaneIdentity.EngineType,
-                EngineCount = this.SimConnect.PlaneIdentity.EngineCount,
-                EmptyWeight = this.SimConnect.WeightAndBalance.EmptyWeight,
-                FuelTotalCapacity = this.SimConnect.WeightAndBalance.FuelTotalCapacity,
-                FuelWeightPerGallon = Math.Round(this.SimConnect.WeightAndBalance.FuelWeightPerGallon, 2),
-                MaxGrossWeight = this.SimConnect.WeightAndBalance.MaxGrossWeight,
-                FlapsAvailable = this.SimConnect.PlaneIdentity.FlapsAvailable,
-                IsGearRetractable = this.SimConnect.PlaneIdentity.GearRetractable,
+                AtcType = !string.IsNullOrEmpty(this.Simulator.AircraftIdentity.AtcType) ? this.Simulator.AircraftIdentity.AtcType : "MISSING",
+                AtcModel = !string.IsNullOrEmpty(this.Simulator.AircraftIdentity.AtcModel) ? this.Simulator.AircraftIdentity.AtcModel : "MISSING",
+                EngineType = this.Simulator.AircraftIdentity.EngineType,
+                EngineCount = this.Simulator.AircraftIdentity.EngineCount,
+                EmptyWeight = this.Simulator.WeightAndBalance.EmptyWeight,
+                FuelTotalCapacity = this.Simulator.WeightAndBalance.FuelTotalCapacity,
+                FuelWeightPerGallon = Math.Round(this.Simulator.WeightAndBalance.FuelWeightPerGallon, 2),
+                MaxGrossWeight = this.Simulator.WeightAndBalance.MaxGrossWeight,
+                FlapsAvailable = this.Simulator.AircraftIdentity.FlapsAvailable,
+                IsGearRetractable = this.Simulator.AircraftIdentity.GearRetractable,
                 Name = this.Name,
                 VersionNumber = this.VersionNumber,
                 Manufacturer = this.Manufacturer,
@@ -1005,7 +1006,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Adding new aircraft type";
             try
             {
-                var result = OpenSkyService.Instance.AddAircraftTypeAsync(newAircraftType).Result;
+                var result = AgentOpenSkyService.Instance.AddAircraftTypeAsync(newAircraftType).Result;
                 if (!result.IsError)
                 {
                     this.AddAircraftTypeCommand.ReportProgress(
@@ -1187,7 +1188,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Deleting aircraft type";
             try
             {
-                var result = OpenSkyService.Instance.DeleteAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
+                var result = AgentOpenSkyService.Instance.DeleteAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
                 if (!result.IsError)
                 {
                     this.DeleteTypeCommand.ReportProgress(
@@ -1244,7 +1245,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Enabling aircraft type detailed checks";
             try
             {
-                var result = OpenSkyService.Instance.DisableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
+                var result = AgentOpenSkyService.Instance.DisableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
                 if (!result.IsError)
                 {
                     this.DisableDetailedChecksCommand.ReportProgress(
@@ -1301,7 +1302,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Disabling aircraft type";
             try
             {
-                var result = OpenSkyService.Instance.DisableAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
+                var result = AgentOpenSkyService.Instance.DisableAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
                 if (!result.IsError)
                 {
                     this.DisableTypeCommand.ReportProgress(
@@ -1358,7 +1359,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Enabling aircraft type detailed checks";
             try
             {
-                var result = OpenSkyService.Instance.EnableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
+                var result = AgentOpenSkyService.Instance.EnableAircraftTypeDetailedChecksAsync(this.SelectedAircraftType.Id).Result;
                 if (!result.IsError)
                 {
                     this.EnableDetailedChecksCommand.ReportProgress(
@@ -1415,7 +1416,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Enabling aircraft type";
             try
             {
-                var result = OpenSkyService.Instance.EnableAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
+                var result = AgentOpenSkyService.Instance.EnableAircraftTypeAsync(this.SelectedAircraftType.Id).Result;
                 if (!result.IsError)
                 {
                     this.EnableTypeCommand.ReportProgress(
@@ -1487,7 +1488,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void IdentifyAircraft()
         {
-            if (!SimConnect.Instance.Connected)
+            if (!this.Simulator.Connected)
             {
                 var notification = new OpenSkyNotification("Identify aircraft", "Not connected to sim!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
                 notification.SetErrorColorStyle();
@@ -1528,7 +1529,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Refreshing aircraft types";
             try
             {
-                var result = OpenSkyService.Instance.GetSimulatorAircraftTypesAsync(Simulator.MSFS).Result;
+                var result = AgentOpenSkyService.Instance.GetSimulatorAircraftTypesAsync(OpenSkyApi.Simulator.MSFS).Result;
                 if (!result.IsError)
                 {
                     this.RefreshAircraftTypesCommand.ReportProgress(
@@ -1600,7 +1601,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Saving changed aircraft type";
             try
             {
-                var result = OpenSkyService.Instance.UpdateAircraftTypeAsync(this.EditedAircraftType).Result;
+                var result = AgentOpenSkyService.Instance.UpdateAircraftTypeAsync(this.EditedAircraftType).Result;
                 if (!result.IsError)
                 {
                     this.SaveEditedAircraftTypeCommand.ReportProgress(
@@ -1649,7 +1650,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void StartAddAircraft()
         {
-            if (!SimConnect.Instance.Connected)
+            if (!this.Simulator.Connected)
             {
                 var notification = new OpenSkyNotification("Add aircraft type", "Not connected to sim!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
                 notification.SetErrorColorStyle();

@@ -53,10 +53,14 @@
     <Reference Include="ParallelExtensionsExtras, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Device" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,7 +82,9 @@
     <Compile Include="Models\PayloadStations.cs" />
     <Compile Include="Models\PrimaryTracking.cs" />
     <Compile Include="Models\SecondaryTracking.cs" />
+    <Compile Include="Models\TrackingCondition.cs" />
     <Compile Include="Models\TrackingConditions.cs" />
+    <Compile Include="Models\TrackingEventLogEntry.cs" />
     <Compile Include="Models\TrackingStatus.cs" />
     <Compile Include="Models\VerticalProfile.cs" />
     <Compile Include="Models\WeightAndBalance.cs" />
@@ -91,6 +97,10 @@
     <Compile Include="OpenAPIs\ValidationProblemDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulator.cs" />
+    <Compile Include="SpeechSoundPacks.cs" />
+    <Compile Include="Tools\ColorExtensions.cs" />
+    <Compile Include="Tools\SleepScheduler.cs" />
+    <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

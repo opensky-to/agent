@@ -248,7 +248,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
                 }
 
-                if (this.SimConnect.Flight == null)
+                if (this.Simulator.Flight == null)
                 {
                     throw new Exception("No flight loaded!");
                 }
@@ -259,17 +259,17 @@ namespace OpenSky.AgentMSFS.Views.Models
                 var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
                 var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
 
-                if (!this.SimConnect.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                if (!this.Simulator.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     throw new Exception("Departure airport doesn't match!");
                 }
 
-                if (!this.SimConnect.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                if (!this.Simulator.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     throw new Exception("Destination airport doesn't match!");
                 }
 
-                this.SimConnect.ImportSimbrief(ofp);
+                this.Simulator.ImportSimbrief(ofp);
                 this.ImportSimbriefVisibility = Visibility.Collapsed;
             }
             catch (WebException ex)

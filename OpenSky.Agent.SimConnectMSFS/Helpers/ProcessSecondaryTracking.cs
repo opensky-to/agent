@@ -6,6 +6,7 @@
 
 namespace OpenSky.AgentMSFS.SimConnect.Helpers
 {
+    using OpenSky.Agent.SimConnectMSFS.Structs;
     using OpenSky.AgentMSFS.SimConnect.Structs;
 
     /// -------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.SimConnectMSFS
 {
     using System;
     using System.Collections.Generic;
@@ -14,8 +14,6 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.IO.Compression;
     using System.Text;
     using System.Threading;
-    using System.Windows;
-    using System.Windows.Media;
 
     using JetBrains.Annotations;
 
@@ -24,7 +22,6 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.FlightLogXML;
@@ -32,7 +29,6 @@ namespace OpenSky.AgentMSFS.SimConnect
     using OpenSkyApi;
 
     using PositionReport = OpenSkyApi.PositionReport;
-    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -273,12 +269,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                         }
                     };
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
-                    this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected = $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
 
-                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
-                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
+                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
 
                     if (!value.Resume)
                     {
@@ -348,7 +344,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                             }
                         };
 
-                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected = $"{this.flightLoadingTempStructs.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
+                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected = $"{this.flightLoadingTempStructs.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempStructs.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     }
                 }
                 else
@@ -375,12 +371,13 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <summary>
         /// Gets the pause info string.
         /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.PauseInfo"/>
         /// -------------------------------------------------------------------------------------------------
-        public string PauseInfo
+        public override string PauseInfo
         {
             get => this.pauseInfo;
 
-            private set
+            protected set
             {
                 if (Equals(this.pauseInfo, value))
                 {
@@ -403,12 +400,13 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <summary>
         /// Gets the duration of the tracking session.
         /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.TrackingDuration"/>
         /// -------------------------------------------------------------------------------------------------
-        public string TrackingDuration
+        public override string TrackingDuration
         {
             get => this.trackingDuration;
 
-            private set
+            protected set
             {
                 if (Equals(this.trackingDuration, value))
                 {
@@ -425,11 +423,11 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// Gets the current tracking status.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public TrackingStatus TrackingStatus
+        public override TrackingStatus TrackingStatus
         {
             get => this.trackingStatus;
 
-            private set
+            protected set
             {
                 if (Equals(this.trackingStatus, value))
                 {
@@ -461,11 +459,11 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// Gets the warp info string.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string WarpInfo
+        public override string WarpInfo
         {
             get => this.warpInfo;
 
-            private set
+            protected set
             {
                 if (Equals(this.warpInfo, value))
                 {
@@ -484,8 +482,12 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 22/03/2021.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.StartTracking()"/>
         /// -------------------------------------------------------------------------------------------------
-        public void StartTracking()
+        public override void StartTracking()
         {
             Debug.WriteLine("SimConnect asked to start/resume tracking...");
             if (!this.CanStartTracking)
@@ -504,7 +506,7 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 this.TrackingStatus = TrackingStatus.GroundOperations;
                 this.trackingStarted = DateTime.UtcNow;
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStartedGroundHandling);
             }
             else
@@ -516,7 +518,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking starting...");
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingStarted);
-                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
+                        this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingStarted, OpenSkyColors.OpenSkyTealLight, "Flight tracking started");
                     }
 
                     if (this.TrackingStatus == TrackingStatus.Resuming)
@@ -524,7 +526,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         this.TrackingStatus = TrackingStatus.Tracking;
                         Debug.WriteLine("Flight tracking resuming...");
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.TrackingResumed);
-                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
+                        this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingResumed, OpenSkyColors.OpenSkyTealLight, "Flight tracking resumed");
 
                         // Check if we just resumed a save that failed to upload
                         if (this.FlightPhase == FlightPhase.PostFlight)
@@ -564,7 +566,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.TrackingConditions[(int)condition].Reset();
                 }
 
-                this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
+                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
             }
 
             if (!resumeLater)
@@ -637,7 +639,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
             else
             {
-                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
+                this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.TrackingPaused, OpenSkyColors.OpenSkyTealLight, "Flight tracking paused");
                 this.SaveFlight();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightSavedPaused);
                 this.UploadPositionReport();
@@ -655,8 +657,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     this.flightLoadingTempStructs = new FlightLoadingTempStructs
                     {
                         FuelTanks = this.FuelTanks,
-                        PayloadStations = this.PayloadStations,
-                        SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTracking)
+                        PayloadStations = this.PayloadStationsStruct,
+                        SlewPlaneIntoPosition = SlewPlaneIntoPosition.FromPrimaryTracking(this.PrimaryTrackingStruct)
                     };
                 }
                 catch (Exception ex)
@@ -752,18 +754,18 @@ namespace OpenSky.AgentMSFS.SimConnect
                     var positionReport = new PositionReport
                     {
                         Id = this.Flight.Id,
-                        AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
-                        Altitude = this.PrimaryTracking.Altitude,
-                        BankAngle = this.PrimaryTracking.BankAngle,
-                        FlightPhase = this.PrimaryTracking.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
-                        GroundSpeed = this.PrimaryTracking.GroundSpeed,
-                        Heading = this.PrimaryTracking.Heading,
-                        Latitude = this.PrimaryTracking.Latitude,
-                        Longitude = this.PrimaryTracking.Longitude,
-                        OnGround = this.PrimaryTracking.OnGround,
-                        PitchAngle = this.PrimaryTracking.PitchAngle,
-                        RadioHeight = this.PrimaryTracking.RadioHeight,
-                        VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
+                        AirspeedTrue = this.PrimaryTrackingStruct.AirspeedTrue,
+                        Altitude = this.PrimaryTrackingStruct.Altitude,
+                        BankAngle = this.PrimaryTrackingStruct.BankAngle,
+                        FlightPhase = this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
+                        GroundSpeed = this.PrimaryTrackingStruct.GroundSpeed,
+                        Heading = this.PrimaryTrackingStruct.Heading,
+                        Latitude = this.PrimaryTrackingStruct.Latitude,
+                        Longitude = this.PrimaryTrackingStruct.Longitude,
+                        OnGround = this.PrimaryTrackingStruct.OnGround,
+                        PitchAngle = this.PrimaryTrackingStruct.PitchAngle,
+                        RadioHeight = this.PrimaryTrackingStruct.RadioHeight,
+                        VerticalSpeedSeconds = this.PrimaryTrackingStruct.VerticalSpeedSeconds,
                         TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
 
                         FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
@@ -1124,7 +1126,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (Math.Abs(ppt.Old.SimulationRate - ppt.New.SimulationRate) > 0)
                 {
                     Debug.WriteLine($"SimRate changed to {ppt.New.SimulationRate}");
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.SimRateChanged, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTrackingStruct, FlightTrackingEventType.SimRateChanged, Colors.DarkViolet, $"Simrate changed: {ppt.New.SimulationRate}");
 
                     // Was there an active simrate above 1?
                     if (this.lastActiveSimRate.HasValue && this.lastActiveSimRateActivated.HasValue)
@@ -1146,10 +1148,10 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 // todo Check if user has paused the sim (but didn't use the pause button we provide) ... check if lat/lon isn't changing while in flight
 
-                if (this.PrimaryTracking.CrashSequence != CrashSequence.Off)
+                if (this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off)
                 {
                     // Plane crashed
-                    this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Crashed, Colors.DarkRed, "Aircraft crashed");
+                    this.AddTrackingEvent(ppt.New, this.SecondaryTrackingStruct, FlightTrackingEventType.Crashed, Colors.DarkRed, "Aircraft crashed");
 
                     // todo play some ELT sound? to be proper annoying :)
                     this.FinishUpFlightTracking();
@@ -1331,18 +1333,18 @@ namespace OpenSky.AgentMSFS.SimConnect
                             var positionReport = new PositionReport
                             {
                                 Id = this.Flight.Id,
-                                AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
-                                Altitude = this.PrimaryTracking.Altitude,
-                                BankAngle = this.PrimaryTracking.BankAngle,
-                                FlightPhase = this.PrimaryTracking.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
-                                GroundSpeed = this.PrimaryTracking.GroundSpeed,
-                                Heading = this.PrimaryTracking.Heading,
-                                Latitude = this.PrimaryTracking.Latitude,
-                                Longitude = this.PrimaryTracking.Longitude,
-                                OnGround = this.PrimaryTracking.OnGround,
-                                PitchAngle = this.PrimaryTracking.PitchAngle,
-                                RadioHeight = this.PrimaryTracking.RadioHeight,
-                                VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
+                                AirspeedTrue = this.PrimaryTrackingStruct.AirspeedTrue,
+                                Altitude = this.PrimaryTrackingStruct.Altitude,
+                                BankAngle = this.PrimaryTrackingStruct.BankAngle,
+                                FlightPhase = this.PrimaryTrackingStruct.CrashSequence != CrashSequence.Off ? FlightPhase.Crashed : this.FlightPhase,
+                                GroundSpeed = this.PrimaryTrackingStruct.GroundSpeed,
+                                Heading = this.PrimaryTrackingStruct.Heading,
+                                Latitude = this.PrimaryTrackingStruct.Latitude,
+                                Longitude = this.PrimaryTrackingStruct.Longitude,
+                                OnGround = this.PrimaryTrackingStruct.OnGround,
+                                PitchAngle = this.PrimaryTrackingStruct.PitchAngle,
+                                RadioHeight = this.PrimaryTrackingStruct.RadioHeight,
+                                VerticalSpeedSeconds = this.PrimaryTrackingStruct.VerticalSpeedSeconds,
                                 TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
 
                                 FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,

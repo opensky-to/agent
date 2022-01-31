@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
@@ -12,7 +12,6 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using CTrue.FsConnect;
 
     using Microsoft.FlightSimulator.SimConnect;
-    using Microsoft.Maps.MapControl.WPF;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -115,6 +114,51 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public double BankAngle { get; set; }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Landing analysis converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class LandingAnalysisConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The LandingAnalysis extension method that converts the given landing analysis struct.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="analysis">
+        /// The analysis to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model landing analysis.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.LandingAnalysis Convert(this LandingAnalysis analysis)
+        {
+            return new Simulator.Models.LandingAnalysis
+            {
+                Latitude = analysis.Latitude,
+                Longitude = analysis.Longitude,
+                Altitude = analysis.Altitude,
+                OnGround = analysis.OnGround,
+                WindLat = analysis.WindLat,
+                WindLong = analysis.WindLong,
+                AirspeedTrue = analysis.AirspeedTrue,
+                GroundSpeed = analysis.GroundSpeed,
+                SpeedLat = analysis.SpeedLat,
+                SpeedLong = analysis.SpeedLong,
+                Gforce = analysis.Gforce,
+                LandingRateSeconds = analysis.LandingRateSeconds,
+                BankAngle = analysis.BankAngle
+            };
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

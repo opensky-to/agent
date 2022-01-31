@@ -19,6 +19,8 @@ namespace OpenSky.AgentMSFS.Views
 
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls;
     using OpenSky.AgentMSFS.Converters;
     using OpenSky.AgentMSFS.Models;
@@ -94,11 +96,11 @@ namespace OpenSky.AgentMSFS.Views
             Debug.WriteLine("Adding aircraft and trails to the map view");
 
             // Add Simbrief route to map
-            var simbriefRoute = new MapPolyline { Stroke = new SolidColorBrush(OpenSkyColors.OpenSkySimBrief), StrokeThickness = 4, Locations = ((FlightTrackingViewModel)this.DataContext).SimConnect.SimbriefRouteLocations };
+            var simbriefRoute = new MapPolyline { Stroke = new SolidColorBrush(OpenSkyColors.OpenSkySimBrief), StrokeThickness = 4, Locations = ((FlightTrackingViewModel)this.DataContext).Simulator.SimbriefRouteLocations };
             this.MapView.Children.Add(simbriefRoute);
 
             // Add aircraft trail to map
-            var aircraftTrail = new MapPolyline { Stroke = new SolidColorBrush(OpenSkyColors.OpenSkyTeal), StrokeThickness = 4, Locations = ((FlightTrackingViewModel)this.DataContext).SimConnect.AircraftTrailLocations };
+            var aircraftTrail = new MapPolyline { Stroke = new SolidColorBrush(OpenSkyColors.OpenSkyTeal), StrokeThickness = 4, Locations = ((FlightTrackingViewModel)this.DataContext).Simulator.AircraftTrailLocations };
             this.MapView.Children.Add(aircraftTrail);
 
             // Add aircraft position to map
@@ -197,9 +199,9 @@ namespace OpenSky.AgentMSFS.Views
             // Replay past tracking markers to add to this view
             if (this.DataContext is FlightTrackingViewModel viewModel)
             {
-                viewModel.SimConnect.ReplayMapMarkers();
-                viewModel.SimConnect.NextStepFlashingChanged += this.SimConnectNextStepFlashingChanged;
-                this.SimConnectNextStepFlashingChanged(this, viewModel.SimConnect.NextStepFlashing);
+                viewModel.Simulator.ReplayMapMarkers();
+                viewModel.Simulator.NextStepFlashingChanged += this.SimConnectNextStepFlashingChanged;
+                this.SimConnectNextStepFlashingChanged(this, viewModel.Simulator.NextStepFlashing);
             }
         }
 

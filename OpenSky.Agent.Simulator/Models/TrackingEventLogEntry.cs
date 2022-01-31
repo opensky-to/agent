@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Models
+namespace OpenSky.Agent.Simulator.Models
 {
     using System;
     using System.Windows.Media;
@@ -13,6 +13,7 @@ namespace OpenSky.AgentMSFS.Models
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.FlightLogXML;
 
     /// -------------------------------------------------------------------------------------------------

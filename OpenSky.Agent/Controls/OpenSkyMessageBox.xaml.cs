@@ -13,6 +13,7 @@ namespace OpenSky.AgentMSFS.Controls
     using System.Windows.Input;
     using System.Windows.Media;
 
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Controls.Models;
     using OpenSky.AgentMSFS.Tools;
 

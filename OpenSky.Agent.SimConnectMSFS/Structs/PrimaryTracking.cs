@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
@@ -151,6 +151,56 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public CrashSequence CrashSequence { get; set; }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Primary tracking converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class PrimaryTrackingConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// A PrimaryTracking extension method that converts the given primary tracking.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="primary">
+        /// The primary to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model primary tracking.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.PrimaryTracking Convert(this PrimaryTracking primary)
+        {
+            return new Simulator.Models.PrimaryTracking
+            {
+                Latitude = primary.Latitude,
+                Longitude = primary.Longitude,
+                Altitude = primary.Altitude,
+                RadioHeight = primary.RadioHeight,
+                IndicatedAltitude = primary.IndicatedAltitude,
+                OnGround = primary.OnGround,
+                Heading = primary.Heading,
+                AirspeedTrue = primary.AirspeedTrue,
+                GroundSpeed = primary.GroundSpeed,
+                PitchAngle = primary.PitchAngle,
+                BankAngle = primary.BankAngle,
+                VerticalSpeedSeconds = primary.VerticalSpeedSeconds,
+                StallWarning = primary.StallWarning,
+                OverspeedWarning = primary.OverspeedWarning,
+                GForce = primary.GForce,
+                SimulationRate = primary.SimulationRate,
+                SlewActive = primary.SlewActive,
+                Crash = primary.CrashSequence != CrashSequence.Off
+            };
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

@@ -17,6 +17,8 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using System.Device.Location;
     using System.Runtime.InteropServices;
 
+    using OpenSky.Agent.SimConnectMSFS.Structs;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     /// Slew plane into position struct.

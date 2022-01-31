@@ -102,7 +102,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
             {
                 this.FuelTankInfos[tank] =
-                    $"{(this.FuelTankQuantities[tank] / this.SimConnect.FuelTanks.Capacities[tank] * 100):F0} % ({this.FuelTankQuantities[tank]:F1} gallons, {(this.FuelTankQuantities[tank] * this.SimConnect.WeightAndBalance.FuelWeightPerGallon):F1} lbs / {(this.FuelTankQuantities[tank] * 3.78541):F1} l, {(this.FuelTankQuantities[tank] * this.SimConnect.WeightAndBalance.FuelWeightPerGallon * 0.453592):F1} kg)";
+                    $"{(this.FuelTankQuantities[tank] / this.Simulator.FuelTanks.Capacities[tank] * 100):F0} % ({this.FuelTankQuantities[tank]:F1} gallons, {(this.FuelTankQuantities[tank] * this.Simulator.WeightAndBalance.FuelWeightPerGallon):F1} lbs / {(this.FuelTankQuantities[tank] * 3.78541):F1} l, {(this.FuelTankQuantities[tank] * this.Simulator.WeightAndBalance.FuelWeightPerGallon * 0.453592):F1} kg)";
             }
 
             this.NotifyPropertyChanged(nameof(this.FuelTankInfos));
@@ -120,12 +120,12 @@ namespace OpenSky.AgentMSFS.Views.Models
         {
             try
             {
-                if (this.SimConnect.Flight == null || this.SimConnect.Flight.Aircraft.Type.RequiresManualFuelling)
+                if (this.Simulator.Flight == null || this.Simulator.Flight.Aircraft.Type.RequiresManualFuelling)
                 {
                     return;
                 }
 
-                var fuelTanks = this.SimConnect.FuelTanks;
+                var fuelTanks = this.Simulator.FuelTanks;
                 var quantities = fuelTanks.Quantities;
                 foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
                 {
@@ -134,9 +134,9 @@ namespace OpenSky.AgentMSFS.Views.Models
 
                 fuelTanks.UpdateQuantitiesFromDictionary(quantities);
 
-                this.SimConnect.SetFuelTanks(fuelTanks);
-                this.SimConnect.RefreshStructNow(Requests.FuelTanks);
-                this.SimConnect.RefreshStructNow(Requests.WeightAndBalance);
+                this.Simulator.SetFuelTanks(fuelTanks);
+                this.Simulator.RefreshStructNow(Requests.FuelTanks);
+                this.Simulator.RefreshStructNow(Requests.WeightAndBalance);
             }
             catch (Exception ex)
             {
@@ -157,30 +157,30 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void SuggestFuel()
         {
             Debug.WriteLine("Calculating suggested fuel distribution");
-            var fuelToLoad = this.SimConnect.Flight?.FuelGallons ?? 0.0;
+            var fuelToLoad = this.Simulator.Flight?.FuelGallons ?? 0.0;
 
             // Priority 1: Left/Right wingtip tanks
-            if (this.SimConnect.FuelTanks.FuelTankLeftTipCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankLeftTipCapacity - this.SimConnect.FuelTanks.FuelTankRightTipCapacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankLeftTipCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankLeftTipCapacity - this.Simulator.FuelTanks.FuelTankRightTipCapacity) == 0)
             {
-                var intoWingTips = Math.Min(this.SimConnect.FuelTanks.FuelTankLeftTipCapacity * 2, fuelToLoad) / 2;
+                var intoWingTips = Math.Min(this.Simulator.FuelTanks.FuelTankLeftTipCapacity * 2, fuelToLoad) / 2;
                 this.FuelTankQuantities[FuelTank.LeftTip] = intoWingTips;
                 this.FuelTankQuantities[FuelTank.RightTip] = intoWingTips;
                 fuelToLoad -= intoWingTips * 2;
             }
 
             // Priority 2: Left/Right main tanks
-            if (this.SimConnect.FuelTanks.FuelTankLeftMainCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankLeftMainCapacity - this.SimConnect.FuelTanks.FuelTankRightMainCapacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankLeftMainCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankLeftMainCapacity - this.Simulator.FuelTanks.FuelTankRightMainCapacity) == 0)
             {
-                var intoMains = Math.Min(this.SimConnect.FuelTanks.FuelTankLeftMainCapacity * 2, fuelToLoad) / 2;
+                var intoMains = Math.Min(this.Simulator.FuelTanks.FuelTankLeftMainCapacity * 2, fuelToLoad) / 2;
                 this.FuelTankQuantities[FuelTank.LeftMain] = intoMains;
                 this.FuelTankQuantities[FuelTank.RightMain] = intoMains;
                 fuelToLoad -= intoMains * 2;
             }
 
             // Priority 3: Left/Right aux tanks
-            if (this.SimConnect.FuelTanks.FuelTankLeftAuxCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankLeftAuxCapacity - this.SimConnect.FuelTanks.FuelTankRightAuxCapacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankLeftAuxCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankLeftAuxCapacity - this.Simulator.FuelTanks.FuelTankRightAuxCapacity) == 0)
             {
-                var intoAuxs = Math.Min(this.SimConnect.FuelTanks.FuelTankLeftAuxCapacity * 2, fuelToLoad) / 2;
+                var intoAuxs = Math.Min(this.Simulator.FuelTanks.FuelTankLeftAuxCapacity * 2, fuelToLoad) / 2;
                 this.FuelTankQuantities[FuelTank.LeftAux] = intoAuxs;
                 this.FuelTankQuantities[FuelTank.RightAux] = intoAuxs;
                 fuelToLoad -= intoAuxs * 2;
@@ -188,10 +188,10 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Priority 4: Center tanks x3
             var fueledCenter3 = false;
-            if (this.SimConnect.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankCenterCapacity - this.SimConnect.FuelTanks.FuelTankCenter2Capacity) == 0 &&
-                Math.Abs(this.SimConnect.FuelTanks.FuelTankCenterCapacity - this.SimConnect.FuelTanks.FuelTankCenter3Capacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankCenterCapacity - this.Simulator.FuelTanks.FuelTankCenter2Capacity) == 0 &&
+                Math.Abs(this.Simulator.FuelTanks.FuelTankCenterCapacity - this.Simulator.FuelTanks.FuelTankCenter3Capacity) == 0)
             {
-                var intoCenter = Math.Min(this.SimConnect.FuelTanks.FuelTankCenterCapacity * 3, fuelToLoad) / 3;
+                var intoCenter = Math.Min(this.Simulator.FuelTanks.FuelTankCenterCapacity * 3, fuelToLoad) / 3;
                 this.FuelTankQuantities[FuelTank.Center] = intoCenter;
                 this.FuelTankQuantities[FuelTank.Center2] = intoCenter;
                 this.FuelTankQuantities[FuelTank.Center3] = intoCenter;
@@ -201,9 +201,9 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Priority 5: Center tanks x2 
             var fueledCenter2 = false;
-            if (this.SimConnect.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankCenterCapacity - this.SimConnect.FuelTanks.FuelTankCenter2Capacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankCenterCapacity - this.Simulator.FuelTanks.FuelTankCenter2Capacity) == 0)
             {
-                var intoCenter = Math.Min(this.SimConnect.FuelTanks.FuelTankCenterCapacity * 2, fuelToLoad) / 2;
+                var intoCenter = Math.Min(this.Simulator.FuelTanks.FuelTankCenterCapacity * 2, fuelToLoad) / 2;
                 this.FuelTankQuantities[FuelTank.Center] = intoCenter;
                 this.FuelTankQuantities[FuelTank.Center2] = intoCenter;
                 fuelToLoad -= intoCenter;
@@ -211,34 +211,34 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
 
             // Priority 6: Center tank alone
-            if (this.SimConnect.FuelTanks.FuelTankCenterCapacity > 0 && !fueledCenter3 && !fueledCenter2)
+            if (this.Simulator.FuelTanks.FuelTankCenterCapacity > 0 && !fueledCenter3 && !fueledCenter2)
             {
-                var intoCenter = Math.Min(this.SimConnect.FuelTanks.FuelTankCenterCapacity, fuelToLoad);
+                var intoCenter = Math.Min(this.Simulator.FuelTanks.FuelTankCenterCapacity, fuelToLoad);
                 this.FuelTankQuantities[FuelTank.Center] = intoCenter;
                 fuelToLoad -= intoCenter;
             }
 
             // Priority 7: Center2 tank alone
-            if (this.SimConnect.FuelTanks.FuelTankCenter2Capacity > 0 && !fueledCenter3 && !fueledCenter2)
+            if (this.Simulator.FuelTanks.FuelTankCenter2Capacity > 0 && !fueledCenter3 && !fueledCenter2)
             {
-                var intoCenter = Math.Min(this.SimConnect.FuelTanks.FuelTankCenter2Capacity, fuelToLoad);
+                var intoCenter = Math.Min(this.Simulator.FuelTanks.FuelTankCenter2Capacity, fuelToLoad);
                 this.FuelTankQuantities[FuelTank.Center2] = intoCenter;
                 fuelToLoad -= intoCenter;
             }
 
             // Priority 8: Center3 tank alone
-            if (this.SimConnect.FuelTanks.FuelTankCenter3Capacity > 0 && !fueledCenter3)
+            if (this.Simulator.FuelTanks.FuelTankCenter3Capacity > 0 && !fueledCenter3)
             {
-                var intoCenter = Math.Min(this.SimConnect.FuelTanks.FuelTankCenter3Capacity, fuelToLoad);
+                var intoCenter = Math.Min(this.Simulator.FuelTanks.FuelTankCenter3Capacity, fuelToLoad);
                 this.FuelTankQuantities[FuelTank.Center3] = intoCenter;
                 fuelToLoad -= intoCenter;
             }
 
             // Priority 9: External tanks x2
             var fueledExternal = false;
-            if (this.SimConnect.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.SimConnect.FuelTanks.FuelTankExternal1Capacity - this.SimConnect.FuelTanks.FuelTankExternal2Capacity) == 0)
+            if (this.Simulator.FuelTanks.FuelTankCenterCapacity > 0 && Math.Abs(this.Simulator.FuelTanks.FuelTankExternal1Capacity - this.Simulator.FuelTanks.FuelTankExternal2Capacity) == 0)
             {
-                var intoExternal = Math.Min(this.SimConnect.FuelTanks.FuelTankExternal1Capacity * 2, fuelToLoad) / 2;
+                var intoExternal = Math.Min(this.Simulator.FuelTanks.FuelTankExternal1Capacity * 2, fuelToLoad) / 2;
                 this.FuelTankQuantities[FuelTank.External1] = intoExternal;
                 this.FuelTankQuantities[FuelTank.External2] = intoExternal;
                 fuelToLoad -= intoExternal * 2;
@@ -246,17 +246,17 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
 
             // Priority 10: External 1 alone
-            if (this.SimConnect.FuelTanks.FuelTankExternal1Capacity > 0 && !fueledExternal)
+            if (this.Simulator.FuelTanks.FuelTankExternal1Capacity > 0 && !fueledExternal)
             {
-                var intoExternal = Math.Min(this.SimConnect.FuelTanks.FuelTankExternal1Capacity, fuelToLoad);
+                var intoExternal = Math.Min(this.Simulator.FuelTanks.FuelTankExternal1Capacity, fuelToLoad);
                 this.FuelTankQuantities[FuelTank.External1] = intoExternal;
                 fuelToLoad -= intoExternal;
             }
 
             // Priority 11: External 2 alone
-            if (this.SimConnect.FuelTanks.FuelTankExternal2Capacity > 0 && !fueledExternal)
+            if (this.Simulator.FuelTanks.FuelTankExternal2Capacity > 0 && !fueledExternal)
             {
-                var intoExternal = Math.Min(this.SimConnect.FuelTanks.FuelTankExternal2Capacity, fuelToLoad);
+                var intoExternal = Math.Min(this.Simulator.FuelTanks.FuelTankExternal2Capacity, fuelToLoad);
                 this.FuelTankQuantities[FuelTank.External2] = intoExternal;
                 fuelToLoad -= intoExternal;
             }

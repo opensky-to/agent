@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
 
@@ -91,6 +91,48 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public double CgPercentLateral { get; set; }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Weight and balance converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class WeightAndBalanceConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// A WeightAndBalance extension method that converts the given weight and balance.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="wab">
+        /// The wab to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model weight and balance.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.WeightAndBalance Convert(this WeightAndBalance wab)
+        {
+            return new Simulator.Models.WeightAndBalance
+            {
+                EmptyWeight = wab.EmptyWeight,
+                TotalWeight = wab.TotalWeight,
+                MaxGrossWeight = wab.MaxGrossWeight,
+                FuelTotalCapacity = wab.FuelTotalCapacity,
+                FuelTotalQuantity = wab.FuelTotalQuantity,
+                FuelWeightPerGallon = wab.FuelWeightPerGallon,
+                CgAftLimit = wab.CgAftLimit,
+                CgFwdLimit = wab.CgFwdLimit,
+                CgPercent = wab.CgPercent,
+                CgPercentLateral = wab.CgPercentLateral
+            };
+        }
     }
 
     /// -------------------------------------------------------------------------------------------------

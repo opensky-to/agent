@@ -85,14 +85,14 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SetPayloadStations()
         {
-            if (this.SimConnect.Flight == null || this.SimConnect.Flight.Aircraft.Type.RequiresManualLoading)
+            if (this.Simulator.Flight == null || this.Simulator.Flight.Aircraft.Type.RequiresManualLoading)
             {
                 return;
             }
 
             try
             {
-                var payloadStations = this.SimConnect.PayloadStations;
+                var payloadStations = this.Simulator.PayloadStations;
                 payloadStations.Weight1 = this.PayloadStationWeights[0];
                 payloadStations.Weight2 = this.PayloadStationWeights[1];
                 payloadStations.Weight3 = this.PayloadStationWeights[2];
@@ -114,9 +114,9 @@ namespace OpenSky.AgentMSFS.Views.Models
                 payloadStations.Weight19 = this.PayloadStationWeights[18];
                 payloadStations.Weight20 = this.PayloadStationWeights[19];
 
-                this.SimConnect.SetPayloadStations(payloadStations);
-                this.SimConnect.RefreshStructNow(Requests.PayloadStations);
-                this.SimConnect.RefreshStructNow(Requests.WeightAndBalance);
+                this.Simulator.SetPayloadStations(payloadStations);
+                this.Simulator.RefreshStructNow(Requests.PayloadStations);
+                this.Simulator.RefreshStructNow(Requests.WeightAndBalance);
             }
             catch (Exception ex)
             {
@@ -137,13 +137,13 @@ namespace OpenSky.AgentMSFS.Views.Models
         private void SuggestPayload()
         {
             Debug.WriteLine("Calculating suggested payload distribution");
-            var payloadToLoad = this.SimConnect.Flight?.PayloadPounds ?? 0.0;
+            var payloadToLoad = this.Simulator.Flight?.PayloadPounds ?? 0.0;
 
             // Check for pilot/copilot first
             var nonPilotStations = 0;
-            for (var i = 0; i < this.SimConnect.PayloadStations.Count; i++)
+            for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
             {
-                if (this.SimConnect.PayloadStations.Names[i].Contains("PILOT"))
+                if (this.Simulator.PayloadStations.Names[i].Contains("PILOT"))
                 {
                     var payload = Math.Min(170, payloadToLoad);
                     this.PayloadStationWeights[i] = payload;
@@ -158,15 +158,15 @@ namespace OpenSky.AgentMSFS.Views.Models
             // Distribute the rest evenly
             if (nonPilotStations == 0)
             {
-                nonPilotStations = this.SimConnect.PayloadStations.Count;
+                nonPilotStations = this.Simulator.PayloadStations.Count;
             }
 
             if (nonPilotStations > 0)
             {
                 var payloadShare = payloadToLoad / nonPilotStations;
-                for (var i = 0; i < this.SimConnect.PayloadStations.Count; i++)
+                for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
                 {
-                    if (!this.SimConnect.PayloadStations.Names[i].Contains("PILOT"))
+                    if (!this.Simulator.PayloadStations.Names[i].Contains("PILOT"))
                     {
                         this.PayloadStationWeights[i] = payloadShare;
                         payloadToLoad -= payloadShare;

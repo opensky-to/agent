@@ -11,6 +11,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Diagnostics;
     using System.Linq;
 
+    using OpenSky.Agent.SimConnectMSFS.Structs;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Structs;
 

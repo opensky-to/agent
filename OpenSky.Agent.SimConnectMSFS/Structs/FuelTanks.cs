@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
@@ -12,10 +12,6 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     using CTrue.FsConnect;
 
     using Microsoft.FlightSimulator.SimConnect;
-
-    using OpenSky.Agent.Simulator.Enums;
-    using OpenSky.AgentMSFS.SimConnect.Enums;
-
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -183,6 +179,104 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
         public double FuelTankExternal2Quantity { get; set; }
     }
 
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Fuel tanks converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class FuelTanksConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The FuelTanks extension method that converts the given tanks struct.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="tanks">
+        /// The tanks to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model fuel tanks.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Simulator.Models.FuelTanks Convert(this FuelTanks tanks)
+        {
+            return new Simulator.Models.FuelTanks
+            {
+                FuelTankCenterCapacity = tanks.FuelTankCenterCapacity,
+                FuelTankCenter2Capacity = tanks.FuelTankCenter2Capacity,
+                FuelTankCenter3Capacity = tanks.FuelTankCenter3Capacity,
+                FuelTankLeftMainCapacity = tanks.FuelTankLeftMainCapacity,
+                FuelTankLeftAuxCapacity = tanks.FuelTankLeftAuxCapacity,
+                FuelTankLeftTipCapacity = tanks.FuelTankLeftTipCapacity,
+                FuelTankRightMainCapacity = tanks.FuelTankRightMainCapacity,
+                FuelTankRightAuxCapacity = tanks.FuelTankRightAuxCapacity,
+                FuelTankRightTipCapacity = tanks.FuelTankRightTipCapacity,
+                FuelTankExternal1Capacity = tanks.FuelTankExternal1Capacity,
+                FuelTankExternal2Capacity = tanks.FuelTankExternal2Capacity,
+
+                FuelTankCenterQuantity = tanks.FuelTankCenterQuantity,
+                FuelTankCenter2Quantity = tanks.FuelTankCenter2Quantity,
+                FuelTankCenter3Quantity = tanks.FuelTankCenter3Quantity,
+                FuelTankLeftMainQuantity = tanks.FuelTankLeftMainQuantity,
+                FuelTankLeftAuxQuantity = tanks.FuelTankLeftAuxQuantity,
+                FuelTankLeftTipQuantity = tanks.FuelTankLeftTipQuantity,
+                FuelTankRightMainQuantity = tanks.FuelTankRightMainQuantity,
+                FuelTankRightAuxQuantity = tanks.FuelTankRightAuxQuantity,
+                FuelTankRightTipQuantity = tanks.FuelTankRightTipQuantity,
+                FuelTankExternal1Quantity = tanks.FuelTankExternal1Quantity,
+                FuelTankExternal2Quantity = tanks.FuelTankExternal2Quantity
+            };
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The FuelTanks extension method that converts the given tanks model.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="tanks">
+        /// The tanks to act on.
+        /// </param>
+        /// <returns>
+        /// The simConnect fuel tanks struct.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static FuelTanks ConvertBack(this Simulator.Models.FuelTanks tanks)
+        {
+            return new FuelTanks
+            {
+                FuelTankCenterCapacity = tanks.FuelTankCenterCapacity,
+                FuelTankCenter2Capacity = tanks.FuelTankCenter2Capacity,
+                FuelTankCenter3Capacity = tanks.FuelTankCenter3Capacity,
+                FuelTankLeftMainCapacity = tanks.FuelTankLeftMainCapacity,
+                FuelTankLeftAuxCapacity = tanks.FuelTankLeftAuxCapacity,
+                FuelTankLeftTipCapacity = tanks.FuelTankLeftTipCapacity,
+                FuelTankRightMainCapacity = tanks.FuelTankRightMainCapacity,
+                FuelTankRightAuxCapacity = tanks.FuelTankRightAuxCapacity,
+                FuelTankRightTipCapacity = tanks.FuelTankRightTipCapacity,
+                FuelTankExternal1Capacity = tanks.FuelTankExternal1Capacity,
+                FuelTankExternal2Capacity = tanks.FuelTankExternal2Capacity,
+
+                FuelTankCenterQuantity = tanks.FuelTankCenterQuantity,
+                FuelTankCenter2Quantity = tanks.FuelTankCenter2Quantity,
+                FuelTankCenter3Quantity = tanks.FuelTankCenter3Quantity,
+                FuelTankLeftMainQuantity = tanks.FuelTankLeftMainQuantity,
+                FuelTankLeftAuxQuantity = tanks.FuelTankLeftAuxQuantity,
+                FuelTankLeftTipQuantity = tanks.FuelTankLeftTipQuantity,
+                FuelTankRightMainQuantity = tanks.FuelTankRightMainQuantity,
+                FuelTankRightAuxQuantity = tanks.FuelTankRightAuxQuantity,
+                FuelTankRightTipQuantity = tanks.FuelTankRightTipQuantity,
+                FuelTankExternal1Quantity = tanks.FuelTankExternal1Quantity,
+                FuelTankExternal2Quantity = tanks.FuelTankExternal2Quantity
+            };
+        }
+    }
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

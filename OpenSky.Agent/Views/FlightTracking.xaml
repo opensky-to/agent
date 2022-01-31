@@ -92,16 +92,16 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Destination:</TextBlock>
                 <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Alternate:</TextBlock>
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.Origin.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Origin, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Origin.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding Simulator.Flight.Origin.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding Simulator.Flight.Origin, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding Simulator.Flight.Origin.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.Destination.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Destination, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Destination.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding Simulator.Flight.Destination.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" Width="55" Foreground="White" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding Simulator.Flight.Destination, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding Simulator.Flight.Destination.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="5,0" VerticalAlignment="Center">
-                    <Button Content="{Binding SimConnect.Flight.Alternate.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding SimConnect.Flight.Alternate, FallbackValue={x:Null}}" />
-                    <TextBlock Text="{Binding SimConnect.Flight.Alternate.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <Button Content="{Binding Simulator.Flight.Alternate.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding Simulator.Flight.Alternate, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{Binding Simulator.Flight.Alternate.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" HorizontalAlignment="Stretch" Style="{StaticResource OpenSkyButtonStyle}" Foreground="White" FontSize="14" FontWeight="SemiBold" Command="{Binding ImportSimbriefCommand}" Visibility="{Binding ImportSimbriefVisibility}">Import waypoints from Simbrief flight plan</Button>
             </Grid>
@@ -112,12 +112,12 @@
             </GroupBox.Header>
             <Grid Margin="5">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[0].RowHeight}" />
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[1].RowHeight}" />
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[2].RowHeight}" />
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[3].RowHeight}" />
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[4].RowHeight}" />
-                    <RowDefinition Height="{Binding SimConnect.TrackingConditions[5].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[0].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[1].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[2].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[3].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[4].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[5].RowHeight}" />
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -128,68 +128,68 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Grid.Row="0" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[0].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="0" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[0].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">Date and Time</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
-                        <TextBlock Text="{Binding SimConnect.TrackingConditions[0].Current}" FontSize="12" />
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[0].Current}" FontSize="12" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
-                        <TextBlock Text="{Binding SimConnect.TrackingConditions[0].Expected}" FontSize="12" />
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[0].Expected}" FontSize="12" />
                     </StackPanel>
                 </StackPanel>
-                <CheckBox Grid.Row="0" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[0].AutoSet, Mode=TwoWay}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
+                <CheckBox Grid.Row="0" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding Simulator.TrackingConditions[0].AutoSet, Mode=TwoWay}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
-                <CheckBox Grid.Row="1" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[1].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="1" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[1].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">Fuel</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
-                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[1].Current}" />
+                        <TextBlock FontSize="12" Text="{Binding Simulator.TrackingConditions[1].Current}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
-                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[1].Expected}" />
+                        <TextBlock FontSize="12" Text="{Binding Simulator.TrackingConditions[1].Expected}" />
                     </StackPanel>
                 </StackPanel>
-                <CheckBox Grid.Row="1" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[1].AutoSet, Mode=TwoWay}" Visibility="{Binding SimConnect.Flight.Aircraft.Type.RequiresManualFuelling, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
+                <CheckBox Grid.Row="1" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding Simulator.TrackingConditions[1].AutoSet, Mode=TwoWay}" Visibility="{Binding Simulator.Flight.Aircraft.Type.RequiresManualFuelling, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
-                <CheckBox Grid.Row="2" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[2].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="2" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[2].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">Payload</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
-                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[2].Current}" />
+                        <TextBlock FontSize="12" Text="{Binding Simulator.TrackingConditions[2].Current}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
-                        <TextBlock FontSize="12" Text="{Binding SimConnect.TrackingConditions[2].Expected}" />
+                        <TextBlock FontSize="12" Text="{Binding Simulator.TrackingConditions[2].Expected}" />
                     </StackPanel>
                 </StackPanel>
-                <CheckBox Grid.Row="2" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding SimConnect.TrackingConditions[2].AutoSet, Mode=TwoWay}" Visibility="{Binding SimConnect.Flight.Aircraft.Type.RequiresManualLoading, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
+                <CheckBox Grid.Row="2" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding Simulator.TrackingConditions[2].AutoSet, Mode=TwoWay}" Visibility="{Binding Simulator.Flight.Aircraft.Type.RequiresManualLoading, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
-                <CheckBox Grid.Row="3" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[3].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="3" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[3].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Plane model</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="3" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
-                        <TextBlock Text="{Binding SimConnect.TrackingConditions[3].Current}" FontSize="12" />
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[3].Current}" FontSize="12" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
-                        <TextBlock Text="{Binding SimConnect.TrackingConditions[3].Expected}" FontSize="12" />
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[3].Expected}" FontSize="12" />
                     </StackPanel>
                 </StackPanel>
 
-                <CheckBox Grid.Row="4" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[4].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="4" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[4].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">Realism</TextBlock>
-                <TextBlock Grid.Row="4" Grid.Column="2" Margin="15,0,0,0" FontSize="12" Text="{Binding SimConnect.TrackingConditions[4].Expected}" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="4" Grid.Column="2" Margin="15,0,0,0" FontSize="12" Text="{Binding Simulator.TrackingConditions[4].Expected}" VerticalAlignment="Center" />
 
-                <CheckBox Grid.Row="5" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding SimConnect.TrackingConditions[5].ConditionMet}" MaxWidth="25" MinWidth="25"  />
+                <CheckBox Grid.Row="5" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[5].ConditionMet}" MaxWidth="25" MinWidth="25"  />
                 <TextBlock Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">Location</TextBlock>
-                <TextBlock Grid.Row="5" Grid.Column="2" Margin="15,0,0,0" FontSize="12" Text="{Binding SimConnect.TrackingConditions[5].Current}" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="5" Grid.Column="2" Margin="15,0,0,0" FontSize="12" Text="{Binding Simulator.TrackingConditions[5].Current}" VerticalAlignment="Center" />
                 <Button Grid.Row="5" Grid.Column="3" Margin="10,2,0,2" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding SlewIntoPositionCommand}">Slew</Button>
 
                 <Rectangle Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Fill="{StaticResource OpenSkyTealBrush}" RadiusX="3" RadiusY="3" Margin="0,5" Visibility="{Binding ResumeFlightTipsVisibility}" />
@@ -241,21 +241,21 @@
                 <TextBlock Grid.Row="5" Grid.Column="0">Paused?</TextBlock>
                 <TextBlock Grid.Row="6" Grid.Column="0">Flight phase</TextBlock>
 
-                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SimConnect.TrackingDuration}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Simulator.TrackingDuration}" />
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
-                    <TextBlock Text="{Binding SimConnect.WeightAndBalance.FuelTotalQuantity, StringFormat=F2}" />
+                    <TextBlock Text="{Binding Simulator.WeightAndBalance.FuelTotalQuantity, StringFormat=F2}" />
                     <TextBlock Margin="3,0,0,0">gallons</TextBlock>
                 </StackPanel>
-                <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SimConnect.PrimaryTracking.SimulationRate, StringFormat=F1}" />
-                <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right"  Text="{Binding SimConnect.WarpInfo}" />
-                <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SimConnect.PauseInfo}" />
-                <TextBlock Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding SimConnect.FlightPhase}" />
+                <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Simulator.PrimaryTracking.SimulationRate, StringFormat=F1}" />
+                <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right"  Text="{Binding Simulator.WarpInfo}" />
+                <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Simulator.PauseInfo}" />
+                <TextBlock Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Simulator.FlightPhase}" />
                 <Rectangle Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Fill="{StaticResource OpenSkyWarningOrangeBrush}" RadiusX="3" RadiusY="3" Margin="0,5" Name="GroundHandlingWarning" Visibility="{Binding GroundHandlingWarningVisibility}" IsVisibleChanged="GroundHandlingWarningOnIsVisibleChanged" />
                 <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="460" FontWeight="Normal" Foreground="Black" Margin="5,10" Visibility="{Binding GroundHandlingWarningVisibility}">Remember: Don't start your engines or pushback until ground handling is complete or your flight tracking will be aborted automatically!</TextBlock>
                 <Rectangle Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Fill="{StaticResource OpenSkyTealBrush}" RadiusX="3" RadiusY="3" Margin="0,5" Name="NextFlightStep" />
-                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Foreground="White" TextWrapping="Wrap" HorizontalAlignment="Left" MaxWidth="350" FontWeight="SemiBold" Margin="5,10" Text="{Binding SimConnect.NextFlightStep}" />
+                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Foreground="White" TextWrapping="Wrap" HorizontalAlignment="Left" MaxWidth="350" FontWeight="SemiBold" Margin="5,10" Text="{Binding Simulator.NextFlightStep}" />
                 <UniformGrid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="0, 5, 0, 3" Rows="1">
-                    <Button Margin="0,0,3,0" Padding="3" Background="{StaticResource OpenSkyTealBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding ToggleFlightPauseCommand}" Content="{Binding SimConnect.IsPaused, Converter={StaticResource IsPausedButtonConverter}}"></Button>
+                    <Button Margin="0,0,3,0" Padding="3" Background="{StaticResource OpenSkyTealBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding ToggleFlightPauseCommand}" Content="{Binding Simulator.IsPaused, Converter={StaticResource IsPausedButtonConverter}}"></Button>
                     <Button Margin="3,0,0,0" Padding="3" Background="{StaticResource OpenSkyRedBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding StopTrackingCommand}">Stop Tracking</Button>
                 </UniformGrid>
                 <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Margin="0,0,0,10">[*] Time warp time saved and pause times only update when the sim rate is changed or the sim is resumed.</TextBlock>
@@ -263,7 +263,7 @@
                 <TextBlock Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Foreground="Black" Margin="10,10">Note: You can close this window and OpenSky will monitor your flight in the background...</TextBlock>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="3" Grid.Column="0" IsEnabled="{Binding SimConnect.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesVisibility}">
+        <GroupBox Grid.Row="3" Grid.Column="0" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesVisibility}">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Weights and Balances</TextBlock>
             </GroupBox.Header>
@@ -280,25 +280,25 @@
                     <RowDefinition Height="5" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Rectangle Grid.Row="0" Grid.Column="0" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource CgColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
-                <Rectangle Grid.Row="0" Grid.Column="2" Fill="{Binding SimConnect.WeightAndBalance.CgPercentLateral, Converter={StaticResource CgLateralColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
+                <Rectangle Grid.Row="0" Grid.Column="0" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource CgColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
+                <Rectangle Grid.Row="0" Grid.Column="2" Fill="{Binding Simulator.WeightAndBalance.CgPercentLateral, Converter={StaticResource CgLateralColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
                 <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="White" Margin="7,7,0,7" HorizontalAlignment="Left">Center of gravity</TextBlock>
                 <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Foreground="White" Margin="7,7,0,7" HorizontalAlignment="Left">Lateral CG</TextBlock>
-                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.CgPercent, StringFormat=P}" Foreground="White" Margin="7" />
-                <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.CgPercentLateral, StringFormat=P}" Foreground="White" Margin="7" />
+                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.CgPercent, StringFormat=P}" Foreground="White" Margin="7" />
+                <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.CgPercentLateral, StringFormat=P}" Foreground="White" Margin="7" />
 
-                <Rectangle Grid.Row="2" Grid.Column="0" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=payload}" RadiusX="1.5" RadiusY="1.5" />
-                <Rectangle Grid.Row="2" Grid.Column="2" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=total}" RadiusX="1.5" RadiusY="1.5" />
+                <Rectangle Grid.Row="2" Grid.Column="0" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=payload}" RadiusX="1.5" RadiusY="1.5" />
+                <Rectangle Grid.Row="2" Grid.Column="2" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=total}" RadiusX="1.5" RadiusY="1.5" />
                 <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Foreground="White" Margin="7,7,0,7" HorizontalAlignment="Left">Payload weight</TextBlock>
                 <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Foreground="White" Margin="7,7,0,7" HorizontalAlignment="Left">Max takeoff weight</TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.PayloadPercentOfMax, StringFormat=P, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" Margin="7" />
-                <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.TotalWeightPercentOfMax, StringFormat=P, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" Margin="7" />
+                <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.PayloadPercentOfMax, StringFormat=P, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" Margin="7" />
+                <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.TotalWeightPercentOfMax, StringFormat=P, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" Margin="7" />
 
                 <Button Grid.Row="4" Grid.Column="0" HorizontalAlignment="Stretch" Command="{Binding SetFuelAndPayloadCommand}" Style="{StaticResource OpenSkyButtonStyle}">Set in sim to test</Button>
                 <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Stretch" Command="{Binding ToggleAdvancedWeightAndBalanceCommand}" Content="{Binding ShowHideAdvancedWeightAndBalanceButtonText}" />
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="5" Grid.Column="0" Visibility="{Binding SimConnect.GroundHandlingComplete, Converter={StaticResource InvertedBooleanVisibilityConverter}}">
+        <GroupBox Grid.Row="5" Grid.Column="0" Visibility="{Binding Simulator.GroundHandlingComplete, Converter={StaticResource InvertedBooleanVisibilityConverter}}">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Ground Handling</TextBlock>
             </GroupBox.Header>
@@ -318,14 +318,14 @@
                 <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Fill="#606060" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
                 <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="5">Fuel loading estimated completion time</TextBlock>
                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="5">Payload loading estimated completion time</TextBlock>
-                <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"  Margin="5" Text="{Binding SimConnect.FuelLoadingEstimateMinutes, Mode=OneWay}" />
-                <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right"  Margin="5" Text="{Binding SimConnect.PayloadLoadingEstimateMinutes, Mode=OneWay}" />
+                <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"  Margin="5" Text="{Binding Simulator.FuelLoadingEstimateMinutes, Mode=OneWay}" />
+                <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right"  Margin="5" Text="{Binding Simulator.PayloadLoadingEstimateMinutes, Mode=OneWay}" />
 
-                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding SimConnect.FuelLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding Simulator.FuelLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
                     <Rectangle Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="1.5" RadiusY="1.5" />
                     <TextBlock Foreground="#404040" Margin="5">Fuel loading complete</TextBlock>
                 </Grid>
-                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding SimConnect.PayloadLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
+                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,1" Visibility="{Binding Simulator.PayloadLoadingComplete, Converter={StaticResource BooleanVisibilityConverter}}">
                     <Rectangle Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="1.5" RadiusY="1.5" />
                     <TextBlock Foreground="#404040" Margin="5">Payload loading complete</TextBlock>
                 </Grid>
@@ -344,15 +344,15 @@
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Payload</TextBlock>
             </GroupBox.Header>
-            <TextBlock Text="{Binding SimConnect.Flight.PayloadSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
+            <TextBlock Text="{Binding Simulator.Flight.PayloadSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
         </GroupBox>
         <GroupBox Grid.Row="7" Grid.Column="0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Crew</TextBlock>
             </GroupBox.Header>
-            <TextBlock Text="{Binding SimConnect.Flight.CrewSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
+            <TextBlock Text="{Binding Simulator.Flight.CrewSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" IsEnabled="{Binding SimConnect.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}">
+        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Weights and Balances</TextBlock>
@@ -376,16 +376,16 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="1*" />
                             </Grid.ColumnDefinitions>
-                            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource CgColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
-                            <Rectangle Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Fill="{Binding SimConnect.WeightAndBalance.CgPercentLateral, Converter={StaticResource CgLateralColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
+                            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource CgColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
+                            <Rectangle Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Fill="{Binding Simulator.WeightAndBalance.CgPercentLateral, Converter={StaticResource CgLateralColorConverter}}" RadiusX="1.5" RadiusY="1.5" />
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="White"  Margin="5,0,0,0">Center of gravity</TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="10,3,3,3">CG forward limit</TextBlock>
                             <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="10,3,3,3">CG aft limit</TextBlock>
                             <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Foreground="White"  Margin="5,0,0,0">Lateral CG</TextBlock>
-                            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.CgPercent, StringFormat=P}" Foreground="White" Margin="5" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" FontSize="13" Text="{Binding SimConnect.WeightAndBalance.CgFwdLimit, StringFormat=P}" Margin="5,3,5,3" />
-                            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" FontSize="13" Text="{Binding SimConnect.WeightAndBalance.CgAftLimit, StringFormat=P}" Margin="5,3,5,3" />
-                            <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding SimConnect.WeightAndBalance.CgPercentLateral, StringFormat=P}" Foreground="White" Margin="5" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.CgPercent, StringFormat=P}" Foreground="White" Margin="5" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" FontSize="13" Text="{Binding Simulator.WeightAndBalance.CgFwdLimit, StringFormat=P}" Margin="5,3,5,3" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" FontSize="13" Text="{Binding Simulator.WeightAndBalance.CgAftLimit, StringFormat=P}" Margin="5,3,5,3" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" FontWeight="SemiBold" Text="{Binding Simulator.WeightAndBalance.CgPercentLateral, StringFormat=P}" Foreground="White" Margin="5" />
                         </Grid>
                     </GroupBox>
                     <GroupBox>
@@ -411,28 +411,28 @@
                             </Grid.ColumnDefinitions>
                             <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" Fill="#606060" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
                             <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Fill="#606060" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
-                            <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="7" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=payload}" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
-                            <Rectangle Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="7" Fill="{Binding SimConnect.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=total}" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
+                            <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="7" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=payload}" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
+                            <Rectangle Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="7" Fill="{Binding Simulator.WeightAndBalance, Converter={StaticResource WeightsColorConverter}, ConverterParameter=total}" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5">Empty weight</TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5">Fuel / Max fuel</TextBlock>
                             <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="5" Foreground="White">Payload / Max</TextBlock>
                             <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="5" Foreground="White">Total / MTOW</TextBlock>
 
-                            <TextBlock Grid.Row="0" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight, StringFormat=F1}" />
+                            <TextBlock Grid.Row="0" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding Simulator.WeightAndBalance.EmptyWeight, StringFormat=F1}" />
                             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.FuelWeight, StringFormat=F1}" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.FuelWeight, StringFormat=F1}" />
                                 <TextBlock Margin="2,0">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxFuelWeight, StringFormat=F1}" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxFuelWeight, StringFormat=F1}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.PayloadWeight, StringFormat=F1}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.PayloadWeight, StringFormat=F1}" Foreground="White" />
                                 <TextBlock Margin="2,0" Foreground="White">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxPayloadWeight, StringFormat=F1}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxPayloadWeight, StringFormat=F1}" Foreground="White" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.TotalWeight, StringFormat=F1}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.TotalWeight, StringFormat=F1}" Foreground="White" />
                                 <TextBlock Margin="2,0" Foreground="White">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight, StringFormat=F1}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxGrossWeight, StringFormat=F1}" Foreground="White" />
                             </StackPanel>
                             <TextBlock Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Margin="-2,0,5,0">lbs</TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" Margin="-2,0,5,0">lbs</TextBlock>
@@ -440,21 +440,21 @@
                             <TextBlock Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Margin="-2,0,5,0" Foreground="White">lbs</TextBlock>
 
 
-                            <TextBlock Grid.Row="0" Grid.Column="5" Margin="5" HorizontalAlignment="Right" Text="{Binding SimConnect.WeightAndBalance.EmptyWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
+                            <TextBlock Grid.Row="0" Grid.Column="5" Margin="5" HorizontalAlignment="Right" Text="{Binding Simulator.WeightAndBalance.EmptyWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
                             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="5" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.FuelWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.FuelWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
                                 <TextBlock Margin="2,0">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxFuelWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxFuelWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="5" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.PayloadWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.PayloadWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
                                 <TextBlock Margin="2,0" Foreground="White">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxPayloadWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxPayloadWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="5" Margin="5" HorizontalAlignment="Right">
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.TotalWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.TotalWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
                                 <TextBlock Margin="2,0" Foreground="White">/</TextBlock>
-                                <TextBlock Text="{Binding SimConnect.WeightAndBalance.MaxGrossWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
+                                <TextBlock Text="{Binding Simulator.WeightAndBalance.MaxGrossWeight, StringFormat=F1, Converter={StaticResource PoundsKilogramsConverter}}" Foreground="White" />
                             </StackPanel>
                             <TextBlock Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" Margin="-2,0,5,0">kg</TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="6" VerticalAlignment="Center" Margin="-2,0,5,0">kg</TextBlock>
@@ -468,7 +468,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Fuel (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.FuelGallons, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0"/>
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding Simulator.Flight.FuelGallons, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0"/>
                                 <TextBlock FontSize="15" FontWeight="DemiBold">gallons)</TextBlock>
                             </StackPanel>
                         </Expander.Header>
@@ -491,7 +491,7 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="15" FontWeight="DemiBold">Payload (</TextBlock>
-                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding SimConnect.Flight.PayloadPounds, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0" />
+                                <TextBlock FontSize="15" FontWeight="DemiBold" Text="{Binding Simulator.Flight.PayloadPounds, FallbackValue=??, StringFormat=F2}" Margin="0,0,3,0" />
                                 <TextBlock FontSize="15" FontWeight="DemiBold">lbs)</TextBlock>
                             </StackPanel>
                         </Expander.Header>
@@ -520,7 +520,7 @@
                     <Button Padding="5,0" FontSize="11" Margin="5,-2,0,0" Command="{Binding ToggleOfpCommand}">hide</Button>
                 </StackPanel>
             </GroupBox.Header>
-            <TextBox Text="{Binding SimConnect.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
+            <TextBox Text="{Binding Simulator.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
         </GroupBox>
         <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="8">
             <Grid.RowDefinitions>
@@ -534,9 +534,9 @@
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <TextBlock FontSize="10">Route</TextBlock>
-                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
                     <TextBlock FontSize="10" Margin="0,10,0,0">Alternate route</TextBlock>
-                    <TextBlock FontFamily="Consolas" Text="{Binding SimConnect.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
                     <Button Style="{StaticResource OpenSkyButtonStyle}" Margin="0,10,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
                 </StackPanel>
             </GroupBox>
@@ -544,7 +544,7 @@
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Flight events</TextBlock>
                 </GroupBox.Header>
-                <controls:ScrollingListBox x:Name="EventLog" FontFamily="Consolas" ItemsSource="{Binding SimConnect.TrackingEventLogEntries, Mode=OneWay}" MouseDoubleClick="EventLogMouseDoubleClick" BorderThickness="0" Background="#1a1e22">
+                <controls:ScrollingListBox x:Name="EventLog" FontFamily="Consolas" ItemsSource="{Binding Simulator.TrackingEventLogEntries, Mode=OneWay}" MouseDoubleClick="EventLogMouseDoubleClick" BorderThickness="0" Background="#1a1e22">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="models:TrackingEventLogEntry">
                             <StackPanel Orientation="Horizontal" Margin="-5">
@@ -598,18 +598,18 @@
                             <sf:NumericalAxis Name="Altitude" Header="Altitude [Feet]" ShowGridLines="False" Visibility="{Binding AltitudeAxisAndSeriesVisibility}" />
                         </sf:SfChart.SecondaryAxis>
                         <sf:SfChart.Series>
-                            <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.Altitude" EnableAnimation="True" Visibility="{Binding AltitudeAxisAndSeriesVisibility}" StrokeThickness="3" Interior="#05826c" Label="Altitude" />
-                            <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.Groundspeed" EnableAnimation="True" Visibility="{Binding GroundSpeedAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkMagenta" Label="Groundspeed">
+                            <sf:FastLineSeries ItemsSource="{Binding Simulator.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.Altitude" EnableAnimation="True" Visibility="{Binding AltitudeAxisAndSeriesVisibility}" StrokeThickness="3" Interior="#05826c" Label="Altitude" />
+                            <sf:FastLineSeries ItemsSource="{Binding Simulator.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.Groundspeed" EnableAnimation="True" Visibility="{Binding GroundSpeedAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkMagenta" Label="Groundspeed">
                                 <sf:FastLineSeries.YAxis>
                                     <sf:NumericalAxis Visibility="{Binding GroundSpeedAxisAndSeriesVisibility}" ShowGridLines="False" Header="Speed [Knots]" />
                                 </sf:FastLineSeries.YAxis>
                             </sf:FastLineSeries>
-                            <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.FuelOnBoard" EnableAnimation="True" Visibility="{Binding FuelAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkOrange" Label="Fuel">
+                            <sf:FastLineSeries ItemsSource="{Binding Simulator.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.FuelOnBoard" EnableAnimation="True" Visibility="{Binding FuelAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkOrange" Label="Fuel">
                                 <sf:FastLineSeries.YAxis>
                                     <sf:NumericalAxis OpposedPosition="True" ShowGridLines="False" Header="Fuel [Gallons]" Visibility="{Binding FuelAxisAndSeriesVisibility}" Minimum="0" />
                                 </sf:FastLineSeries.YAxis>
                             </sf:FastLineSeries>
-                            <sf:FastLineSeries ItemsSource="{Binding SimConnect.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.SimulationRate" EnableAnimation="True" Visibility="{Binding SimRateAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkRed" Label="SimRate">
+                            <sf:FastLineSeries ItemsSource="{Binding Simulator.AircraftTrailLocations}" XBindingPath="Position.Timestamp" YBindingPath="Position.SimulationRate" EnableAnimation="True" Visibility="{Binding SimRateAxisAndSeriesVisibility}" StrokeThickness="3" Interior="DarkRed" Label="SimRate">
                                 <sf:FastLineSeries.YAxis>
                                     <sf:NumericalAxis OpposedPosition="True" ShowGridLines="False" Header="SimRate" Interval="1" Visibility="{Binding SimRateAxisAndSeriesVisibility}" />
                                 </sf:FastLineSeries.YAxis>
@@ -625,7 +625,7 @@
                 <TextBlock FontSize="15" FontWeight="DemiBold">Map</TextBlock>
             </GroupBox.Header>
             <Grid>
-                <wpf:Map Name="MapView" ZoomLevel="13" UseInertia="False" AnimationLevel="Full" MouseDoubleClick="UserMapInteraction" MouseWheel="UserMapInteraction" MouseLeftButtonDown="UserMapInteraction" MouseLeftButtonUp="UserMapInteraction" TouchMove="UserMapInteraction" Center="{Binding SimConnect.PrimaryTracking.MapLocation, Mode=OneTime}" />
+                <wpf:Map Name="MapView" ZoomLevel="13" UseInertia="False" AnimationLevel="Full" MouseDoubleClick="UserMapInteraction" MouseWheel="UserMapInteraction" MouseLeftButtonDown="UserMapInteraction" MouseLeftButtonUp="UserMapInteraction" TouchMove="UserMapInteraction" Center="{Binding Simulator.PrimaryTracking.MapLocation, Mode=OneTime}" />
                 <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="#66000000" IsHitTestVisible="False" Visibility="{Binding DarkRoadMapVisibility}" />
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
                     <Border CornerRadius="2" Padding="8,0,8,0" BorderThickness="0.7" BorderBrush="White" Margin="1">

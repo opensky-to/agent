@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PlaneIdentity.cs" company="OpenSky">
+// <copyright file="AircraftIdentity.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect.Structs
+namespace OpenSky.Agent.SimConnectMSFS.Structs
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Plane identity struct.
+    /// Aircraft identity struct.
     /// </summary>
     /// <remarks>
     /// sushi.at, 20/03/2021.
@@ -26,7 +26,7 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
     /// -------------------------------------------------------------------------------------------------
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
     [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Uppercase naming for struct variables/mixed with some being properties")]
-    public struct PlaneIdentity
+    public struct AircraftIdentity
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -83,13 +83,52 @@ namespace OpenSky.AgentMSFS.SimConnect.Structs
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// The plane identity struct SimConnect properties definition.
+    /// Aircraft identity converter (simConnect struct to simulator model).
+    /// </summary>
+    /// <remarks>
+    /// sushi.at, 31/01/2022.
+    /// </remarks>
+    /// -------------------------------------------------------------------------------------------------
+    public static class AircraftIdentityConverter
+    {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// An AircraftIdentity extension method that converts the given aircraft identity.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="identity">
+        /// The identity to act on.
+        /// </param>
+        /// <returns>
+        /// The simulator model aircraft identity.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static Agent.Simulator.Models.AircraftIdentity Convert(this AircraftIdentity identity)
+        {
+            return new Agent.Simulator.Models.AircraftIdentity
+            {
+                Type = identity.Type,
+                EngineType = identity.EngineType,
+                EngineCount = identity.EngineCount,
+                AtcType = identity.AtcType,
+                AtcModel = identity.AtcModel,
+                FlapsAvailable = identity.FlapsAvailable,
+                GearRetractable = identity.GearRetractable
+            };
+        }
+    }
+
+    /// -------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// The aircraft identity struct SimConnect properties definition.
     /// </summary>
     /// <remarks>
     /// sushi.at, 20/03/2021.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public static class PlaneIdentityDefinition
+    public static class AircraftIdentityDefinition
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

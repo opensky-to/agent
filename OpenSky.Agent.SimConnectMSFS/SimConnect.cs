@@ -4,18 +4,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.SimConnect
+namespace OpenSky.Agent.SimConnectMSFS
 {
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
     using System.Threading;
-    using System.Windows;
 
     using CTrue.FsConnect;
 
@@ -23,14 +20,25 @@ namespace OpenSky.AgentMSFS.SimConnect
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.SimConnectMSFS.Helpers;
+    using OpenSky.Agent.SimConnectMSFS.Structs;
+    using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.Models;
     using OpenSky.AgentMSFS.SimConnect.Enums;
     using OpenSky.AgentMSFS.SimConnect.Helpers;
     using OpenSky.AgentMSFS.SimConnect.Structs;
     using OpenSky.FlightLogXML;
 
-    using OpenSky.Agent.Simulator;
-    using OpenSky.Agent.Simulator.Enums;
+    using AircraftIdentity = Structs.AircraftIdentity;
+    using FuelTanks = Structs.FuelTanks;
+    using LandingAnalysis = Structs.LandingAnalysis;
+    using PayloadStations = Structs.PayloadStations;
+    using PrimaryTracking = Structs.PrimaryTracking;
+    using SecondaryTracking = Structs.SecondaryTracking;
+    using WeightAndBalance = Structs.WeightAndBalance;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -40,7 +48,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     /// sushi.at, 13/03/2021.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public partial class SimConnect : Simulator, INotifyPropertyChanged
+    public partial class SimConnect : Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -68,14 +76,14 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The last fuel tanks info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private FuelTanks fuelTanks;
+        private FuelTanks fuelTanksStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last landing analysis info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private LandingAnalysis landingAnalysis;
+        private LandingAnalysis landingAnalysisStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -89,28 +97,28 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The last payload stations info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private PayloadStations payloadStations;
+        private PayloadStations payloadStationsStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last plane identity info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private PlaneIdentity planeIdentity;
+        private AircraftIdentity aircraftIdentityStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last primary tracking info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private PrimaryTracking primaryTracking;
+        private PrimaryTracking primaryTrackingStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last plane systems info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private SecondaryTracking secondaryTracking;
+        private SecondaryTracking secondaryTrackingStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -131,20 +139,7 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// The last weight and balance info received from the sim.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private WeightAndBalance weightAndBalance;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Initializes static members of the <see cref="SimConnect"/> class.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 17/03/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        static SimConnect()
-        {
-            Instance = new SimConnect();
-        }
+        private WeightAndBalance weightAndBalanceStruct;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -153,9 +148,18 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 13/03/2021.
         /// </remarks>
+        /// <param name="simulatorHostName">
+        /// Name of the simulator host.
+        /// </param>
+        /// <param name="simulatorPort">
+        /// The simulator port.
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private SimConnect()
+        public SimConnect(string simulatorHostName, uint simulatorPort)
         {
+            this.simulatorHostName = simulatorHostName;
+            this.simulatorPort = simulatorPort;
+
             // Default values and init data structures
             this.SampleRates = new ObservableConcurrentDictionary<Requests, int>
             {
@@ -179,16 +183,16 @@ namespace OpenSky.AgentMSFS.SimConnect
             this.landingAnalysisProcessingQueue = new ConcurrentQueue<ProcessLandingAnalysis>();
             this.AircraftTrailLocations = new LocationCollection();
             this.SimbriefRouteLocations = new LocationCollection();
-            this.TrackingEventLogEntries = new ObservableCollection<TrackingEventLogEntry>();
+            this.TrackingEventLogEntries = new ObservableCollection<Agent.Simulator.Models.TrackingEventLogEntry>();
             this.LandingReports = new ObservableCollection<TouchDown>();
             this.TrackingConditions = new Dictionary<int, TrackingCondition>
             {
-                { (int)Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
-                { (int)Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
-                { (int)Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
-                { (int)Models.TrackingConditions.PlaneModel, new TrackingCondition() },
-                { (int)Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1" } },
-                { (int)Models.TrackingConditions.Location, new TrackingCondition() }
+                { (int)Agent.Simulator.Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
+                { (int)Agent.Simulator.Models.TrackingConditions.PlaneModel, new TrackingCondition() },
+                { (int)Agent.Simulator.Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1" } },
+                { (int)Agent.Simulator.Models.TrackingConditions.Location, new TrackingCondition() }
             };
 
             // Set up fsConnect client
@@ -206,29 +210,15 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Occurs when a property value changes.
+        /// Gets a value indicating whether the simulator is connected.
         /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.Connected"/>
         /// -------------------------------------------------------------------------------------------------
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The single instance of the SimConnect class.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        [NotNull]
-        public static SimConnect Instance { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets a value indicating whether we are connected via SimConnect.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public bool Connected
+        public override bool Connected
         {
             get => this.connected;
 
-            private set
+            protected set
             {
                 if (Equals(this.connected, value))
                 {
@@ -242,52 +232,70 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest fuel tanks info.
+        /// Gets the latest fuel tanks info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public FuelTanks FuelTanks
+        private FuelTanks FuelTanksStruct
         {
-            get => this.fuelTanks;
+            get => this.fuelTanksStruct;
 
-            private set
+            set
             {
-                if (Equals(this.fuelTanks, value))
+                if (Equals(this.fuelTanksStruct, value))
                 {
                     return;
                 }
 
-                this.fuelTanks = value;
-                this.OnPropertyChanged();
+                this.fuelTanksStruct = value;
+                this.OnPropertyChanged(nameof(this.FuelTanks));
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets a value indicating whether the sim is paused (proper pause, not ESC menu and definitely not active pause).
+        /// Gets the fuel tanks data.
         /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.FuelTanks"/>
         /// -------------------------------------------------------------------------------------------------
-        public bool IsPaused => this.fsConnect.Paused;
+        public override Agent.Simulator.Models.FuelTanks FuelTanks => this.FuelTanksStruct.Convert();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest landing analysis.
+        /// Gets a value indicating whether the sim is paused (proper pause, not ESC menu and definitely
+        /// not active pause).
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.IsPaused"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override bool IsPaused => this.fsConnect.Paused;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the latest landing analysis struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public LandingAnalysis LandingAnalysis
+        private LandingAnalysis LandingAnalysisStruct
         {
-            get => this.landingAnalysis;
+            get => this.landingAnalysisStruct;
 
-            private set
+            set
             {
-                if (Equals(this.landingAnalysis, value))
+                if (Equals(this.landingAnalysisStruct, value))
                 {
                     return;
                 }
 
-                this.landingAnalysis = value;
-                this.OnPropertyChanged();
+                this.landingAnalysisStruct = value;
+                this.OnPropertyChanged(nameof(this.LandingAnalysis));
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the landing analysis data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.LandingAnalysis"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.LandingAnalysis LandingAnalysis => this.LandingAnalysisStruct.Convert();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -298,94 +306,127 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest payload stations info.
+        /// Gets the latest payload stations info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public PayloadStations PayloadStations
+        private PayloadStations PayloadStationsStruct
         {
-            get => this.payloadStations;
+            get => this.payloadStationsStruct;
 
-            private set
+            set
             {
-                if (Equals(this.payloadStations, value))
+                if (Equals(this.payloadStationsStruct, value))
                 {
                     return;
                 }
 
-                this.payloadStations = value;
-                this.OnPropertyChanged();
+                this.payloadStationsStruct = value;
+                this.OnPropertyChanged(nameof(this.PayloadStations));
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest plane identity info.
+        /// Gets the payload stations data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.PayloadStations"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.PayloadStations PayloadStations => this.PayloadStationsStruct.Convert();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the latest aircraft identity info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public PlaneIdentity PlaneIdentity
+        private AircraftIdentity AircraftIdentityStruct
         {
-            get => this.planeIdentity;
+            get => this.aircraftIdentityStruct;
 
-            private set
+            set
             {
-                if (Equals(this.planeIdentity, value))
+                if (Equals(this.aircraftIdentityStruct, value))
                 {
                     return;
                 }
 
-                this.planeIdentity = value;
-                this.OnPropertyChanged();
+                this.aircraftIdentityStruct = value;
+                this.OnPropertyChanged(nameof(this.AircraftIdentity));
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest primary tracking info.
+        /// Gets the aircraft identity data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.AircraftIdentity"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.AircraftIdentity AircraftIdentity => this.AircraftIdentityStruct.Convert();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the latest primary tracking info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public PrimaryTracking PrimaryTracking
+        private PrimaryTracking PrimaryTrackingStruct
         {
-            get => this.primaryTracking;
+            get => this.primaryTrackingStruct;
 
-            private set
+            set
             {
-                if (Equals(this.primaryTracking, value))
+                if (Equals(this.primaryTrackingStruct, value))
                 {
                     return;
                 }
 
-                this.primaryTracking = value;
-                this.OnPropertyChanged();
+                this.primaryTrackingStruct = value;
+                this.OnPropertyChanged(nameof(this.PrimaryTracking));
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the primary tracking data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.PrimaryTracking"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.PrimaryTracking PrimaryTracking => this.PrimaryTrackingStruct.Convert();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The sample rates/request dictionary.
         /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.SampleRates"/>
         /// -------------------------------------------------------------------------------------------------
-        public ObservableConcurrentDictionary<Requests, int> SampleRates { get; }
+        public override ObservableConcurrentDictionary<Requests, int> SampleRates { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest secondary tracking info.
+        /// Gets the latest secondary tracking info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public SecondaryTracking SecondaryTracking
+        private SecondaryTracking SecondaryTrackingStruct
         {
-            get => this.secondaryTracking;
+            get => this.secondaryTrackingStruct;
 
-            private set
+            set
             {
-                if (Equals(this.secondaryTracking, value))
+                if (Equals(this.secondaryTrackingStruct, value))
                 {
                     return;
                 }
 
-                this.secondaryTracking = value;
-                this.OnPropertyChanged();
+                this.secondaryTrackingStruct = value;
+                this.OnPropertyChanged(nameof(this.SecondaryTracking));
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the secondary tracking data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.SecondaryTracking"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.SecondaryTracking SecondaryTracking => this.SecondaryTrackingStruct.Convert();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -410,36 +451,45 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the latest weight and balance info.
+        /// Gets the latest weight and balance info struct.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public WeightAndBalance WeightAndBalance
+        private WeightAndBalance WeightAndBalanceStruct
         {
-            get => this.weightAndBalance;
+            get => this.weightAndBalanceStruct;
 
-            private set
+            set
             {
-                if (Equals(this.weightAndBalance, value))
+                if (Equals(this.weightAndBalanceStruct, value))
                 {
                     return;
                 }
 
-                this.weightAndBalance = value;
-                this.OnPropertyChanged();
+                this.weightAndBalanceStruct = value;
+                this.OnPropertyChanged(nameof(this.WeightAndBalance));
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Close all connections and dispose the client.
+        /// Gets the weight and balance data.
+        /// </summary>
+        /// <seealso cref="P:OpenSky.Agent.Simulator.Simulator.WeightAndBalance"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override Agent.Simulator.Models.WeightAndBalance WeightAndBalance => this.WeightAndBalanceStruct.Convert();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Close all connections and dispose the simulator client.
         /// </summary>
         /// <remarks>
         /// sushi.at, 13/03/2021.
         /// </remarks>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.Close()"/>
         /// -------------------------------------------------------------------------------------------------
-        public void Close()
+        public override void Close()
         {
-            Debug.WriteLine("SimConnect closing down...");
+            Debug.WriteLine("SimConnect simulator interface closing down...");
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 this.StopTracking(false);
@@ -461,8 +511,9 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <param name="pause">
         /// True to pause, false to un-pause.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.Pause(bool)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void Pause(bool pause)
+        public override void Pause(bool pause)
         {
             if (this.fsConnect.Connected)
             {
@@ -477,16 +528,17 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Refresh SimConnect with the specified request ID now.
+        /// Refresh the request-associated data model object NOW, don't wait for normal refresh interval.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 20/03/2021.
+        /// sushi.at, 31/01/2022.
         /// </remarks>
         /// <param name="request">
-        /// The request ID.
+        /// The request ID type to refresh.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.RefreshModelNow(Requests)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void RefreshStructNow(Requests request)
+        public override void RefreshModelNow(Requests request)
         {
             this.LastReceivedTimes[request] = null;
         }
@@ -501,24 +553,25 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// -------------------------------------------------------------------------------------------------
         public void ReplayMapMarkers()
         {
-            Debug.WriteLine("SimConnect is replaying map markers to listeners...");
+            // todo RESTORE THIS
+            //Debug.WriteLine("SimConnect is replaying map markers to listeners...");
 
-            UpdateGUIDelegate restoreMarkers = () =>
-            {
-                foreach (var waypointMarker in this.simbriefWaypointMarkers)
-                {
-                    this.SimbriefWaypointMarkerAdded?.Invoke(this, waypointMarker);
-                }
+            //UpdateGUIDelegate restoreMarkers = () =>
+            //{
+            //    foreach (var waypointMarker in this.simbriefWaypointMarkers)
+            //    {
+            //        this.SimbriefWaypointMarkerAdded?.Invoke(this, waypointMarker);
+            //    }
 
-                lock (this.trackingEventMarkers)
-                {
-                    foreach (var trackingEventMarker in this.trackingEventMarkers)
-                    {
-                        this.TrackingEventMarkerAdded?.Invoke(this, trackingEventMarker);
-                    }
-                }
-            };
-            Application.Current.Dispatcher.BeginInvoke(restoreMarkers);
+            //    lock (this.trackingEventMarkers)
+            //    {
+            //        foreach (var trackingEventMarker in this.trackingEventMarkers)
+            //        {
+            //            this.TrackingEventMarkerAdded?.Invoke(this, trackingEventMarker);
+            //        }
+            //    }
+            //};
+            //Application.Current.Dispatcher.BeginInvoke(restoreMarkers);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -531,8 +584,9 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <exception cref="Exception">
         /// Thrown when an exception error condition occurs.
         /// </exception>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetFuelAndPayloadFromSave()"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetFuelAndPayloadFromSave()
+        public override void SetFuelAndPayloadFromSave()
         {
             if (this.fsConnect.Connected)
             {
@@ -542,10 +596,10 @@ namespace OpenSky.AgentMSFS.SimConnect
                 }
 
                 Debug.WriteLine("SimConnect setting fuel and payload stations from temp structs restored from save");
-                this.fsConnect.UpdateData(Requests.FuelTanks, this.flightLoadingTempStructs.FuelTanks);
-                this.fsConnect.UpdateData(Requests.PayloadStations, this.flightLoadingTempStructs.PayloadStations);
-                this.RefreshStructNow(Requests.FuelTanks);
-                this.RefreshStructNow(Requests.PayloadStations);
+                this.fsConnect.UpdateData<Agent.Simulator.Models.FuelTanks>(Requests.FuelTanks, this.flightLoadingTempStructs.FuelTanks);
+                this.fsConnect.UpdateData<Agent.Simulator.Models.PayloadStations>(Requests.PayloadStations, this.flightLoadingTempStructs.PayloadStations);
+                this.RefreshModelNow(Requests.FuelTanks);
+                this.RefreshModelNow(Requests.PayloadStations);
             }
             else
             {
@@ -560,17 +614,21 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 19/03/2021.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
         /// <param name="newFuelTanks">
         /// The new fuel tank quantities to set.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetFuelTanks(Agent.Simulator.Models.FuelTanks)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetFuelTanks(FuelTanks newFuelTanks)
+        public override void SetFuelTanks(Agent.Simulator.Models.FuelTanks newFuelTanks)
         {
             if (this.fsConnect.Connected)
             {
                 Debug.WriteLine("SimConnect setting fuel tanks");
-                this.fsConnect.UpdateData(Requests.FuelTanks, newFuelTanks);
-                this.RefreshStructNow(Requests.FuelTanks);
+                this.fsConnect.UpdateData(Requests.FuelTanks, newFuelTanks.ConvertBack());
+                this.RefreshModelNow(Requests.FuelTanks);
             }
             else
             {
@@ -585,17 +643,21 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 19/03/2021.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
         /// <param name="newPayloadStations">
         /// The new payload station weights to set.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetPayloadStations(Agent.Simulator.Models.PayloadStations)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetPayloadStations(PayloadStations newPayloadStations)
+        public override void SetPayloadStations(Agent.Simulator.Models.PayloadStations newPayloadStations)
         {
             if (this.fsConnect.Connected)
             {
                 Debug.WriteLine("SimConnect setting payload stations");
-                this.fsConnect.UpdateData(Requests.PayloadStations, newPayloadStations);
-                this.RefreshStructNow(Requests.PayloadStations);
+                this.fsConnect.UpdateData(Requests.PayloadStations, newPayloadStations.ConvertBack());
+                this.RefreshModelNow(Requests.PayloadStations);
             }
             else
             {
@@ -605,10 +667,10 @@ namespace OpenSky.AgentMSFS.SimConnect
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Sets plane registry in the sim.
+        /// Sets the aircraft registration in the simulator.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 02/04/2021.
+        /// sushi.at, 31/01/2022.
         /// </remarks>
         /// <exception cref="Exception">
         /// Thrown when an exception error condition occurs.
@@ -616,8 +678,9 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <param name="registry">
         /// The registry to set.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetAircraftRegistry(string)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetPlaneRegistry(string registry)
+        public override void SetAircraftRegistry(string registry)
         {
             if (string.IsNullOrEmpty(registry))
             {
@@ -642,11 +705,15 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 31/03/2021.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
         /// <param name="enable">
         /// True to enable, false to disable.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetSlew(bool)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetSlew(bool enable)
+        public override void SetSlew(bool enable)
         {
             if (this.fsConnect.Connected)
             {
@@ -658,8 +725,6 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
         }
 
-        
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Sets the UTC time in the sim.
@@ -667,11 +732,15 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <remarks>
         /// sushi.at, 31/03/2021.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
         /// <param name="time">
         /// The new UTC time.
         /// </param>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SetTime(DateTime)"/>
         /// -------------------------------------------------------------------------------------------------
-        public void SetTime(DateTime time)
+        public override void SetTime(DateTime time)
         {
             if (this.fsConnect.Connected)
             {
@@ -697,9 +766,10 @@ namespace OpenSky.AgentMSFS.SimConnect
         /// <exception cref="Exception">
         /// Thrown when an exception error condition occurs.
         /// </exception>
+        /// <seealso cref="M:OpenSky.Agent.Simulator.Simulator.SlewPlaneToFlightPosition()"/>
         /// -------------------------------------------------------------------------------------------------
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public void SlewPlaneToFlightPosition()
+        public override void SlewPlaneToFlightPosition()
         {
             if (this.fsConnect.Connected)
             {
@@ -727,12 +797,12 @@ namespace OpenSky.AgentMSFS.SimConnect
                     }
 
                     var slewTo = this.SlewPlaneIntoPosition;
-                    if (!this.PrimaryTracking.OnGround || this.PrimaryTracking.GroundSpeed > 0)
+                    if (!this.PrimaryTrackingStruct.OnGround || this.PrimaryTrackingStruct.GroundSpeed > 0)
                     {
                         throw new Exception("Plane needs to be stationary on the ground for this!");
                     }
 
-                    if (!this.PrimaryTracking.SlewActive)
+                    if (!this.PrimaryTrackingStruct.SlewActive)
                     {
                         this.SetSlew(true);
                     }
@@ -748,7 +818,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                         throw new Exception("No resume position available.");
                     }
 
-                    if (!this.PrimaryTracking.SlewActive)
+                    if (!this.PrimaryTrackingStruct.SlewActive)
                     {
                         this.SetSlew(true);
                     }
@@ -762,22 +832,7 @@ namespace OpenSky.AgentMSFS.SimConnect
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Executes the property changed action.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 13/03/2021.
-        /// </remarks>
-        /// <param name="propertyName">
-        /// (Optional) Name of the property.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName][CanBeNull] string propertyName = null)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -862,25 +917,25 @@ namespace OpenSky.AgentMSFS.SimConnect
             {
                 if (simConnectObject is PrimaryTracking isPrimaryTracking)
                 {
-                    this.primaryTrackingProcessingQueue.Enqueue(new ProcessPrimaryTracking { Old = this.PrimaryTracking, New = isPrimaryTracking });
-                    this.OnPropertyChanged(nameof(this.PrimaryTrackingProcessingQueueLength));
+                    this.primaryTrackingProcessingQueue.Enqueue(new ProcessPrimaryTracking { Old = this.PrimaryTrackingStruct, New = isPrimaryTracking });
+                    this.OnPropertyChanged(nameof(SimConnect.PrimaryTrackingProcessingQueueLength));
 
-                    this.PrimaryTracking = isPrimaryTracking;
+                    this.PrimaryTrackingStruct = isPrimaryTracking;
                     this.LastReceivedTimes[Requests.Primary] = DateTime.UtcNow;
                 }
 
                 if (simConnectObject is SecondaryTracking isSecondaryTracking)
                 {
-                    this.secondaryTrackingProcessingQueue.Enqueue(new ProcessSecondaryTracking { Old = this.SecondaryTracking, New = isSecondaryTracking });
-                    this.OnPropertyChanged(nameof(this.SecondaryTrackingProcessingQueueLength));
+                    this.secondaryTrackingProcessingQueue.Enqueue(new ProcessSecondaryTracking { Old = this.SecondaryTrackingStruct, New = isSecondaryTracking });
+                    this.OnPropertyChanged(nameof(SimConnect.SecondaryTrackingProcessingQueueLength));
 
-                    this.SecondaryTracking = isSecondaryTracking;
+                    this.SecondaryTrackingStruct = isSecondaryTracking;
                     this.LastReceivedTimes[Requests.Secondary] = DateTime.UtcNow;
                 }
 
                 if (simConnectObject is FuelTanks isFuelTanks)
                 {
-                    this.FuelTanks = isFuelTanks;
+                    this.FuelTanksStruct = isFuelTanks;
                     this.LastReceivedTimes[Requests.FuelTanks] = DateTime.UtcNow;
                 }
 
@@ -889,16 +944,16 @@ namespace OpenSky.AgentMSFS.SimConnect
                     new Thread(
                         () =>
                         {
-                            this.ProcessPayloadStations(this.PayloadStations, isPayloadStations);
-                            this.PayloadStations = isPayloadStations;
+                            this.ProcessPayloadStations(this.PayloadStationsStruct, isPayloadStations);
+                            this.PayloadStationsStruct = isPayloadStations;
                         })
                     { Name = "OpenSky.ProcessPayloadStations" }.Start();
                     this.LastReceivedTimes[Requests.PayloadStations] = DateTime.UtcNow;
                 }
 
-                if (simConnectObject is PlaneIdentity isPlaneIdentity)
+                if (simConnectObject is AircraftIdentity isPlaneIdentity)
                 {
-                    this.PlaneIdentity = isPlaneIdentity;
+                    this.AircraftIdentityStruct = isPlaneIdentity;
                     this.LastReceivedTimes[Requests.PlaneIdentity] = DateTime.UtcNow;
                     new Thread(this.ProcessPlaneIdentity) { Name = "OpenSky.ProcessPlaneIdentity" }.Start();
                 }
@@ -908,8 +963,8 @@ namespace OpenSky.AgentMSFS.SimConnect
                     new Thread(
                             () =>
                             {
-                                this.ProcessWeightAndBalance(this.WeightAndBalance, isWeightAndBalance);
-                                this.WeightAndBalance = isWeightAndBalance;
+                                this.ProcessWeightAndBalance(this.WeightAndBalanceStruct, isWeightAndBalance);
+                                this.WeightAndBalanceStruct = isWeightAndBalance;
                             })
                     { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
                     this.LastReceivedTimes[Requests.WeightAndBalance] = DateTime.UtcNow;
@@ -917,10 +972,10 @@ namespace OpenSky.AgentMSFS.SimConnect
 
                 if (simConnectObject is LandingAnalysis isLandingAnalysis)
                 {
-                    this.landingAnalysisProcessingQueue.Enqueue(new ProcessLandingAnalysis { Old = this.LandingAnalysis, New = isLandingAnalysis });
-                    this.OnPropertyChanged(nameof(this.LandingAnalysisProcessingQueueLength));
+                    this.landingAnalysisProcessingQueue.Enqueue(new ProcessLandingAnalysis { Old = this.LandingAnalysisStruct, New = isLandingAnalysis });
+                    this.OnPropertyChanged(nameof(SimConnect.LandingAnalysisProcessingQueueLength));
 
-                    this.LandingAnalysis = isLandingAnalysis;
+                    this.LandingAnalysisStruct = isLandingAnalysis;
                     this.LastReceivedTimes[Requests.LandingAnalysis] = DateTime.UtcNow;
                 }
 
@@ -931,6 +986,20 @@ namespace OpenSky.AgentMSFS.SimConnect
                 }
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Name of the simulator host.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string simulatorHostName;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The simulator port.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private uint simulatorPort;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -951,14 +1020,14 @@ namespace OpenSky.AgentMSFS.SimConnect
                     {
                         try
                         {
-                            this.fsConnect.Connect("OpenSky.AgentMSFS.Primary", Settings.Default.SimulatorHostName, Settings.Default.SimulatorPort, SimConnectProtocol.Ipv4);
+                            this.fsConnect.Connect("OpenSky.Agent.SimConnectMSFS.Primary", this.simulatorHostName, this.simulatorPort, SimConnectProtocol.Ipv4);
 
                             // Register struct data definitions
                             this.fsConnect.RegisterDataDefinition<PrimaryTracking>(Requests.Primary, PrimaryTrackingDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<SecondaryTracking>(Requests.Secondary, SecondaryTrackingDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<FuelTanks>(Requests.FuelTanks, FuelTanksDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<PayloadStations>(Requests.PayloadStations, PayloadStationsDefinition.Definition);
-                            this.fsConnect.RegisterDataDefinition<PlaneIdentity>(Requests.PlaneIdentity, PlaneIdentityDefinition.Definition);
+                            this.fsConnect.RegisterDataDefinition<AircraftIdentity>(Requests.PlaneIdentity, AircraftIdentityDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<WeightAndBalance>(Requests.WeightAndBalance, WeightAndBalanceDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<LandingAnalysis>(Requests.LandingAnalysis, LandingAnalysisDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<SlewPlaneIntoPosition>(Requests.SlewPlaneIntoPosition, SlewPlaneIntoPositionDefinition.Definition);

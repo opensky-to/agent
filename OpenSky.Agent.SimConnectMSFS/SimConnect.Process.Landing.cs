@@ -11,6 +11,7 @@ namespace OpenSky.AgentMSFS.SimConnect
     using System.Diagnostics;
     using System.Windows;
 
+    using OpenSky.Agent.SimConnectMSFS.Helpers;
     using OpenSky.AgentMSFS.Properties;
 
     using OpenSky.AgentMSFS.Models;
@@ -69,7 +70,7 @@ namespace OpenSky.AgentMSFS.SimConnect
                 if (this.LandingReports.Count == 1)
                 {
                     // First landing for this flight
-                    this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
+                    this.AddTrackingEvent(this.PrimaryTrackingStruct, this.SecondaryTrackingStruct, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
 
                     // Show landing report notification now?
                     if (LandingReportNotification.AsSoonAsPossible.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))

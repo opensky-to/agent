@@ -13,6 +13,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Threading;
 
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.AgentMSFS.MVVM;
     using OpenSky.AgentMSFS.Tools;
 

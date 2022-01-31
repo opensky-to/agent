@@ -136,9 +136,8 @@
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
     <Compile Include="Models\SimbriefWaypointMarker.cs" />
-    <Compile Include="Models\TrackingCondition.cs" />
-    <Compile Include="Models\TrackingEventLogEntry.cs" />
     <Compile Include="Models\TrackingEventMarker.cs" />
+    <Compile Include="OpenAPIs\AgentOpenSkyService.cs" />
     <Compile Include="OpenSkyColors.cs" />
     <Compile Include="Models\LandingReportNotification.cs" />
     <Compile Include="MVVM\AsynchronousCommand.cs" />
@@ -159,14 +158,10 @@
     <Compile Include="Native\PInvoke\Structs\Rect.cs" />
     <Compile Include="Native\PInvoke\User32.cs" />
     <Compile Include="Native\Taskbar.cs" />
-    <Compile Include="SpeechSoundPacks.cs" />
     <Compile Include="Tools\AssemblyVersionExtension.cs" />
-    <Compile Include="Tools\ColorExtensions.cs" />
     <Compile Include="Tools\DateTimeTextWriterTraceListener.cs" />
     <Compile Include="Tools\ExceptionExtensions.cs" />
     <Compile Include="Tools\MultiSelectExtension.cs" />
-    <Compile Include="Tools\SleepScheduler.cs" />
-    <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
     <Compile Include="Tools\UpdateGUIDelegate.cs" />
     <Compile Include="Tools\VisibilityAnimation.cs" />
@@ -451,9 +446,7 @@
       <Name>OpenSky.Agent.Simulator</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="OpenAPIs\ModelExtensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"
