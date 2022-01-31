@@ -1,0 +1,132 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="FlightTracking.xaml" company="OpenSky">
+  OpenSky project 2021-2022
+</copyright>
+<summary>
+  Landing report notification window
+</summary>
+====================================================================================================================
+-->
+
+<Window x:Class="OpenSky.AgentMSFS.Views.LandingReport"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:ui="http://schemas.modernwpf.com/2019"
+            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+            mc:Ignorable="d" WindowStyle="None" Topmost="True"
+            ui:ThemeManager.IsThemeAware="True" AllowsTransparency="True" ShowInTaskbar="False"
+            Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
+            Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
+            SizeToContent="WidthAndHeight"
+            FontFamily="/Fonts/#Montserrat" FontSize="13" Loaded="LandingReportNotificationOnLoaded">
+    <Window.DataContext>
+        <models:LandingReportViewModel CloseWindow="LandingReportViewModelOnClose" />
+    </Window.DataContext>
+    <Window.Resources>
+        <Storyboard x:Key="Rotate">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:4" Value="360"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+    <Grid Margin="30">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenskyLogoGradientOnly}">
+                <Image.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform/>
+                    </TransformGroup>
+                </Image.RenderTransform>
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Window.Loaded">
+                        <BeginStoryboard Storyboard="{StaticResource Rotate}"/>
+                    </EventTrigger>
+                </Image.Triggers>
+            </Image>
+            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenskyLogoPlaneAndTrail}" />
+            <TextBlock Grid.Column="1" FontFamily="/Fonts/#Montserrat" FontSize="30" VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding FlightNumberHeader}" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" IsSharedSizeScope="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" MinWidth="50" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="BigLetters" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="BigLetters" />
+                <ColumnDefinition Width="1*" MinWidth="50" />
+            </Grid.ColumnDefinitions>
+            <TextBlock FontSize="60" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding LandingGrade, Mode=OneWay, FallbackValue=??}" />
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Image Source="{StaticResource ArrowUp}" Height="40" Width="40" VerticalAlignment="Center">
+                    <Image.RenderTransform>
+                        <RotateTransform Angle="{Binding WindAngle, Mode=OneWay, FallbackValue=0}" CenterX="20" CenterY="20" />
+                    </Image.RenderTransform>
+                </Image>
+                <TextBlock FontSize="60" VerticalAlignment="Center" Text="{Binding WindKnots, Mode=OneWay, StringFormat=F0, FallbackValue=0}" Margin="2,0,0,0" />
+            </StackPanel>
+            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,-10,0,0">Grade</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,-10,0,0">Wind</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" Margin="0,10,0,0" Text="{Binding LandingGradeDescription, Mode=OneWay, FallbackValue=Unknown case or no landing recorded}" />
+        </Grid>
+        <TextBlock Grid.Row="3" Grid.Column="0">Max Landing Rate</TextBlock>
+        <TextBlock Grid.Row="4" Grid.Column="0">Max G-Force</TextBlock>
+        <TextBlock Grid.Row="5" Grid.Column="0">Max Sideslip angle</TextBlock>
+        <TextBlock Grid.Row="6" Grid.Column="0">Max Bank angle</TextBlock>
+        <TextBlock Grid.Row="7" Grid.Column="0">Headwind</TextBlock>
+        <TextBlock Grid.Row="8" Grid.Column="0">Crosswind</TextBlock>
+        <TextBlock Grid.Row="9" Grid.Column="0">Airspeed</TextBlock>
+        <TextBlock Grid.Row="10" Grid.Column="0">Groundspeed</TextBlock>
+        <TextBlock Grid.Row="11" Grid.Column="0">Bounces</TextBlock>
+
+        <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding MaxLandingRate, Mode=OneWay, StringFormat=F0}" />
+        <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding MaxGForce, Mode=OneWay, StringFormat=F1}" />
+        <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding MaxSideSlipAngleInfo, Mode=OneWay, StringFormat=F1}" />
+        <TextBlock Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding MaxBankAngleInfo, Mode=OneWay, StringFormat=F1}" />
+        <TextBlock Grid.Row="7" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding HeadWind, Mode=OneWay}" />
+        <TextBlock Grid.Row="8" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding CrossWind, Mode=OneWay}" />
+        <TextBlock Grid.Row="9" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Airspeed, Mode=OneWay, StringFormat=F0}" />
+        <TextBlock Grid.Row="10" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding GroundSpeed, Mode=OneWay, StringFormat=F0}" />
+        <TextBlock Grid.Row="11" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Bounces, Mode=OneWay}" />
+        <TextBlock Grid.Row="3" Grid.Column="2" Margin="5,0,0,0">feet/min</TextBlock>
+        <TextBlock Grid.Row="4" Grid.Column="2" Margin="5,0,0,0">G</TextBlock>
+        <TextBlock Grid.Row="5" Grid.Column="2" Margin="5,0,0,0">degrees</TextBlock>
+        <TextBlock Grid.Row="6" Grid.Column="2" Margin="5,0,0,0">degrees</TextBlock>
+        <TextBlock Grid.Row="7" Grid.Column="2" Margin="5,0,0,0">knots</TextBlock>
+        <TextBlock Grid.Row="8" Grid.Column="2" Margin="5,0,0,0">knots</TextBlock>
+        <TextBlock Grid.Row="9" Grid.Column="2" Margin="5,0,0,0">knots</TextBlock>
+        <TextBlock Grid.Row="10" Grid.Column="2" Margin="5,0,0,0">knots</TextBlock>
+        <Button Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,0" Style="{StaticResource OpenSkyButtonStyle}" HorizontalAlignment="Stretch" Command="{Binding DismissLandingReportCommand}">Dismiss</Button>
+    </Grid>
+</Window>

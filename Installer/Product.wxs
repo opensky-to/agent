@@ -2,9 +2,9 @@
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Product Id="*" Name="OpenSky Agent for MSFS" Language="1033" Version="!(bind.FileVersion.OpenSkyAgentExeFile)" Manufacturer="OpenSky" UpgradeCode="13497001-3D38-4CC3-B197-03DB857240BC">
+    <Product Id="*" Name="OpenSky Flight Tracking Agent" Language="1033" Version="!(bind.FileVersion.OpenSkyAgentExeFile)" Manufacturer="OpenSky" UpgradeCode="13497001-3D38-4CC3-B197-03DB857240BC">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
-        <Icon Id="opensky.ico" SourceFile="..\OpenSky.AgentMSFS\Resources\opensky.ico" />
+        <Icon Id="opensky.ico" SourceFile="..\OpenSky.Agent\Resources\opensky.ico" />
         <Property Id="ARPPRODUCTICON" Value="opensky.ico" />
 
         <PropertyRef Id="WIX_EXT_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
@@ -15,20 +15,20 @@
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
 
-        <Feature Id="ProductFeature" Title="OpenSky.AgentMSFS" Level="1">
-            <ComponentGroupRef Id="OpenSky.AgentMSFS" />
-            <ComponentGroupRef Id="OpenSky.AgentMSFS.Libraries" />
+        <Feature Id="ProductFeature" Title="OpenSky.Agent" Level="1">
+            <ComponentGroupRef Id="OpenSky.Agent" />
+            <ComponentGroupRef Id="OpenSky.Agent.Libraries" />
             <ComponentGroupRef Id="OpenSky.SoundPacks" />
         </Feature>
 
-        <util:CloseApplication Id="CloseOpenSky.AgentMSFS" Target="OpenSky.AgentMSFS.exe" TerminateProcess="1" RebootPrompt="no" PromptToContinue="no" />
+        <util:CloseApplication Id="CloseOpenSky.Agent" Target="OpenSky.Agent.exe" TerminateProcess="1" RebootPrompt="no" PromptToContinue="no" />
     </Product>
 
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFiles64Folder">
                 <Directory Id="OpenSkyFolder" Name="OpenSky">
-                    <Directory Id="INSTALLFOLDER" Name="Agent.MSFS" />
+                    <Directory Id="INSTALLFOLDER" Name="Flight Tracking Agent" />
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder">
@@ -39,14 +39,14 @@
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="OpenSky.AgentMSFS" Directory="INSTALLFOLDER">
+        <ComponentGroup Id="OpenSky.Agent" Directory="INSTALLFOLDER">
             <Component Guid="{C7192B21-EB14-435E-991E-CA1BD4D6D616}" Win64="yes">
-                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.AgentMSFS.exe" KeyPath="yes" Id="OpenSkyAgentExeFile">
-                    <Shortcut Id="OpenSky.AgentMSFS.Shortcut" Directory="ApplicationProgramsFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
-                    <Shortcut Id="OpenSky.AgentMSFS.DeskShortcut" Directory="DesktopFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Agent for MSFS" Icon="opensky.ico" Advertise="yes" />
+                <File Source="..\OpenSky.Agent\bin\$(var.Configuration)\OpenSky.Agent.exe" KeyPath="yes" Id="OpenSkyAgentExeFile">
+                    <Shortcut Id="OpenSky.Agent.Shortcut" Directory="ApplicationProgramsFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Flight Tracking Agent" Icon="opensky.ico" Advertise="yes" />
+                    <Shortcut Id="OpenSky.Agent.DeskShortcut" Directory="DesktopFolder" WorkingDirectory="INSTALLFOLDER" Name="OpenSky Flight Tracking Agent" Icon="opensky.ico" Advertise="yes" />
                 </File>
-	            <RegistryKey Root="HKCR" Key="opensky-agent-msfs">
-		            <RegistryValue Type="string" Value="URL:opensky-agent-msfs" />
+	            <RegistryKey Root="HKCR" Key="opensky-agent">
+		            <RegistryValue Type="string" Value="URL:opensky-agent" />
 		            <RegistryValue Type="string" Name="URL Protocol" Value="" />
 		            <RegistryKey Key="shell\open\command">
 			            <RegistryValue Type="string" Value="&quot;[#OpenSkyAgentExeFile]&quot; &quot;%1&quot;" />
@@ -55,7 +55,7 @@
                 <RemoveFolder Id="RemoveProgramMenuDir" Directory="ApplicationProgramsFolder" On="uninstall" />
             </Component>
             <Component Guid="{F58EF8AF-5D4E-4005-8D90-5A83F0D26CFF}" Win64="yes">
-                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.AgentMSFS.exe.config" KeyPath="yes" />
+                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.Agent.exe.config" KeyPath="yes" />
             </Component>
             <Component Guid="{388E5BC7-6F40-4E0A-A64F-32B80F1E14E5}" Win64="yes">
                 <File Source="..\changelog.txt" KeyPath="yes" />

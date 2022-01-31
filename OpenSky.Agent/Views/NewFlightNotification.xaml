@@ -1,0 +1,68 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="NewFlightNotification.xaml" company="OpenSky">
+  OpenSky project 2021-2022
+</copyright>
+<summary>
+  New flight notification window
+</summary>
+====================================================================================================================
+-->
+
+<Window x:Class="OpenSky.AgentMSFS.Views.NewFlightNotification"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:ui="http://schemas.modernwpf.com/2019"
+            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+            mc:Ignorable="d"
+            SizeToContent="WidthAndHeight" WindowStyle="None" Topmost="True"
+            ui:ThemeManager.IsThemeAware="True" AllowsTransparency="True" ShowInTaskbar="False"
+            Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
+            Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
+            FontFamily="/Fonts/#Montserrat" FontSize="13" Loaded="NewFlightNotificationOnLoaded">
+    <Window.DataContext>
+        <models:NewFlightNotificationViewModel CloseWindow="NewFlightNotificationViewModelOnCloseWindow" />
+    </Window.DataContext>
+    <Window.Resources>
+        <Storyboard x:Key="Rotate">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:4" Value="360"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <Grid Margin="0,0,0,10">
+                <Image Grid.Row="0" Grid.Column="0" RenderTransformOrigin="0.5,0.5" Width="100" Height="100" x:Name="GearImage" Source="{StaticResource OpenskyLogoGradientOnly}">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <RotateTransform/>
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                    <Image.Triggers>
+                        <EventTrigger RoutedEvent="Window.Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource Rotate}"/>
+                        </EventTrigger>
+                    </Image.Triggers>
+                </Image>
+                <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Source="{StaticResource OpenskyLogoPlaneAndTrail}" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock>OpenSky flight #</TextBlock>
+                <TextBlock Text="{Binding FlightNumber}" />
+                <TextBlock Margin="5,0,0,0">from</TextBlock>
+            </StackPanel>
+            <TextBlock FontSize="25" HorizontalAlignment="Center" Text="{Binding Airports}" />
+            <TextBlock HorizontalAlignment="Center">is now ready for boarding</TextBlock>
+            <Button Style="{StaticResource OpenSkyButtonStyle}" HorizontalAlignment="Center" Margin="0,10,0,0" Command="{Binding StartTrackingCommand}">Start tracking</Button>
+        </StackPanel>
+    </Grid>
+</Window>
