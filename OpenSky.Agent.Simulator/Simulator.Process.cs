@@ -354,20 +354,27 @@ namespace OpenSky.Agent.Simulator
                 {
                     try
                     {
-                        this.CheckChangesOverTime(ppt.New);
-                        this.MonitorPrimarySystems(ppt);
-                        this.AddPositionReport(ppt.New);
-                        this.TrackFlight(ppt);
-
-                        // Fire the location changed event?
-                        if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation))
+                        if (ppt.Old != null && ppt.New != null)
                         {
-                            newLocation = ppt.New.MapLocation;
-                        }
+                            this.CheckChangesOverTime(ppt.New);
+                            this.MonitorPrimarySystems(ppt);
+                            this.AddPositionReport(ppt.New);
+                            this.TrackFlight(ppt);
 
-                        // Are we close to landing?
-                        this.SampleRates[Requests.LandingAnalysis] = this.WasAirborne && ppt.New.RadioHeight < 500 ? 25 : 500;
-                        this.OnPropertyChanged(nameof(this.SampleRates));
+                            // Fire the location changed event?
+                            if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation))
+                            {
+                                newLocation = ppt.New.MapLocation;
+                            }
+
+                            // Are we close to landing?
+                            this.SampleRates[Requests.LandingAnalysis] = this.WasAirborne && ppt.New.RadioHeight < 500 ? 25 : 500;
+                            this.OnPropertyChanged(nameof(this.SampleRates));
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Dequeued primary tracking containing at least one NULL value.");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -400,10 +407,17 @@ namespace OpenSky.Agent.Simulator
                 {
                     try
                     {
-                        this.MonitorLights(pst);
-                        this.TransitionFlightPhase();
-                        this.MonitorSecondarySystems(pst);
-                        this.MonitorTrackingStartConditions(pst.New);
+                        if (pst.Old != null && pst.New != null)
+                        {
+                            this.MonitorLights(pst);
+                            this.TransitionFlightPhase();
+                            this.MonitorSecondarySystems(pst);
+                            this.MonitorTrackingStartConditions(pst.New);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Dequeued secondary tracking containing at least one NULL value.");
+                        }
                     }
                     catch (Exception ex)
                     {

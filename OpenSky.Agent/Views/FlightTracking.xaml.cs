@@ -106,12 +106,12 @@ namespace OpenSky.Agent.Views
             aircraftPosition.SetValue(Panel.ZIndexProperty, 999);
             aircraftPosition.SetValue(MapLayer.PositionOriginProperty, PositionOrigin.Center);
             var rotateTransform = new RotateTransform { CenterX = 20, CenterY = 20 };
-            var headingBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("SimConnect.PrimaryTracking.Heading"), Mode = BindingMode.OneWay };
+            var headingBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("Simulator.PrimaryTracking.Heading"), Mode = BindingMode.OneWay };
             BindingOperations.SetBinding(rotateTransform, RotateTransform.AngleProperty, headingBinding);
             aircraftPosition.RenderTransform = rotateTransform;
             var aircraftDrawingImage = this.FindResource("OpenSkyLogoPointingUpForMap") as DrawingImage;
             aircraftPosition.Source = aircraftDrawingImage;
-            var positionBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("SimConnect.PrimaryTracking.MapLocation"), Mode = BindingMode.OneWay };
+            var positionBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("Simulator.PrimaryTracking.MapLocation"), Mode = BindingMode.OneWay };
             BindingOperations.SetBinding(aircraftPosition, MapLayer.PositionProperty, positionBinding);
             this.MapView.Children.Add(aircraftPosition);
         }

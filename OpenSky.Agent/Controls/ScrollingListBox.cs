@@ -56,7 +56,14 @@ namespace OpenSky.Agent.Controls
         {
             if (e.NewItems?.Count > 0)
             {
-                this.ScrollIntoView(e.NewItems[e.NewItems.Count - 1]);
+                try
+                {
+                    this.ScrollIntoView(e.NewItems[e.NewItems.Count - 1]);
+                }
+                catch
+                {
+                    // Ignore
+                }
             }
 
             base.OnItemsChanged(e);

@@ -80,8 +80,8 @@ namespace OpenSky.Agent.Simulator
                 }
             }
 
-            // 10000 feet speed limit 250 knots (give 500 feet spare)
-            if (ppt.New.IndicatedAltitude < 9500 && !ppt.New.OnGround && ppt.New.AirspeedIndicated > 250)
+            // 10000 feet speed limit 250 knots (give 500 feet and 10 knots spare)
+            if (ppt.New.IndicatedAltitude < 9500 && !ppt.New.OnGround && ppt.New.AirspeedIndicated > 260)
             {
                 if (!this.speedLimitWarningActive)
                 {
