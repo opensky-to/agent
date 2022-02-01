@@ -23,7 +23,7 @@
         <models:AutoUpdateViewModel Close="AutoUpdateViewModelOnClose" />
     </Window.DataContext>
     <StackPanel Orientation="Vertical" Margin="30,15">
-        <TextBlock FontSize="13" FontWeight="Bold" Margin="5,0">A new version of the OpenSky Agent for Microsoft Flight Simulator is available!</TextBlock>
+        <TextBlock FontSize="13" FontWeight="Bold" Margin="5,0">A new version of the OpenSky Flight Tracking Agent is available!</TextBlock>
         <TextBlock Text="{Binding VersionInfoText}" Margin="5,10" />
         <GroupBox>
             <GroupBox.Header>
