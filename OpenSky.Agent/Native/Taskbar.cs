@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Native
+namespace OpenSky.Agent.Native
 {
     using System;
     using System.Drawing;
@@ -12,9 +12,9 @@ namespace OpenSky.AgentMSFS.Native
 
     using JetBrains.Annotations;
 
-    using OpenSky.AgentMSFS.Native.PInvoke;
-    using OpenSky.AgentMSFS.Native.PInvoke.Enums;
-    using OpenSky.AgentMSFS.Native.PInvoke.Structs;
+    using OpenSky.Agent.Native.PInvoke;
+    using OpenSky.Agent.Native.PInvoke.Enums;
+    using OpenSky.Agent.Native.PInvoke.Structs;
 
     using Point = System.Drawing.Point;
 

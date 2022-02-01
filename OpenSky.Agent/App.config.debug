@@ -2,17 +2,17 @@
 <configuration>
 	<configSections>
 		<sectionGroup name="userSettings" type="System.Configuration.UserSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
-			<section name="OpenSky.AgentMSFS.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" allowExeDefinition="MachineToLocalUser" requirePermission="false" />
+			<section name="OpenSky.Agent.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" allowExeDefinition="MachineToLocalUser" requirePermission="false" />
 		</sectionGroup>
 		<sectionGroup name="applicationSettings" type="System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
-			<section name="OpenSky.AgentMSFS.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+			<section name="OpenSky.Agent.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
 		</sectionGroup>
 	</configSections>
 	<startup>
 		<supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
 	</startup>
 	<userSettings>
-		<OpenSky.AgentMSFS.Properties.Settings>
+		<OpenSky.Agent.Properties.Settings>
 			<setting name="SettingsUpdateRequired" serializeAs="String">
 				<value>True</value>
 			</setting>
@@ -46,10 +46,13 @@
 			<setting name="SoundPack" serializeAs="String">
 				<value />
 			</setting>
-		</OpenSky.AgentMSFS.Properties.Settings>
+			<setting name="SimulatorInterface" serializeAs="String">
+				<value>SimConnectMSFS</value>
+			</setting>
+		</OpenSky.Agent.Properties.Settings>
 	</userSettings>
 	<applicationSettings>
-		<OpenSky.AgentMSFS.Properties.Settings>
+		<OpenSky.Agent.Properties.Settings>
 			<setting name="OpenSkyTokenUrl" serializeAs="String">
 				<value>http://localhost:5001/apptoken/0932018B-FB9C-4B59-B898-C4244EAC6D0B</value>
 			</setting>
@@ -57,11 +60,11 @@
 				<value>http://localhost:5000</value>
 			</setting>
 			<setting name="AutoUpdateURL" serializeAs="String">
-				<value>https://api.github.com/repos/opensky-to/agent-msfs/releases/latest</value>
+				<value>https://api.github.com/repos/opensky-to/agent/releases/latest</value>
 			</setting>
 			<setting name="OpenSkyChangePasswordUrl" serializeAs="String">
 				<value>http://localhost:5001/changepassword</value>
 			</setting>
-		</OpenSky.AgentMSFS.Properties.Settings>
+		</OpenSky.Agent.Properties.Settings>
 	</applicationSettings>
 </configuration>

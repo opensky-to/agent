@@ -4,13 +4,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views
+namespace OpenSky.Agent.Views
 {
     using System.Windows;
 
     using DataGridExtensions;
 
-    using OpenSky.AgentMSFS.Views.Models;
+    using OpenSky.Agent.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>

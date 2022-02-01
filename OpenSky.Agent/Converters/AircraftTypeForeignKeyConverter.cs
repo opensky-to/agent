@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Converters
+namespace OpenSky.Agent.Converters
 {
     using System;
     using System.Collections.ObjectModel;

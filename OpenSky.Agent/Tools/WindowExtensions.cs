@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Tools
+namespace OpenSky.Agent.Tools
 {
     using System.Windows;
 
-    using OpenSky.AgentMSFS.Native;
-    using OpenSky.AgentMSFS.Native.PInvoke.Enums;
+    using OpenSky.Agent.Native;
+    using OpenSky.Agent.Native.PInvoke.Enums;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

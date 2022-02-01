@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Native.PInvoke
+namespace OpenSky.Agent.Native.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;

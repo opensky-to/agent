@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Native.PInvoke.Structs
+namespace OpenSky.Agent.Native.PInvoke.Structs
 {
     using System;
     using System.Runtime.InteropServices;
 
-    using OpenSky.AgentMSFS.Native.PInvoke.Enums;
+    using OpenSky.Agent.Native.PInvoke.Enums;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

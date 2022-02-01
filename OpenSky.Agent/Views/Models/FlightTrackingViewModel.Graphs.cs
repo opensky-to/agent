@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System.Windows;
 
@@ -15,7 +15,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 21/01/2022.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public partial class FlightTrackingViewModel
     {

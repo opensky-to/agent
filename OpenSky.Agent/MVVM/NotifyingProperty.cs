@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.MVVM
+namespace OpenSky.Agent.MVVM
 {
     using System;
 

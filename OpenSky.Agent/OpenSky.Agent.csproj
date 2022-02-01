@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{26FAA45D-B4A3-4228-8AF3-E5811BCFC765}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>OpenSky.AgentMSFS</RootNamespace>
-    <AssemblyName>OpenSky.AgentMSFS</AssemblyName>
+    <RootNamespace>OpenSky.Agent</RootNamespace>
+    <AssemblyName>OpenSky.Agent</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -42,7 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\OpenSky.AgentMSFS.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\OpenSky.Agent.xml</DocumentationFile>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -59,11 +59,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\OpenSky.AgentMSFS.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\OpenSky.Agent.xml</DocumentationFile>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>OpenSky.AgentMSFS.App</StartupObject>
+    <StartupObject>OpenSky.Agent.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
@@ -437,6 +437,10 @@
     <Resource Include="Resources\profile200.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpenSky.Agent.SimConnectMSFS\OpenSky.Agent.SimConnectMSFS.csproj">
+      <Project>{1f9cbede-669d-4510-bca2-e6ad29d6a498}</Project>
+      <Name>OpenSky.Agent.SimConnectMSFS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenSky.Agent.Simulator\OpenSky.Agent.Simulator.csproj">
       <Project>{30c467e8-2eee-41e5-be01-0142a61ba171}</Project>
       <Name>OpenSky.Agent.Simulator</Name>

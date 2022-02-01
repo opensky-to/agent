@@ -4,12 +4,12 @@
   OpenSky project 2021-2022
 </copyright>
 <summary>
-  OpenSky agent for MSFS main wpf application configuration
+  OpenSky agent main wpf application configuration
 </summary>
 ====================================================================================================================
 -->
 
-<Application x:Class="OpenSky.AgentMSFS.App"
+<Application x:Class="OpenSky.Agent.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.modernwpf.com/2019"

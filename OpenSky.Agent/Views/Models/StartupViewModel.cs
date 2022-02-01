@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Generic;
@@ -17,18 +17,18 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Windows.Media.Imaging;
 
     using DiscordRPC;
-#if DEBUG
     using DiscordRPC.Logging;
-#endif
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.MVVM;
 
     using OpenSkyApi;
+#if DEBUG
+#endif
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -56,7 +56,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private readonly BitmapImage greyIcon =
             new(
                 new Uri(
-                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_grey16.ico",
+                    @"pack://application:,,,/OpenSky.Agent;component/Resources/opensky_grey16.ico",
                     UriKind.RelativeOrAbsolute));
 
         /// -------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private readonly BitmapImage openSkyIcon =
             new(
                 new Uri(
-                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky.ico",
+                    @"pack://application:,,,/OpenSky.Agent;component/Resources/opensky.ico",
                     UriKind.RelativeOrAbsolute));
 
         /// -------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private readonly BitmapImage pauseIcon =
             new(
                 new Uri(
-                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_pause16.ico",
+                    @"pack://application:,,,/OpenSky.Agent;component/Resources/opensky_pause16.ico",
                     UriKind.RelativeOrAbsolute));
 
         /// -------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         private readonly BitmapImage redIcon =
             new(
                 new Uri(
-                    @"pack://application:,,,/OpenSky.AgentMSFS;component/Resources/opensky_red16.ico",
+                    @"pack://application:,,,/OpenSky.Agent;component/Resources/opensky_red16.ico",
                     UriKind.RelativeOrAbsolute));
 
         /// -------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private string notificationStatusString = "OpenSky is trying to connect to Flight Simulator 2020...";
+        private string notificationStatusString = "OpenSky is trying to connect to the simulator...";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -213,11 +213,11 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.DiscordRpcClient.SetPresence(new RichPresence
             {
                 State = "Not Connected",
-                Details = "Trying to connect to MSFS",
+                Details = "Trying to connect to simulator",
                 Assets = new Assets
                 {
                     LargeImageKey = "openskylogogrey512",
-                    LargeImageText = "OpenSky Agent for MSFS"
+                    LargeImageText = "OpenSky Agent"
                 }
             });
 
@@ -365,16 +365,16 @@ namespace OpenSky.AgentMSFS.Views.Models
                 {
                     this.redFlashing = false;
                     this.NotificationIcon = this.greyIcon;
-                    this.NotificationStatusString = "OpenSky is trying to connect to Flight Simulator 2020...";
+                    this.NotificationStatusString = "OpenSky is trying to connect to the simulator...";
 
                     this.DiscordRpcClient.SetPresence(new RichPresence
                     {
                         State = "Not Connected",
-                        Details = "Trying to connect to MSFS",
+                        Details = "Trying to connect to simulator",
                         Assets = new Assets
                         {
                             LargeImageKey = "openskylogogrey512",
-                            LargeImageText = "OpenSky Agent for MSFS"
+                            LargeImageText = "OpenSky Agent"
                         }
                     });
                 }
@@ -395,7 +395,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 Assets = new Assets
                                 {
                                     LargeImageKey = "openskylogo512",
-                                    LargeImageText = "OpenSky Agent for MSFS"
+                                    LargeImageText = "OpenSky Agent"
                                 }
                             });
                         }
@@ -412,7 +412,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                                 Assets = new Assets
                                 {
                                     LargeImageKey = "openskylogo512",
-                                    LargeImageText = "OpenSky Agent for MSFS"
+                                    LargeImageText = "OpenSky Agent"
                                 }
                             });
                         }
@@ -430,7 +430,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                             Assets = new Assets
                             {
                                 LargeImageKey = "openskylogo512",
-                                LargeImageText = "OpenSky Agent for MSFS",
+                                LargeImageText = "OpenSky Agent",
                                 SmallImageKey = "pause512",
                                 SmallImageText = "Paused"
                             }
@@ -449,7 +449,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                             Assets = new Assets
                             {
                                 LargeImageKey = "openskylogo512",
-                                LargeImageText = "OpenSky Agent for MSFS",
+                                LargeImageText = "OpenSky Agent",
                                 SmallImageKey = "record512",
                                 SmallImageText = "Recording"
                             }

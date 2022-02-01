@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Generic;
@@ -20,15 +20,18 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Microsoft.Win32;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.Models;
+    using OpenSky.Agent.MVVM;
+    using OpenSky.Agent.SimConnectMSFS;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.Models;
-    using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Tools;
 
     using OpenSkyApi;
+
+    using Simulator = OpenSky.Agent.Simulator.Simulator;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -113,6 +116,34 @@ namespace OpenSky.AgentMSFS.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True if simConnect MSFS is checked.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool simConnectMSFSChecked;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether simConnect MSFS is checked.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool SimConnectMSFSChecked
+        {
+            get => this.simConnectMSFSChecked;
+
+            set
+            {
+                if (Equals(this.simConnectMSFSChecked, value))
+                {
+                    return;
+                }
+
+                this.simConnectMSFSChecked=value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="SettingsViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -145,8 +176,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
             // Load settings
             Properties.Settings.Default.Reload();
-            this.SimulatorHostName = Properties.Settings.Default.SimulatorHostName;
-            this.SimulatorPort = Properties.Settings.Default.SimulatorPort;
+            this.SimulatorHostName = Properties.Settings.Default.SimConnectHostName;
+            this.SimulatorPort = Properties.Settings.Default.SimConnectPort;
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Properties.Settings.Default.LandingReportNotification);
@@ -158,6 +189,12 @@ namespace OpenSky.AgentMSFS.Views.Models
             if (!string.IsNullOrEmpty(Properties.Settings.Default.TextToSpeechVoice))
             {
                 this.SelectedTextToSpeechVoice = Properties.Settings.Default.TextToSpeechVoice;
+            }
+
+            var simulatorInterface = Properties.Settings.Default.SimulatorInterface;
+            if (SimConnect.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.SimConnectMSFSChecked = true;
             }
 
             // Load profile image
@@ -179,7 +216,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             }
             else
             {
-                this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
+                this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.Agent;component/Resources/profile200.png"));
             }
 
             // Make sure we are notified if the UserSession service changes user logged in status
@@ -576,7 +613,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     var wasDirty = this.IsDirty;
                     this.BingMapsKey = null;
                     this.SimBriefUsername = null;
-                    this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
+                    this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.Agent;component/Resources/profile200.png"));
                     this.IsDirty = wasDirty;
                 });
         }
@@ -624,8 +661,17 @@ namespace OpenSky.AgentMSFS.Views.Models
             // Save local settings
             try
             {
-                Properties.Settings.Default.SimulatorHostName = this.SimulatorHostName;
-                Properties.Settings.Default.SimulatorPort = this.SimulatorPort;
+                if (this.SimConnectMSFSChecked)
+                {
+                    Properties.Settings.Default.SimulatorInterface = SimConnect.SimulatorInterfaceName;
+                    if (Simulator.Instance == null || Simulator.Instance.GetType() != typeof(SimConnect))
+                    {
+                        Simulator.SetSimulatorInstance(new SimConnect(this.SimulatorHostName, this.SimulatorPort, AgentOpenSkyService.Instance));
+                    }
+                }
+
+                Properties.Settings.Default.SimConnectHostName = this.SimulatorHostName;
+                Properties.Settings.Default.SimConnectPort = this.SimulatorPort;
                 Properties.Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
                 Properties.Settings.Default.SoundPack = this.SelectedSoundPack;
                 SpeechSoundPacks.Instance.SelectedSoundPack = this.SelectedSoundPack;
@@ -799,7 +845,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     }
                     else
                     {
-                        this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.AgentMSFS;component/Resources/profile200.png"));
+                        this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.Agent;component/Resources/profile200.png"));
                     }
                 }
             }

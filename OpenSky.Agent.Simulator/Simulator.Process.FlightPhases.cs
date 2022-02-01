@@ -199,7 +199,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("Tracking aborted, sim returned to main menu.");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.Play();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedSimMainMenu);
                     this.StopTracking(false);

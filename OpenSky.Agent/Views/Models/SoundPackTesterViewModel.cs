@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Generic;
@@ -12,10 +12,10 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Linq;
     using System.Speech.Synthesis;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.MVVM;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -24,7 +24,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 24/12/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class SoundPackTesterViewModel : ViewModel
     {

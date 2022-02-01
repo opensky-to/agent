@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Tools
+namespace OpenSky.Agent.Tools
 {
     using System;
     using System.Diagnostics;
@@ -15,11 +15,11 @@ namespace OpenSky.AgentMSFS.Tools
 
     using Newtonsoft.Json;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.OpenAPIs;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Views;
+    using OpenSky.Agent.Views;
 
     using OpenSkyApi;
 

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.ComponentModel;
@@ -16,11 +16,11 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using Newtonsoft.Json;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -29,7 +29,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 24/11/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class AutoUpdateViewModel : ViewModel
     {
@@ -284,7 +284,7 @@ namespace OpenSky.AgentMSFS.Views.Models
         /// Gets the version information text.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string VersionInfoText => $"OpenSky Agent MSFS {this.CurrentVersion} is now available. You have version {this.InstalledVersion} installed.\r\nWould you like to download it now?";
+        public string VersionInfoText => $"OpenSky Flight Tracking Agent {this.CurrentVersion} is now available. You have version {this.InstalledVersion} installed.\r\nWould you like to download it now?";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -321,7 +321,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             try
             {
                 using var client = new WebClient();
-                client.Headers[HttpRequestHeader.UserAgent] = "OpenSky.AgentMSFS";
+                client.Headers[HttpRequestHeader.UserAgent] = "OpenSky.Agent";
 
                 var jsonString = client.DownloadString(Properties.Settings.Default.AutoUpdateURL);
                 dynamic json = JsonConvert.DeserializeObject(jsonString);
@@ -486,7 +486,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             var localInstallerFile = Path.Combine(Path.GetTempPath(), this.DownloadURL.Substring(this.DownloadURL.LastIndexOf('/') + 1));
 
             using var client = new WebClient();
-            client.Headers[HttpRequestHeader.UserAgent] = "OpenSky.AgentMSFS";
+            client.Headers[HttpRequestHeader.UserAgent] = "OpenSky.Agent";
             client.DownloadProgressChanged += this.DownloadProgressChanged;
             client.DownloadFileCompleted += this.DownloadFileCompleted;
             client.DownloadFileAsync(new Uri(this.DownloadURL), localInstallerFile, localInstallerFile);

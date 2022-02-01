@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Native.PInvoke.Structs
+namespace OpenSky.Agent.Native.PInvoke.Structs
 {
     using System;
     using System.Runtime.InteropServices;
@@ -253,7 +253,7 @@ namespace OpenSky.AgentMSFS.Native.PInvoke.Structs
         /// <see langword="true" /> if the current object is equal to the <paramref name="other" />
         /// parameter; otherwise, <see langword="false" />.
         /// </returns>
-        /// <seealso cref="M:System.IEquatable{OpenSky.AgentMSFS.Native.PInvoke.Structs.Rect}.Equals(Rect)"/>
+        /// <seealso cref="M:System.IEquatable{OpenSky.Agent.Native.PInvoke.Structs.Rect}.Equals(Rect)"/>
         /// -------------------------------------------------------------------------------------------------
         public bool Equals(Rect other)
         {

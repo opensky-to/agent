@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Controls.Models
+namespace OpenSky.Agent.Controls.Models
 {
     using System;
 

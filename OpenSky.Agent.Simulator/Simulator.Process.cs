@@ -212,7 +212,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, aircraft type was changed.");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedAircraftType);
                     this.StopTracking(false);
@@ -250,7 +250,7 @@ namespace OpenSky.Agent.Simulator
                         {
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, payload changed below required load.");
                             var assembly = Assembly.GetExecutingAssembly();
-                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                             player.PlaySync();
                             SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedPayloadChange);
                             this.StopTracking(false);
@@ -291,7 +291,7 @@ namespace OpenSky.Agent.Simulator
                         {
                             Debug.WriteLine("OpenSky Warning: Tracking aborted, fuel increased.");
                             var assembly = Assembly.GetExecutingAssembly();
-                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                             player.PlaySync();
                             SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedFuelIncreased);
                             this.StopTracking(false);

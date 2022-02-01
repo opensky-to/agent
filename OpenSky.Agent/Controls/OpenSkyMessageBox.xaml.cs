@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Controls
+namespace OpenSky.Agent.Controls
 {
     using System;
     using System.Media;
@@ -13,8 +13,8 @@ namespace OpenSky.AgentMSFS.Controls
     using System.Windows.Input;
     using System.Windows.Media;
 
+    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>

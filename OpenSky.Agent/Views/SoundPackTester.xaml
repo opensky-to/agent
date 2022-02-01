@@ -9,16 +9,16 @@
 ====================================================================================================================
 -->
     
-<controls:OpenSkyWindow x:Class="OpenSky.AgentMSFS.Views.SoundPackTester"
+<controls:OpenSkyWindow x:Class="OpenSky.Agent.Views.SoundPackTester"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-               xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
-               xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
                xmlns:ui="http://schemas.modernwpf.com/2019"
-               xmlns:converters="clr-namespace:OpenSky.AgentMSFS.Converters"
                xmlns:simulator="clr-namespace:OpenSky.Agent.Simulator;assembly=OpenSky.Agent.Simulator"
+               xmlns:controls="clr-namespace:OpenSky.Agent.Controls"
+               xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
+               xmlns:converters="clr-namespace:OpenSky.Agent.Converters"
                mc:Ignorable="d" Loaded="SoundPackTesterOnLoaded"
                Title="Sound Pack Tester" Height="450" Width="1200" ResizeMode="CanResize" ShowMinMaxButtons="True" FontSize="14" HorizontalScrollBar="False" VerticalScrollBar="False"
                SizeToContent="Height">

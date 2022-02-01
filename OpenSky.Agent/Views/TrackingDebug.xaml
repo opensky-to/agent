@@ -9,13 +9,13 @@
 ====================================================================================================================
 -->
 
-<controls:OpenSkyWindow x:Class="OpenSky.AgentMSFS.Views.TrackingDebug"
+<controls:OpenSkyWindow x:Class="OpenSky.Agent.Views.TrackingDebug"
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:controls="clr-namespace:OpenSky.AgentMSFS.Controls"
-            xmlns:models="clr-namespace:OpenSky.AgentMSFS.Views.Models"
+            xmlns:controls="clr-namespace:OpenSky.Agent.Controls"
+            xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
             mc:Ignorable="d"
             Title="Tracking Debug" Height="1300" Width="1600" ResizeMode="CanResize" ShowMinMaxButtons="True" FontSize="12" HorizontalScrollBar="False">
     <Window.DataContext>

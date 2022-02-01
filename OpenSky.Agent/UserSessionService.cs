@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS
+namespace OpenSky.Agent
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace OpenSky.AgentMSFS
 
     using JetBrains.Annotations;
 
-    using OpenSky.AgentMSFS.Properties;
+    using OpenSky.Agent.Properties;
 
     using OpenSkyApi;
 

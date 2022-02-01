@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Concurrent;
@@ -17,13 +17,13 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Tools;
 
     using OpenSkyApi;
 
@@ -34,7 +34,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 17/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public partial class FlightTrackingViewModel : ViewModel
     {
@@ -1100,7 +1100,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                     {
                         Debug.WriteLine("Starting 5 second resume timer...");
                         var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSbeepbeepstart.wav"));
+                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSbeepbeepstart.wav"));
                         player.Play();
                         var secondsToGo = 5;
                         this.StartTrackingButtonText = "Resuming in 5";

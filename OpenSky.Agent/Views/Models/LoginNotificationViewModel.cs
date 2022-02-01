@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Diagnostics;
@@ -12,8 +12,8 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Reflection;
     using System.Threading;
 
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.MVVM;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -22,7 +22,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 01/06/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class LoginNotificationViewModel : ViewModel
     {
@@ -46,7 +46,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.Timeout = DateTime.Now.AddMilliseconds(60 * 1000);
 
             var assembly = Assembly.GetExecutingAssembly();
-            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSdingdong.wav"));
+            var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSdingdong.wav"));
             player.Play();
 
             this.LoginCommand = new Command(this.Login);
@@ -89,7 +89,7 @@ namespace OpenSky.AgentMSFS.Views.Models
                 this.soundLastPlayed = DateTime.Now;
 
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSdingdong.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSdingdong.wav"));
                 player.Play();
             }
         }

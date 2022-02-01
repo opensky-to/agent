@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS
+namespace OpenSky.Agent
 {
     using System;
     using System.ComponentModel;
@@ -17,11 +17,14 @@ namespace OpenSky.AgentMSFS
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.Properties;
+    using OpenSky.Agent.SimConnectMSFS;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Properties;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Tools;
+
+    using OpenSkyApi;
 
     using Syncfusion.SfSkinManager;
 
@@ -40,7 +43,7 @@ namespace OpenSky.AgentMSFS
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
-        private static readonly Mutex Mutex = new(false, "OpenSky.AgentMSFS.SingleInstance." + Environment.UserName);
+        private static readonly Mutex Mutex = new(false, "OpenSky.Agent.SingleInstance." + Environment.UserName);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -67,7 +70,7 @@ namespace OpenSky.AgentMSFS
         /// -------------------------------------------------------------------------------------------------
         public App()
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NTUyMDAyQDMxMzkyZTM0MmUzMEhnTjE1eWF6VXhzUG5jSTlKSEVnejlsUTJxdFdrWmFrOUJJK21BL0RndFk9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
             SfSkinManager.ApplyStylesOnApplication = false;
         }
 
@@ -123,9 +126,9 @@ namespace OpenSky.AgentMSFS
             var updatedToken = false;
             foreach (var arg in e.Args)
             {
-                if (arg.StartsWith("opensky-agent-msfs://") || arg.StartsWith("opensky-agent-msfs-debug://"))
+                if (arg.StartsWith("opensky-agent://") || arg.StartsWith("opensky-agent-debug://"))
                 {
-                    var appTokenUri = arg.Replace("opensky-agent-msfs://", string.Empty).Replace("opensky-agent-msfs-debug://", string.Empty).TrimEnd('/');
+                    var appTokenUri = arg.Replace("opensky-agent://", string.Empty).Replace("opensky-agent-debug://", string.Empty).TrimEnd('/');
                     var parameters = appTokenUri.Split('&');
 
                     string token = null;
@@ -193,14 +196,14 @@ namespace OpenSky.AgentMSFS
                 {
                     if (!updatedToken)
                     {
-                        ModernWpf.MessageBox.Show("The OpenSky agent for Flight Simulator 2020 is already running.", "OpenSky", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        ModernWpf.MessageBox.Show("The OpenSky flight tracking agent is already running.", "OpenSky", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                     else
                     {
                         // We updated the token in the settings, before we exit let the running instance now about this
                         var client = new XDMessagingClient();
                         var broadcaster = client.Broadcasters.GetBroadcasterForMode(XDTransportMode.Compatibility);
-                        broadcaster.SendToChannel("OPENSKY-AGENT-MSFS", "TokensUpdated");
+                        broadcaster.SendToChannel("OPENSKY-AGENT", "TokensUpdated");
                     }
 
                     Environment.Exit(1);
@@ -225,17 +228,27 @@ namespace OpenSky.AgentMSFS
                 Directory.CreateDirectory(openSkyFolder);
             }
 
-            var logFilePath = Environment.ExpandEnvironmentVariables("%localappdata%\\OpenSky\\agent_msfs_debug.log");
+            var logFilePath = Environment.ExpandEnvironmentVariables("%localappdata%\\OpenSky\\agent_debug.log");
             var traceListener = new DateTimeTextWriterTraceListener(File.Open(logFilePath, FileMode.Append, FileAccess.Write));
             Debug.AutoFlush = true;
             Debug.Listeners.Add(traceListener);
 #endif
             Debug.WriteLine("========================================================================================");
-            Debug.WriteLine($"OPENSKY AGENT FOR MSFS {Assembly.GetExecutingAssembly().GetName().Version.ToString(4)} STARTING UP");
+            Debug.WriteLine($"OPENSKY AGENT {Assembly.GetExecutingAssembly().GetName().Version.ToString(4)} STARTING UP");
             Debug.WriteLine("========================================================================================");
 
             // Unexpected error handler
             this.DispatcherUnhandledException += AppDispatcherUnhandledException;
+
+            // Initialize speech sound pack manager
+            SpeechSoundPacks.InitializeSpeechSoundPacks(Settings.Default.SoundPack, Settings.Default.TextToSpeechVoice);
+
+            // Initialize selected simulator interface
+            var simulatorInterface = Settings.Default.SimulatorInterface;
+            if (SimConnect.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Agent.Simulator.Simulator.SetSimulatorInstance(new SimConnect(Settings.Default.SimConnectHostName, Settings.Default.SimConnectPort, AgentOpenSkyService.Instance));
+            }
 
             // Continue startup
             base.OnStartup(e);
@@ -260,7 +273,7 @@ namespace OpenSky.AgentMSFS
             [NotNull] DispatcherUnhandledExceptionEventArgs e)
         {
             var crashReport = "==============================================================================\r\n";
-            crashReport += "  OPENSKY AGENT-MSFS CRASH REPORT\r\n";
+            crashReport += "  OPENSKY AGENT CRASH REPORT\r\n";
             crashReport += "  " + DateTime.Now + "\r\n";
             crashReport += "==============================================================================\r\n";
             crashReport += e.Exception + "\r\n";
@@ -268,13 +281,13 @@ namespace OpenSky.AgentMSFS
             crashReport += "\r\n\r\n";
 
             Debug.WriteLine(crashReport);
-            var filePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\OpenSky.AgentMSFS.Crash.txt";
+            var filePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\OpenSky.Agent.Crash.txt";
 
             try
             {
                 File.AppendAllText(filePath, crashReport);
                 ModernWpf.MessageBox.Show(
-                    e.Exception.Message + "\r\n\r\nPlease check OpenSky.AgentMSFS.Crash.txt for details!",
+                    e.Exception.Message + "\r\n\r\nPlease check OpenSky.Agent.Crash.txt for details!",
                     "Unexpected error!",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -298,7 +311,7 @@ namespace OpenSky.AgentMSFS
         private void PerformShutdown()
         {
             // Check if we are currently tracking a flight
-            if (Simulator.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
+            if (Agent.Simulator.Simulator.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("User requested shutdown, but flight tracking is still in progress...");
                 MessageBoxResult? answer = MessageBoxResult.None;

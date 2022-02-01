@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.MVVM
+namespace OpenSky.Agent.MVVM
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -13,7 +13,7 @@ namespace OpenSky.AgentMSFS.MVVM
     /// <remarks>
     /// sushi.at, 11/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.CommandEventArgs"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.CommandEventArgs"/>
     /// -------------------------------------------------------------------------------------------------
     public class CancelCommandEventArgs : CommandEventArgs
     {

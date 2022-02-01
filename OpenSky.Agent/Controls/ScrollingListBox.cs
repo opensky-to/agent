@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Controls
+namespace OpenSky.Agent.Controls
 {
     using System.Collections.Specialized;
     using System.Windows.Controls;

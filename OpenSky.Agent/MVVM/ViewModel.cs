@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.MVVM
+namespace OpenSky.Agent.MVVM
 {
     using System;
     using System.Collections;
@@ -18,7 +18,7 @@ namespace OpenSky.AgentMSFS.MVVM
 
     using JetBrains.Annotations;
 
-    using OpenSky.AgentMSFS.Controls;
+    using OpenSky.Agent.Controls;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Models
+namespace OpenSky.Agent.Models
 {
     using System.Collections.Generic;
     using System.Linq;

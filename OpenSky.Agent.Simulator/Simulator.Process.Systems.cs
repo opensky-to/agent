@@ -100,7 +100,7 @@ namespace OpenSky.Agent.Simulator
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, slew detected.");
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.Play();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedSlew);
                 this.StopTracking(false);
@@ -116,7 +116,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, teleport detected.");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.Play();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTeleport);
                     this.StopTracking(false);
@@ -151,7 +151,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, you cannot start your engines while ground handling isn't complete!");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedEnginesGroundHandling);
                     this.StopTracking(false);
@@ -183,7 +183,7 @@ namespace OpenSky.Agent.Simulator
                     {
                         Debug.WriteLine("Engine was turned off, but the plane was never airborne, aborting...");
                         var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                         player.PlaySync();
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.EngineOffNeverAirborne);
                         this.StopTracking(false);
@@ -233,7 +233,7 @@ namespace OpenSky.Agent.Simulator
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, you cannot start your pushback while ground handling isn't complete!");
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.PlaySync();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedPushbackGroundHandling);
                 this.StopTracking(false);
@@ -322,7 +322,7 @@ namespace OpenSky.Agent.Simulator
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, crash detection turned off!");
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.PlaySync();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedCrashDetectOff);
                 this.StopTracking(false);
@@ -333,7 +333,7 @@ namespace OpenSky.Agent.Simulator
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, unlimited fuel turned on!");
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.PlaySync();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedUnlimitedFuel);
                 this.StopTracking(false);
@@ -347,7 +347,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, time moved backwards!");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeBackwards);
                     this.StopTracking(false);
@@ -357,7 +357,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Debug.WriteLine("OpenSky Warning: Tracking aborted, time changed in sim!");
                     var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.AgentMSFS.Resources.OSnegative.wav"));
+                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeChanged);
                     this.StopTracking(false);

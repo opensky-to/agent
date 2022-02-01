@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Controls
+namespace OpenSky.Agent.Controls
 {
     using System;
     using System.Collections.Concurrent;
@@ -19,8 +19,8 @@ namespace OpenSky.AgentMSFS.Controls
     using System.Windows.Interop;
     using System.Windows.Shapes;
 
+    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls.Models;
 
     using Button = System.Windows.Controls.Button;
     using Cursors = System.Windows.Input.Cursors;

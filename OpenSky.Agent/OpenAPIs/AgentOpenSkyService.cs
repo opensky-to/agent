@@ -17,8 +17,8 @@ namespace OpenSkyApi
     using System.Threading;
     using System.Threading.Tasks;
 
-    using OpenSky.AgentMSFS;
-    using OpenSky.AgentMSFS.Properties;
+    using OpenSky.Agent;
+    using OpenSky.Agent.Properties;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

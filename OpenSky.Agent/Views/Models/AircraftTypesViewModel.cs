@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.ObjectModel;
@@ -13,11 +13,11 @@ namespace OpenSky.AgentMSFS.Views.Models
     using System.Threading;
     using System.Windows;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Controls.Models;
-    using OpenSky.AgentMSFS.MVVM;
-    using OpenSky.AgentMSFS.Tools;
+    using OpenSky.Agent.Tools;
 
     using OpenSkyApi;
 
@@ -28,7 +28,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 28/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class AircraftTypesViewModel : ViewModel
     {
@@ -1525,6 +1525,7 @@ namespace OpenSky.AgentMSFS.Views.Models
             this.LoadingText = "Refreshing aircraft types";
             try
             {
+                // todo get this from the simulator interface!
                 var result = AgentOpenSkyService.Instance.GetSimulatorAircraftTypesAsync(OpenSkyApi.Simulator.MSFS).Result;
                 if (!result.IsError)
                 {

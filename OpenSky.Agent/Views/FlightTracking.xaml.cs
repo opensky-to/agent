@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views
+namespace OpenSky.Agent.Views
 {
     using System;
     using System.Diagnostics;
@@ -17,13 +17,13 @@ namespace OpenSky.AgentMSFS.Views
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Converters;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.Controls;
-    using OpenSky.AgentMSFS.Converters;
-    using OpenSky.AgentMSFS.Views.Models;
+    using OpenSky.Agent.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>

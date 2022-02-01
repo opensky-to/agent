@@ -39,7 +39,7 @@ namespace OpenSky.Agent.Simulator
         /// Identifier for the agent.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private const string AgentIdentifier = "OpenSky.AgentMSFS";
+        private const string AgentIdentifier = "OpenSky.Agent";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

@@ -4,14 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Native.PInvoke
+namespace OpenSky.Agent.Native.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;
 
     using JetBrains.Annotations;
 
-    using OpenSky.AgentMSFS.Native.PInvoke.Structs;
+    using OpenSky.Agent.Native.PInvoke.Structs;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

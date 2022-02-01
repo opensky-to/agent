@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace OpenSky.AgentMSFS.Views.Models
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Tools;
-    using OpenSky.AgentMSFS.MVVM;
     using OpenSky.FlightLogXML;
 
     using OpenSkyApi;
@@ -28,7 +28,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 30/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class LandingReportViewModel : ViewModel
     {

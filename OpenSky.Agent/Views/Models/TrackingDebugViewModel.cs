@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views.Models
+namespace OpenSky.Agent.Views.Models
 {
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
-    using OpenSky.AgentMSFS.MVVM;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -18,7 +18,7 @@ namespace OpenSky.AgentMSFS.Views.Models
     /// <remarks>
     /// sushi.at, 13/03/2021.
     /// </remarks>
-    /// <seealso cref="T:OpenSky.AgentMSFS.MVVM.ViewModel"/>
+    /// <seealso cref="T:OpenSky.Agent.MVVM.ViewModel"/>
     /// -------------------------------------------------------------------------------------------------
     public class TrackingDebugViewModel : ViewModel
     {

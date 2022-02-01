@@ -8,11 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Properties {
+namespace OpenSky.Agent.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -38,24 +38,24 @@ namespace OpenSky.AgentMSFS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string SimulatorHostName {
+        public string SimConnectHostName {
             get {
-                return ((string)(this["SimulatorHostName"]));
+                return ((string)(this["SimConnectHostName"]));
             }
             set {
-                this["SimulatorHostName"] = value;
+                this["SimConnectHostName"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public uint SimulatorPort {
+        public uint SimConnectPort {
             get {
-                return ((uint)(this["SimulatorPort"]));
+                return ((uint)(this["SimConnectPort"]));
             }
             set {
-                this["SimulatorPort"] = value;
+                this["SimConnectPort"] = value;
             }
         }
         
@@ -161,7 +161,7 @@ namespace OpenSky.AgentMSFS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://api.github.com/repos/opensky-to/agent-msfs/releases/latest")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://api.github.com/repos/opensky-to/agent/releases/latest")]
         public string AutoUpdateURL {
             get {
                 return ((string)(this["AutoUpdateURL"]));
@@ -186,6 +186,42 @@ namespace OpenSky.AgentMSFS.Properties {
             }
             set {
                 this["SoundPack"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SimConnectMSFS")]
+        public string SimulatorInterface {
+            get {
+                return ((string)(this["SimulatorInterface"]));
+            }
+            set {
+                this["SimulatorInterface"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string SimulatorHostName {
+            get {
+                return ((string)(this["SimulatorHostName"]));
+            }
+            set {
+                this["SimulatorHostName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public string SimulatorPort {
+            get {
+                return ((string)(this["SimulatorPort"]));
+            }
+            set {
+                this["SimulatorPort"] = value;
             }
         }
     }

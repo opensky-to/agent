@@ -99,6 +99,13 @@ namespace OpenSky.Agent.SimConnectMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the name of the simulator interface.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static string SimulatorInterfaceName => "SimConnectMSFS";
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets a value indicating whether the sim is paused (proper pause, not ESC menu and definitely
         /// not active pause).
         /// </summary>

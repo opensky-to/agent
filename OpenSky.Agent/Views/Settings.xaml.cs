@@ -4,14 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.AgentMSFS.Views
+namespace OpenSky.Agent.Views
 {
     using System.Diagnostics;
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Navigation;
 
-    using OpenSky.AgentMSFS.Views.Models;
+    using OpenSky.Agent.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
