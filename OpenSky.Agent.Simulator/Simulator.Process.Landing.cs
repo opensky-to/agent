@@ -30,6 +30,13 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Occurs when a landing should be reported (event parameter specifies triggering time).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public event EventHandler<LandingReportNotification> LandingReported;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Check for and analyse landings.
         /// </summary>
         /// <remarks>
@@ -67,14 +74,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     // First landing for this flight
                     this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
-
-                    // Show landing report notification now?
-                    // todo RESTORE THIS, via event to agent main project
-                    //if (LandingReportNotification.AsSoonAsPossible.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
-                    //{
-                    //    UpdateGUIDelegate showNotification = () => new Views.LandingReport().Show();
-                    //    Application.Current.Dispatcher.BeginInvoke(showNotification);
-                    //}
+                    this.LandingReported?.Invoke(this, LandingReportNotification.AsSoonAsPossible);
                 }
             }
         }

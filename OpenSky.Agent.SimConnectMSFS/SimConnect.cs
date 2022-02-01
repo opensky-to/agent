@@ -115,6 +115,14 @@ namespace OpenSky.Agent.SimConnectMSFS
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the type of the simulator.
+        /// </summary>
+        /// <seealso cref="OpenSky.Agent.Simulator.Simulator.SimulatorType"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override OpenSkyApi.Simulator SimulatorType => OpenSkyApi.Simulator.MSFS;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Pauses the simulator (proper pause).
         /// </summary>
         /// <remarks>

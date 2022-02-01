@@ -1525,8 +1525,7 @@ namespace OpenSky.Agent.Views.Models
             this.LoadingText = "Refreshing aircraft types";
             try
             {
-                // todo get this from the simulator interface!
-                var result = AgentOpenSkyService.Instance.GetSimulatorAircraftTypesAsync(OpenSkyApi.Simulator.MSFS).Result;
+                var result = AgentOpenSkyService.Instance.GetSimulatorAircraftTypesAsync(this.Simulator.SimulatorType).Result;
                 if (!result.IsError)
                 {
                     this.RefreshAircraftTypesCommand.ReportProgress(

@@ -136,7 +136,6 @@
     <Compile Include="Converters\PoundsKilogramsConverter.cs" />
     <Compile Include="Converters\WeightsColorConverter.cs" />
     <Compile Include="OpenAPIs\AgentOpenSkyService.cs" />
-    <Compile Include="Models\LandingReportNotification.cs" />
     <Compile Include="MVVM\AsynchronousCommand.cs" />
     <Compile Include="MVVM\CancelCommandEventArgs.cs" />
     <Compile Include="MVVM\Command.cs" />
@@ -446,7 +445,9 @@
       <Name>OpenSky.Agent.Simulator</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"

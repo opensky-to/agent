@@ -21,6 +21,7 @@ namespace OpenSky.Agent
     using OpenSky.Agent.SimConnectMSFS;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
+    using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.Agent.Tools;
 
@@ -247,7 +248,19 @@ namespace OpenSky.Agent
             var simulatorInterface = Settings.Default.SimulatorInterface;
             if (SimConnect.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
             {
-                Agent.Simulator.Simulator.SetSimulatorInstance(new SimConnect(Settings.Default.SimConnectHostName, Settings.Default.SimConnectPort, AgentOpenSkyService.Instance));
+                Simulator.Simulator.SetSimulatorInstance(new SimConnect(Settings.Default.SimConnectHostName, Settings.Default.SimConnectPort, AgentOpenSkyService.Instance));
+            }
+
+            if (Simulator.Simulator.Instance != null)
+            {
+                Simulator.Simulator.Instance.LandingReported += (_, landingReportNotification) =>
+                {
+                    if (landingReportNotification.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
+                    {
+                        UpdateGUIDelegate showNotification = () => new Views.LandingReport().Show();
+                        Current.Dispatcher.BeginInvoke(showNotification);
+                    }
+                };
             }
 
             // Continue startup

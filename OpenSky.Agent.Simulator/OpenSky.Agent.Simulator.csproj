@@ -86,6 +86,7 @@
     <Compile Include="Models\FlightLoadingTempModels.cs" />
     <Compile Include="Models\FuelTanks.cs" />
     <Compile Include="Models\LandingAnalysis.cs" />
+    <Compile Include="Models\LandingReportNotification.cs" />
     <Compile Include="Models\MapPositionUpdate.cs" />
     <Compile Include="Models\AircraftIdentity.cs" />
     <Compile Include="Models\PayloadStations.cs" />

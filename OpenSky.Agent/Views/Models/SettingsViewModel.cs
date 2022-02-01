@@ -22,16 +22,17 @@ namespace OpenSky.Agent.Views.Models
 
     using OpenSky.Agent.Controls;
     using OpenSky.Agent.Controls.Models;
-    using OpenSky.Agent.Models;
     using OpenSky.Agent.MVVM;
+    using OpenSky.Agent.Properties;
     using OpenSky.Agent.SimConnectMSFS;
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.Agent.Tools;
 
     using OpenSkyApi;
 
-    using Simulator = OpenSky.Agent.Simulator.Simulator;
+    using Simulator = Simulator.Simulator;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -175,23 +176,23 @@ namespace OpenSky.Agent.Views.Models
             this.SelectedTextToSpeechVoice = speech.Voice.Name;
 
             // Load settings
-            Properties.Settings.Default.Reload();
-            this.SimulatorHostName = Properties.Settings.Default.SimConnectHostName;
-            this.SimulatorPort = Properties.Settings.Default.SimConnectPort;
+            Settings.Default.Reload();
+            this.SimulatorHostName = Settings.Default.SimConnectHostName;
+            this.SimulatorPort = Settings.Default.SimConnectPort;
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
-            this.SelectedLandingReportNotification = LandingReportNotification.Parse(Properties.Settings.Default.LandingReportNotification);
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.SoundPack))
+            this.SelectedLandingReportNotification = LandingReportNotification.Parse(Settings.Default.LandingReportNotification);
+            if (!string.IsNullOrEmpty(Settings.Default.SoundPack))
             {
-                this.SelectedSoundPack = Properties.Settings.Default.SoundPack;
+                this.SelectedSoundPack = Settings.Default.SoundPack;
             }
 
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.TextToSpeechVoice))
+            if (!string.IsNullOrEmpty(Settings.Default.TextToSpeechVoice))
             {
-                this.SelectedTextToSpeechVoice = Properties.Settings.Default.TextToSpeechVoice;
+                this.SelectedTextToSpeechVoice = Settings.Default.TextToSpeechVoice;
             }
 
-            var simulatorInterface = Properties.Settings.Default.SimulatorInterface;
+            var simulatorInterface = Settings.Default.SimulatorInterface;
             if (SimConnect.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
             {
                 this.SimConnectMSFSChecked = true;
@@ -540,7 +541,7 @@ namespace OpenSky.Agent.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void ChangePassword()
         {
-            Process.Start(Properties.Settings.Default.OpenSkyChangePasswordUrl);
+            Process.Start(Settings.Default.OpenSkyChangePasswordUrl);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -566,7 +567,7 @@ namespace OpenSky.Agent.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void LoginOpenSkyUser()
         {
-            Process.Start(Properties.Settings.Default.OpenSkyTokenUrl);
+            Process.Start(Settings.Default.OpenSkyTokenUrl);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -661,27 +662,41 @@ namespace OpenSky.Agent.Views.Models
             // Save local settings
             try
             {
+                var simulatorWasChanged = false;
                 if (this.SimConnectMSFSChecked)
                 {
-                    Properties.Settings.Default.SimulatorInterface = SimConnect.SimulatorInterfaceName;
+                    Settings.Default.SimulatorInterface = SimConnect.SimulatorInterfaceName;
                     if (Simulator.Instance == null || Simulator.Instance.GetType() != typeof(SimConnect))
                     {
                         Simulator.SetSimulatorInstance(new SimConnect(this.SimulatorHostName, this.SimulatorPort, AgentOpenSkyService.Instance));
+                        simulatorWasChanged = true;
                     }
                 }
 
-                Properties.Settings.Default.SimConnectHostName = this.SimulatorHostName;
-                Properties.Settings.Default.SimConnectPort = this.SimulatorPort;
-                Properties.Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
-                Properties.Settings.Default.SoundPack = this.SelectedSoundPack;
+                if (simulatorWasChanged && Simulator.Instance != null)
+                {
+                    Simulator.Instance.LandingReported += (_, landingReportNotification) =>
+                    {
+                        if (landingReportNotification.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
+                        {
+                            UpdateGUIDelegate showNotification = () => new LandingReport().Show();
+                            Application.Current.Dispatcher.BeginInvoke(showNotification);
+                        }
+                    };
+                }
+
+                Settings.Default.SimConnectHostName = this.SimulatorHostName;
+                Settings.Default.SimConnectPort = this.SimulatorPort;
+                Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
+                Settings.Default.SoundPack = this.SelectedSoundPack;
                 SpeechSoundPacks.Instance.SelectedSoundPack = this.SelectedSoundPack;
-                Properties.Settings.Default.TextToSpeechVoice = this.SelectedTextToSpeechVoice;
+                Settings.Default.TextToSpeechVoice = this.SelectedTextToSpeechVoice;
                 if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))
                 {
                     SpeechSoundPacks.Instance.SetSpeechVoice(this.SelectedTextToSpeechVoice);
                 }
 
-                Properties.Settings.Default.Save();
+                Settings.Default.Save();
                 this.SaveSettingsCommand.ReportProgress(() => this.IsDirty = false);
             }
             catch (Exception ex)

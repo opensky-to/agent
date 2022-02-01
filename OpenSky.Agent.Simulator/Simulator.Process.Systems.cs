@@ -214,12 +214,7 @@ namespace OpenSky.Agent.Simulator
                         this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TrackingStopped, OpenSkyColors.OpenSkyTealLight, "Flight tracking stopped");
 
                         // Show landing report notification now?
-                        // TODO RESTORE THIS
-                        //if (LandingReportNotification.AfterTurningEnginesOff.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
-                        //{
-                        //    UpdateGUIDelegate showNotification = () => new Views.LandingReport().Show();
-                        //    Application.Current.Dispatcher.BeginInvoke(showNotification);
-                        //}
+                        this.LandingReported?.Invoke(this, LandingReportNotification.AfterTurningEnginesOff);
 
                         // Actually finish up the tracking session now
                         SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightCompleteSubmitting);
