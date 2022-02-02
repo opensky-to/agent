@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>853790e9-5caa-4ebc-b4c3-c563c3242f1d</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>OpenSky.AgentMSFS</OutputName>
+    <OutputName>OpenSky.Agent</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -58,7 +58,7 @@
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.-->
   <Target Name="BeforeBuild">
-    <GetFileVersionTask AssemblyPath="$(OutDir)..\..\..\OpenSky.AgentMSFS\bin\$(Configuration)\OpenSky.AgentMSFS.exe">
+    <GetFileVersionTask AssemblyPath="$(OutDir)..\..\..\OpenSky.Agent\bin\$(Configuration)\OpenSky.Agent.exe">
       <Output TaskParameter="VersionNumber" PropertyName="VersionNumber" />
     </GetFileVersionTask>
     <CreateProperty Value="$(OutputName).$(VersionNumber)">
@@ -84,7 +84,7 @@
     </Task>
   </UsingTask>
   <PropertyGroup>
-    <PreBuildEvent>"..\..\StellarHeat\DevToolkit.StellarHeat.exe" -dr:INSTALLFOLDER -cg:OpenSky.AgentMSFS.Libraries -dir:"..\..\..\OpenSky.AgentMSFS\bin\$(Configuration)" -out:"..\..\Libraries.wxs"
+    <PreBuildEvent>"..\..\StellarHeat\DevToolkit.StellarHeat.exe" -dr:INSTALLFOLDER -cg:OpenSky.Agent.Libraries -dir:"..\..\..\OpenSky.Agent\bin\$(Configuration)" -out:"..\..\Libraries.wxs"
 "C:\Program Files (x86)\WiX Toolset v3.11\bin\heat.exe" dir "..\..\..\SoundPacks" -o "..\..\SoundPacks.wxs" -cg OpenSky.SoundPacks -sfrag -gg -suid -dr INSTALLFOLDER -var var.SoundPackSourceFolder -v -t ..\..\win64.xslt</PreBuildEvent>
   </PropertyGroup>
 </Project>

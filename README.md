@@ -10,9 +10,9 @@
 
 OpenSky is an open-source airline management simulation currently in development. We are actively seeking aviation enthusiast whom would love to be part of this upcoming project and shape it with us! If you have experience in coding, graphical or game design and feel like you could be an asset to the project, please head over to the [contribute page](https://www.opensky.to/contribute) and do not hesitate to jump into our [Discord](https://discord.com/invite/eR3yePrj79) and say hello! We would love to hear your ideas and feedback and are actively collecting them in our [forums](https://forum.opensky.to/)!
 
-## OpenSky Agent for Microsoft Flight Simulator 2020
+## OpenSky Agent
 
-This repository contains the C# code for our MSFS flight tracking agent. This part of the project is luckily already pretty mature but if you have a brilliant new feature that
+This repository contains the C# code for our Windows flight tracking agent. It currently supports MSFS via SimConnect but is designed so that other simulators can be added in the future. This part of the project is luckily already pretty mature but if you have a brilliant new feature that
 you want to see added, let us know or better open a pull request and help us develop this amazing project further.
 
 ## Screenshots

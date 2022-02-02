@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- OPENSKY COLOR STYLE DEFINITIONS -->
+    <Color x:Key="OpenSkyTeal">#05826c</Color>
+    <SolidColorBrush x:Key="OpenSkyTealBrush" Color="{StaticResource OpenSkyTeal}" />
+    <Color x:Key="OpenSkyTealLight">#08c6a4</Color>
+    <SolidColorBrush x:Key="OpenSkyTealLightBrush" Color="{StaticResource OpenSkyTealLight}" />
+    <Color x:Key="OpenSkyRed">DarkRed</Color>
+    <SolidColorBrush x:Key="OpenSkyRedBrush" Color="{StaticResource OpenSkyRed}" />
+    <Color x:Key="OpenSkyRedLight">#CC0000</Color>
+    <SolidColorBrush x:Key="OpenSkyRedLightBrush" Color="{StaticResource OpenSkyRedLight}" />
+    <Color x:Key="OpenSkyDarkGrayHeader">#29323c</Color>
+    <SolidColorBrush x:Key="OpenSkyDarkGrayHeaderBrush" Color="{StaticResource OpenSkyDarkGrayHeader}" />
+    <Color x:Key="OpenSkyGroupboxBackground">#1a1e22</Color>
+    <SolidColorBrush x:Key="OpenSkyGroupboxBackgroundBrush" Color="{StaticResource OpenSkyGroupboxBackground}" />
+    <Color x:Key="OpenSkyLightYellow">Yellow</Color>
+    <SolidColorBrush x:Key="OpenSkyLightYellowBrush" Color="{StaticResource OpenSkyLightYellow}" />
+    <Color x:Key="OpenSkyWarningOrange">DarkOrange</Color>
+    <SolidColorBrush x:Key="OpenSkyWarningOrangeBrush" Color="{StaticResource OpenSkyWarningOrange}" />
+    <Color x:Key="OpenSkyWarningOrangeLight">Orange</Color>
+    <SolidColorBrush x:Key="OpenSkyWarningOrangeLightBrush" Color="{StaticResource OpenSkyWarningOrangeLight}" />
+    <Color x:Key="OpenSkySimBrief">Black</Color>
+    <SolidColorBrush x:Key="OpenSkySimBriefBrush" Color="{StaticResource OpenSkySimBrief}" />
+    <Color x:Key="OpenSkySimBriefText">White</Color>
+    <SolidColorBrush x:Key="OpenSkySimBriefTextBrush" Color="{StaticResource OpenSkySimBriefText}" />
+</ResourceDictionary>
