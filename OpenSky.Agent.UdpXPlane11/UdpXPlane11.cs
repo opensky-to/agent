@@ -59,9 +59,7 @@ namespace OpenSky.Agent.UdpXPlane11
         {
             this.connector = new XPlaneConnector(simulatorIPAddress, (int)simulatorPort);
 
-            var primaryTracking = new PrimaryTrackingDataRef();
-            primaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Primary]);
-            this.PrimaryTracking = primaryTracking;
+            
 
             // Start our worker thread
             new Thread(this.ReadFromXPlane) { Name = "UdpXPlane11.ReadFromXPlane" }.Start();
@@ -136,24 +134,46 @@ namespace OpenSky.Agent.UdpXPlane11
         {
             try
             {
+                // Subscribe to datarefs
+                var primaryTracking = new PrimaryTrackingDataRef();
+                primaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Primary]);
+
                 this.connector.Start();
                 while (!this.close)
                 {
                     try
                     {
-                        if ((DateTime.Now - this.connector.LastReceive) > TimeSpan.FromSeconds(30))
+                        if ((DateTime.Now - this.connector.LastReceive) > TimeSpan.FromSeconds(10))
                         {
                             this.Connected = false;
                         }
-                        else if ((DateTime.Now - this.connector.LastReceive) < TimeSpan.FromSeconds(5))
+                        else if ((DateTime.Now - this.connector.LastReceive) < TimeSpan.FromSeconds(3))
                         {
                             this.Connected = true;
                         }
 
-                        // todo trigger "struct" received events like simconnect on configured intervals
-                        // Nothing else to do here, just wait 5 seconds and monitor the last receive timestamp, since
-                        // the connector doesn't report connection status.
-                        Thread.Sleep(5000);
+                        // Primary tracking
+                        {
+                            var clone = primaryTracking.Clone();
+                            this.primaryTrackingProcessingQueue.Enqueue(new ProcessPrimaryTracking { Old = this.PrimaryTracking, New = clone });
+                            this.OnPropertyChanged(nameof(this.PrimaryTrackingProcessingQueueLength));
+
+                            this.PrimaryTracking = clone;
+                            this.LastReceivedTimes[Requests.Primary] = DateTime.UtcNow;
+                        }
+                        foreach (Requests request in Enum.GetValues(typeof(Requests)))
+                        {
+                            if (this.SampleRates.ContainsKey(request))
+                            {
+                                var lastTime = this.LastReceivedTimes[request];
+                                if (request != Requests.Primary && (!lastTime.HasValue || (DateTime.UtcNow - lastTime.Value).TotalMilliseconds > this.SampleRates[request]))
+                                {
+                                    
+                                }
+                            }
+                        }
+
+                        Thread.Sleep(Math.Min(this.SampleRates[Requests.Primary], this.SampleRates[Requests.LandingAnalysis]));
                     }
                     catch (Exception ex)
                     {
@@ -166,7 +186,7 @@ namespace OpenSky.Agent.UdpXPlane11
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error starting/stopping XPlane connector: " + ex);
+                Debug.WriteLine("Error managing XPlane connector: " + ex);
             }
         }
     }
