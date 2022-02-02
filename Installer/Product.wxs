@@ -55,7 +55,7 @@
                 <RemoveFolder Id="RemoveProgramMenuDir" Directory="ApplicationProgramsFolder" On="uninstall" />
             </Component>
             <Component Guid="{F58EF8AF-5D4E-4005-8D90-5A83F0D26CFF}" Win64="yes">
-                <File Source="..\OpenSky.AgentMSFS\bin\$(var.Configuration)\OpenSky.Agent.exe.config" KeyPath="yes" />
+                <File Source="..\OpenSky.Agent\bin\$(var.Configuration)\OpenSky.Agent.exe.config" KeyPath="yes" />
             </Component>
             <Component Guid="{388E5BC7-6F40-4E0A-A64F-32B80F1E14E5}" Win64="yes">
                 <File Source="..\changelog.txt" KeyPath="yes" />
