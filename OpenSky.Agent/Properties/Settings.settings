@@ -50,11 +50,11 @@
     <Setting Name="SimulatorInterface" Type="System.String" Scope="User">
       <Value Profile="(Default)">SimConnectMSFS</Value>
     </Setting>
-    <Setting Name="SimulatorHostName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">localhost</Value>
+    <Setting Name="XPlaneIPAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
-    <Setting Name="SimulatorPort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">500</Value>
+    <Setting Name="XPlanePort" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">49000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -29,10 +29,11 @@ namespace OpenSky.Agent.Views.Models
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.Agent.Tools;
+    using OpenSky.Agent.UdpXPlane11;
 
     using OpenSkyApi;
 
-    using Simulator = Simulator.Simulator;
+    using Simulator = OpenSky.Agent.Simulator.Simulator;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -103,17 +104,10 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The simulator host name.
+        /// The simconnect simulator host name.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string simulatorHostName;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The simulator port.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private uint simulatorPort;
+        private string simConnectHostName;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -124,24 +118,31 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets a value indicating whether simConnect MSFS is checked.
+        /// The simconnect simulator port.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool SimConnectMSFSChecked
-        {
-            get => this.simConnectMSFSChecked;
+        private uint simConnectPort;
 
-            set
-            {
-                if (Equals(this.simConnectMSFSChecked, value))
-                {
-                    return;
-                }
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if UDP X-Plane 11 is checked.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool udpXplaneChecked;
 
-                this.simConnectMSFSChecked=value;
-                this.NotifyPropertyChanged();
-            }
-        }
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Name of the X-Plane 11 IP address.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string xplaneIPAddress;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The X-Plane 11 UDP port.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private uint xplanePort;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -177,8 +178,10 @@ namespace OpenSky.Agent.Views.Models
 
             // Load settings
             Settings.Default.Reload();
-            this.SimulatorHostName = Settings.Default.SimConnectHostName;
-            this.SimulatorPort = Settings.Default.SimConnectPort;
+            this.SimConnectHostName = Settings.Default.SimConnectHostName;
+            this.SimConnectPort = Settings.Default.SimConnectPort;
+            this.XplaneIPAddress = Settings.Default.XPlaneIPAddress;
+            this.XplanePort = Settings.Default.XPlanePort;
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Settings.Default.LandingReportNotification);
@@ -454,21 +457,21 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the simulator host name.
+        /// Gets or sets the simconnect simulator host name.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string SimulatorHostName
+        public string SimConnectHostName
         {
-            get => this.simulatorHostName;
+            get => this.simConnectHostName;
 
             set
             {
-                if (Equals(this.simulatorHostName, value))
+                if (Equals(this.simConnectHostName, value))
                 {
                     return;
                 }
 
-                this.simulatorHostName = value;
+                this.simConnectHostName = value;
                 this.NotifyPropertyChanged();
                 this.IsDirty = true;
             }
@@ -476,21 +479,43 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the simulator port.
+        /// Gets or sets a value indicating whether simConnect MSFS is checked.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public uint SimulatorPort
+        public bool SimConnectMSFSChecked
         {
-            get => this.simulatorPort;
+            get => this.simConnectMSFSChecked;
 
             set
             {
-                if (Equals(this.simulatorPort, value))
+                if (Equals(this.simConnectMSFSChecked, value))
                 {
                     return;
                 }
 
-                this.simulatorPort = value;
+                this.simConnectMSFSChecked = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the simconnect simulator port.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public uint SimConnectPort
+        {
+            get => this.simConnectPort;
+
+            set
+            {
+                if (Equals(this.simConnectPort, value))
+                {
+                    return;
+                }
+
+                this.simConnectPort = value;
                 this.NotifyPropertyChanged();
                 this.IsDirty = true;
             }
@@ -519,6 +544,27 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets a value indicating whether UDP X-Plane 11 is checked.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool UdpXplaneChecked
+        {
+            get => this.udpXplaneChecked;
+            set
+            {
+                if (Equals(this.udpXplaneChecked, value))
+                {
+                    return;
+                }
+
+                this.udpXplaneChecked = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the update profile image command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -530,6 +576,48 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public UserSessionService UserSession => UserSessionService.Instance;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the IP address of the X-Plane 11 host.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string XplaneIPAddress
+        {
+            get => this.xplaneIPAddress;
+            set
+            {
+                if (Equals(this.xplaneIPAddress, value))
+                {
+                    return;
+                }
+
+                this.xplaneIPAddress = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the X-Plane 11 port.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public uint XplanePort
+        {
+            get => this.xplanePort;
+            set
+            {
+                if (Equals(this.xplanePort, value))
+                {
+                    return;
+                }
+
+                this.xplanePort = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -639,8 +727,8 @@ namespace OpenSky.Agent.Views.Models
                 if (messageBox.Result == ExtendedMessageBoxResult.Yes)
                 {
                     Debug.WriteLine("Resetting settings to defaults...");
-                    this.SimulatorHostName = "localhost";
-                    this.SimulatorPort = 500;
+                    this.SimConnectHostName = "localhost";
+                    this.SimConnectPort = 500;
                 }
             };
             this.ViewReference.ShowMessageBox(messageBox);
@@ -666,9 +754,19 @@ namespace OpenSky.Agent.Views.Models
                 if (this.SimConnectMSFSChecked)
                 {
                     Settings.Default.SimulatorInterface = SimConnect.SimulatorInterfaceName;
-                    if (Simulator.Instance == null || Simulator.Instance.GetType() != typeof(SimConnect))
+                    if (Simulator.Instance == null || Simulator.Instance.GetType() != typeof(SimConnect) || !Equals(Settings.Default.SimConnectHostName, this.SimConnectHostName) || Settings.Default.SimConnectPort != this.SimConnectPort)
                     {
-                        Simulator.SetSimulatorInstance(new SimConnect(this.SimulatorHostName, this.SimulatorPort, AgentOpenSkyService.Instance));
+                        Simulator.SetSimulatorInstance(new SimConnect(this.SimConnectHostName, this.SimConnectPort, AgentOpenSkyService.Instance));
+                        simulatorWasChanged = true;
+                    }
+                }
+
+                if (this.UdpXplaneChecked)
+                {
+                    Settings.Default.SimulatorInterface = UdpXPlane11.SimulatorInterfaceName;
+                    if (Simulator.Instance == null || Simulator.Instance.GetType() != typeof(UdpXPlane11) || !Equals(Settings.Default.XPlaneIPAddress, this.XplaneIPAddress) || Settings.Default.XPlanePort != this.XplanePort)
+                    {
+                        Simulator.SetSimulatorInstance(new UdpXPlane11(this.XplaneIPAddress, this.XplanePort, AgentOpenSkyService.Instance));
                         simulatorWasChanged = true;
                     }
                 }
@@ -685,8 +783,10 @@ namespace OpenSky.Agent.Views.Models
                     };
                 }
 
-                Settings.Default.SimConnectHostName = this.SimulatorHostName;
-                Settings.Default.SimConnectPort = this.SimulatorPort;
+                Settings.Default.SimConnectHostName = this.SimConnectHostName;
+                Settings.Default.SimConnectPort = this.SimConnectPort;
+                Settings.Default.XPlaneIPAddress = this.XplaneIPAddress;
+                Settings.Default.XPlanePort = this.XplanePort;
                 Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
                 Settings.Default.SoundPack = this.SelectedSoundPack;
                 SpeechSoundPacks.Instance.SelectedSoundPack = this.SelectedSoundPack;

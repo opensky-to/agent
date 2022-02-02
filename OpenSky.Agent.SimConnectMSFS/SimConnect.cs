@@ -24,19 +24,19 @@ namespace OpenSky.Agent.SimConnectMSFS
 
     using OpenSkyApi;
 
-    using AircraftIdentity = OpenSky.Agent.SimConnectMSFS.Structs.AircraftIdentity;
-    using FuelTanks = OpenSky.Agent.SimConnectMSFS.Structs.FuelTanks;
-    using LandingAnalysis = OpenSky.Agent.SimConnectMSFS.Structs.LandingAnalysis;
-    using PayloadStations = OpenSky.Agent.SimConnectMSFS.Structs.PayloadStations;
-    using PrimaryTracking = OpenSky.Agent.SimConnectMSFS.Structs.PrimaryTracking;
-    using SecondaryTracking = OpenSky.Agent.SimConnectMSFS.Structs.SecondaryTracking;
-    using Simulator = OpenSky.Agent.Simulator.Simulator;
-    using SlewAircraftIntoPosition = OpenSky.Agent.SimConnectMSFS.Structs.SlewAircraftIntoPosition;
-    using WeightAndBalance = OpenSky.Agent.SimConnectMSFS.Structs.WeightAndBalance;
+    using AircraftIdentity = Structs.AircraftIdentity;
+    using FuelTanks = Structs.FuelTanks;
+    using LandingAnalysis = Structs.LandingAnalysis;
+    using PayloadStations = Structs.PayloadStations;
+    using PrimaryTracking = Structs.PrimaryTracking;
+    using SecondaryTracking = Structs.SecondaryTracking;
+    using Simulator = Simulator.Simulator;
+    using SlewAircraftIntoPosition = Structs.SlewAircraftIntoPosition;
+    using WeightAndBalance = Structs.WeightAndBalance;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Simconnect client.
+    /// Simconnect client for Microsoft Flight Simulator 2020.
     /// </summary>
     /// <remarks>
     /// sushi.at, 13/03/2021.

@@ -444,6 +444,10 @@
       <Project>{30c467e8-2eee-41e5-be01-0142a61ba171}</Project>
       <Name>OpenSky.Agent.Simulator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenSky.Agent.UdpXPlane11\OpenSky.Agent.UdpXPlane11.csproj">
+      <Project>{dfbda2b8-5775-4766-be86-d729fcf20de1}</Project>
+      <Name>OpenSky.Agent.UdpXPlane11</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
