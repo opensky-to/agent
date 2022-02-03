@@ -23,6 +23,20 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     /// -------------------------------------------------------------------------------------------------
     public class PrimaryTrackingDataRef : Simulator.Models.PrimaryTracking
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Register with Xplane connector.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <param name="connector">
+        /// The Xplane connector.
+        /// </param>
+        /// <param name="sampleRate">
+        /// The configured sample rate.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
         public void RegisterWithConnector(XPlaneConnector connector, int sampleRate)
         {
             connector.Subscribe(DataRefs.FlightmodelPositionLatitude, 1000 / sampleRate, this.DataRefUpdated);
@@ -36,7 +50,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.FlightmodelPositionIndicatedAirspeed, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTrueTheta, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTruePhi, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionVhIndFpm, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.FlightmodelPositionVhInd, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Cockpit2AnnunciatorsStallWarning, 1000 / sampleRate, this.DataRefUpdated);
             // todo detect overspeed possible?
             connector.Subscribe(DataRefs.Flightmodel2MiscGforceNormal, 1000 / sampleRate, this.DataRefUpdated);
@@ -45,20 +59,56 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.Flightmodel2MiscHasCrashed, 1000 / sampleRate, this.DataRefUpdated);
         }
 
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The OnChange subscribed datarefs.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
         private readonly List<string> subscribed = new();
 
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Dataref subscription updated.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <param name="element">
+        /// The element.
+        /// </param>
+        /// <param name="value">
+        /// The value.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
         private void DataRefUpdated(DataRefElement element, float value)
         {
             if (!this.subscribed.Contains(element.DataRef))
             {
-                Debug.WriteLine($"{element.DataRef} : {element.Value}");
+                Debug.WriteLine($"SUBSCRIBED TO: {element.DataRef} : {element.Value}");
                 this.subscribed.Add(element.DataRef);
-                element.OnValueChange += this.Element_OnValueChange;
+                element.OnValueChange += this.DatarefOnValueChange;
             }
-            
+            else
+            {
+                Debug.WriteLine($"REPEAT VALUE?: {element.DataRef} : {element.Value}");
+            }
         }
 
-        private void Element_OnValueChange(DataRefElement sender, float newValue)
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Dataref on value change.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="newValue">
+        /// The new value.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void DatarefOnValueChange(DataRefElement sender, float newValue)
         {
             if (sender.DataRef == DataRefs.FlightmodelPositionLatitude.DataRef)
             {
@@ -70,11 +120,11 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionElevation.DataRef)
             {
-                this.Altitude = newValue;
+                this.Altitude = newValue * 3.281;
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionYAgl.DataRef)
             {
-                this.RadioHeight = newValue; // todo is this in meters?
+                this.RadioHeight = newValue * 3.281;
                 this.OnGround = newValue < 1; // todo there has to be a better way
             }
             if (sender.DataRef == DataRefs.FlightmodelMiscHInd2.DataRef)
@@ -87,15 +137,15 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionTrueAirspeed.DataRef)
             {
-                this.AirspeedTrue = newValue;
+                this.AirspeedTrue = newValue * 1.944;
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionGroundspeed.DataRef)
             {
-                this.GroundSpeed = newValue; // todo unit? m/s?
+                this.GroundSpeed = newValue * 1.944;
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionIndicatedAirspeed.DataRef)
             {
-                this.AirspeedIndicated = newValue;
+                this.AirspeedIndicated = newValue * 1.944;
             }
             if (sender.DataRef == DataRefs.FlightmodelPositionTrueTheta.DataRef)
             {
@@ -105,9 +155,9 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             {
                 this.BankAngle = newValue;
             }
-            if (sender.DataRef == DataRefs.FlightmodelPositionVhIndFpm.DataRef)
+            if (sender.DataRef == DataRefs.FlightmodelPositionVhInd.DataRef)
             {
-                this.VerticalSpeedSeconds = newValue;
+                this.VerticalSpeedSeconds = newValue * 3.281;
             }
             if (sender.DataRef == DataRefs.Cockpit2AnnunciatorsStallWarning.DataRef)
             {
@@ -127,6 +177,17 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             }
         }
 
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Makes a copy of this object.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <returns>
+        /// A copy of this object.
+        /// </returns>
+        /// -------------------------------------------------------------------------------------------------
         public Simulator.Models.PrimaryTracking Clone()
         {
             return new Simulator.Models.PrimaryTracking

@@ -59,7 +59,7 @@ namespace OpenSky.Agent.UdpXPlane11
         {
             this.connector = new XPlaneConnector(simulatorIPAddress, (int)simulatorPort);
 
-            
+
 
             // Start our worker thread
             new Thread(this.ReadFromXPlane) { Name = "UdpXPlane11.ReadFromXPlane" }.Start();
@@ -138,6 +138,9 @@ namespace OpenSky.Agent.UdpXPlane11
                 var primaryTracking = new PrimaryTrackingDataRef();
                 primaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Primary]);
 
+                var secondaryTracking = new SecondaryTrackingDataRef();
+                secondaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Secondary]);
+
                 this.connector.Start();
                 while (!this.close)
                 {
@@ -168,7 +171,15 @@ namespace OpenSky.Agent.UdpXPlane11
                                 var lastTime = this.LastReceivedTimes[request];
                                 if (request != Requests.Primary && (!lastTime.HasValue || (DateTime.UtcNow - lastTime.Value).TotalMilliseconds > this.SampleRates[request]))
                                 {
-                                    
+                                    if (request == Requests.Secondary)
+                                    {
+                                        var clone = secondaryTracking.Clone();
+                                        this.secondaryTrackingProcessingQueue.Enqueue(new ProcessSecondaryTracking { Old = this.SecondaryTracking, New = clone });
+                                        this.OnPropertyChanged(nameof(this.SecondaryTrackingProcessingQueueLength));
+
+                                        this.SecondaryTracking = clone;
+                                        this.LastReceivedTimes[Requests.Secondary] = DateTime.UtcNow;
+                                    }
                                 }
                             }
                         }
