@@ -40,9 +40,9 @@ namespace OpenSky.Agent.Simulator.Enums
         PayloadStations = 3,
         
         /// <summary>
-        /// Plane identity request
+        /// Aircraft identity request
         /// </summary>
-        PlaneIdentity = 4,
+        AircraftIdentity = 4,
 
         /// <summary>
         /// Weight and balance request
@@ -60,8 +60,8 @@ namespace OpenSky.Agent.Simulator.Enums
         SlewPlaneIntoPosition = 7,
 
         /// <summary>
-        /// Plane registry request
+        /// Aircraft registry request
         /// </summary>
-        PlaneRegistry = 8
+        AircraftRegistry = 8
     }
 }

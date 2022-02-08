@@ -1,59 +1,56 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PrimaryTrackingDataRef.cs" company="OpenSky">
+// <copyright file="LandingAnalysisDataRef.cs" company="OpenSky">
 // OpenSky project 2021-2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
+    using System;
+    using System.Diagnostics;
+
     using XPlaneConnector;
     using XPlaneConnector.DataRefs;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// XPlane 11 dataref enabled version of primary tracking model.
+    /// XPlane 11 dataref enabled version of landing analysis model.
     /// </summary>
     /// <remarks>
-    /// sushi.at, 02/02/2022.
+    /// sushi.at, 07/02/2022.
     /// </remarks>
-    /// <seealso cref="OpenSky.Agent.Simulator.Models.PrimaryTracking"/>
+    /// <seealso cref="OpenSky.Agent.Simulator.Models.LandingAnalysis"/>
     /// -------------------------------------------------------------------------------------------------
-    public class PrimaryTrackingDataRef : Simulator.Models.PrimaryTracking
+    public class LandingAnalysisDataRef : Simulator.Models.LandingAnalysis
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Makes a copy of this object.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/02/2022.
+        /// sushi.at, 06/02/2022.
         /// </remarks>
         /// <returns>
         /// A copy of this object.
         /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public Simulator.Models.PrimaryTracking Clone()
+        public Simulator.Models.LandingAnalysis Clone()
         {
-            return new Simulator.Models.PrimaryTracking
+            return new Simulator.Models.LandingAnalysis
             {
                 Latitude = this.Latitude,
                 Longitude = this.Longitude,
                 Altitude = this.Altitude,
-                RadioHeight = this.RadioHeight,
-                IndicatedAltitude = this.IndicatedAltitude,
                 OnGround = this.OnGround,
-                Heading = this.Heading,
+                WindLat = this.WindLat,
+                WindLong = this.WindLong,
                 AirspeedTrue = this.AirspeedTrue,
                 GroundSpeed = this.GroundSpeed,
-                AirspeedIndicated = this.AirspeedIndicated,
-                PitchAngle = this.PitchAngle,
-                BankAngle = this.BankAngle,
-                VerticalSpeedSeconds = this.VerticalSpeedSeconds,
-                StallWarning = this.StallWarning,
-                OverspeedWarning = this.OverspeedWarning,
-                GForce = this.GForce,
-                SimulationRate = this.SimulationRate,
-                SlewActive = this.SlewActive,
-                Crash = this.Crash
+                SpeedLat = this.SpeedLat,
+                SpeedLong = this.SpeedLong,
+                Gforce = this.Gforce,
+                LandingRateSeconds = this.LandingRateSeconds,
+                BankAngle = this.BankAngle
             };
         }
 
@@ -62,7 +59,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// Register with Xplane connector.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/02/2022.
+        /// sushi.at, 06/02/2022.
         /// </remarks>
         /// <param name="connector">
         /// The Xplane connector.
@@ -77,22 +74,17 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.FlightmodelPositionLongitude, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionElevation, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionYAgl, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelMiscHInd2, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionMagPsi, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.WeatherWindDirectionDegt, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.WeatherWindSpeedKt, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTrueAirspeed, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionGroundspeed, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionIndicatedAirspeed, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionTrueTheta, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionTruePhi, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionVhInd, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.Cockpit2AnnunciatorsStallWarning, 1000 / sampleRate, this.DataRefUpdated);
-
-            // todo detect overspeed possible?
+            connector.Subscribe(DataRefs.FlightmodelPositionBeta, 1000 / sampleRate, this.DataRefUpdated);
+            // speed lat
+            // speed long
             connector.Subscribe(DataRefs.Flightmodel2MiscGforceNormal, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.TimeSimSpeed, 1000 / sampleRate, this.DataRefUpdated);
-
-            // no slew mode really
-            connector.Subscribe(DataRefs.Flightmodel2MiscHasCrashed, 1000 / sampleRate, this.DataRefUpdated);
+            // landing rate seconds
+            connector.Subscribe(DataRefs.FlightmodelPositionTruePhi, 1000 / sampleRate, this.DataRefUpdated);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -100,7 +92,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// Dataref subscription updated.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/02/2022.
+        /// sushi.at, 06/02/2022.
         /// </remarks>
         /// <param name="element">
         /// The element.
@@ -128,18 +120,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             if (element.DataRef == DataRefs.FlightmodelPositionYAgl.DataRef)
             {
-                this.RadioHeight = value * 3.281;
                 this.OnGround = value < 1; // todo there has to be a better way
-            }
-
-            if (element.DataRef == DataRefs.FlightmodelMiscHInd2.DataRef)
-            {
-                this.IndicatedAltitude = value;
-            }
-
-            if (element.DataRef == DataRefs.FlightmodelPositionMagPsi.DataRef)
-            {
-                this.Heading = value;
             }
 
             if (element.DataRef == DataRefs.FlightmodelPositionTrueAirspeed.DataRef)
@@ -152,45 +133,76 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 this.GroundSpeed = value * 1.944;
             }
 
-            if (element.DataRef == DataRefs.FlightmodelPositionIndicatedAirspeed.DataRef)
+            if (element.DataRef == DataRefs.FlightmodelPositionBeta.DataRef)
             {
-                this.AirspeedIndicated = value * 1.944;
+                this.betaAngle = value / (Math.PI / 180);
+                Debug.WriteLine($"beta: {betaAngle}");
             }
 
-            if (element.DataRef == DataRefs.FlightmodelPositionTrueTheta.DataRef)
+
+            // speed lat
+            // speed long
+
+            if (element.DataRef == DataRefs.Flightmodel2MiscGforceNormal.DataRef)
             {
-                this.PitchAngle = value;
+                this.Gforce = value;
             }
+
+            // landing rate seconds
 
             if (element.DataRef == DataRefs.FlightmodelPositionTruePhi.DataRef)
             {
                 this.BankAngle = value;
             }
 
-            if (element.DataRef == DataRefs.FlightmodelPositionVhInd.DataRef)
+            if (element.DataRef == DataRefs.FlightmodelPositionMagPsi.DataRef)
             {
-                this.VerticalSpeedSeconds = value * 3.281;
+                this.heading = value;
+            }
+            if (element.DataRef == DataRefs.WeatherWindDirectionDegt.DataRef)
+            {
+                this.windDegrees = value;
+            }
+            if (element.DataRef == DataRefs.WeatherWindSpeedKt.DataRef)
+            {
+                this.windSpeed = value * 1.944f;
             }
 
-            if (element.DataRef == DataRefs.Cockpit2AnnunciatorsStallWarning.DataRef)
-            {
-                this.StallWarning = (int)value == 1;
-            }
+            var windDelta = Math.Abs(this.heading - this.windDegrees);
+            this.WindLat = Math.Sin((Math.PI / 180) * windDelta) * this.windSpeed;
+            this.WindLong = Math.Cos((Math.PI / 180) * windDelta) * this.windSpeed;
 
-            if (element.DataRef == DataRefs.Flightmodel2MiscGforceNormal.DataRef)
-            {
-                this.GForce = value;
-            }
+            var speedDetla = Math.Abs(this.heading - this.betaAngle);
+            this.SpeedLat = Math.Sin((Math.PI / 180) * speedDetla) * this.GroundSpeed;
+            this.SpeedLong = Math.Cos((Math.PI / 180) * speedDetla) * this.GroundSpeed;
+            Debug.WriteLine($"LAT: {this.SpeedLat}");
+            Debug.WriteLine($"LONG: {this.SpeedLong}");
 
-            if (element.DataRef == DataRefs.TimeSimSpeed.DataRef)
-            {
-                this.SimulationRate = value;
-            }
-
-            if (element.DataRef == DataRefs.Flightmodel2MiscHasCrashed.DataRef)
-            {
-                this.Crash = (int)value == 1;
-            }
+            var sideSlipAngle = Math.Atan(SpeedLong / SpeedLat) * 180.0 / Math.PI;
+            Debug.WriteLine($"Sideslip: {sideSlipAngle}");
         }
+
+        private double betaAngle;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The heading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float heading;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The wind degrees.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float windDegrees;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The wind speed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float windSpeed;
     }
 }

@@ -115,7 +115,7 @@ namespace OpenSky.Agent.Simulator
                 { Requests.Secondary, 500 },
                 { Requests.FuelTanks, 15000 },
                 { Requests.PayloadStations, 15000 },
-                { Requests.PlaneIdentity, 15000 },
+                { Requests.AircraftIdentity, 15000 },
                 { Requests.WeightAndBalance, 15000 },
                 { Requests.LandingAnalysis, 500 }
             };

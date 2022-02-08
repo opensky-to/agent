@@ -7,8 +7,6 @@
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
 
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.FlightLogXML;
@@ -47,138 +45,15 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Register with Xplane connector.
+        /// Makes a copy of this object.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 03/02/2022.
+        /// sushi.at, 06/02/2022.
         /// </remarks>
-        /// <param name="connector">
-        /// The Xplane connector.
-        /// </param>
-        /// <param name="sampleRate">
-        /// The configured sample rate.
-        /// </param>
+        /// <returns>
+        /// A copy of this object.
+        /// </returns>
         /// -------------------------------------------------------------------------------------------------
-        public void RegisterWithConnector(XPlaneConnector connector, int sampleRate)
-        {
-            connector.Subscribe(DataRefs.TimeZuluTimeSec, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentDay, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentMonth, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalBatteryOn, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.Flightmodel2EnginesEngineIsBurningFuel, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.GraphicsAnimationGroundTrafficTowbarHeadingDeg, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.Cockpit2ElectricalAPURunning, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalBeaconLightsOn, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalNavLightsOn, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalStrobeLightsOn, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalTaxiLightOn, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.CockpitElectricalLandingLightsOn, 1000 / sampleRate, this.DataRefUpdated);
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The OnChange subscribed datarefs.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private readonly List<string> subscribed = new();
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Dataref subscription updated.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 03/02/2022.
-        /// </remarks>
-        /// <param name="element">
-        /// The element.
-        /// </param>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void DataRefUpdated(DataRefElement element, float value)
-        {
-            if (!this.subscribed.Contains(element.DataRef))
-            {
-                Debug.WriteLine($"SUBSCRIBED TO: {element.DataRef} : {element.Value}");
-                this.subscribed.Add(element.DataRef);
-                element.OnValueChange += this.DatarefOnValueChange;
-            }
-            else
-            {
-                Debug.WriteLine($"REPEAT VALUE?: {element.DataRef} : {element.Value}");
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Dataref on value change.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 03/02/2022.
-        /// </remarks>
-        /// <param name="sender">
-        /// The sender.
-        /// </param>
-        /// <param name="newValue">
-        /// The new value.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void DatarefOnValueChange(DataRefElement sender, float newValue)
-        {
-            if (sender.DataRef == DataRefs.TimeZuluTimeSec.DataRef)
-            {
-                this.UtcTime = newValue;
-            }
-            if (sender.DataRef == DataRefs.Cockpit2ClockTimerCurrentDay.DataRef)
-            {
-                this.UtcDay = (int)newValue;
-            }
-            if (sender.DataRef == DataRefs.Cockpit2ClockTimerCurrentMonth.DataRef)
-            {
-                this.UtcMonth = (int)newValue;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalBatteryOn.DataRef)
-            {
-                this.ElectricalMasterBattery = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.Flightmodel2EnginesEngineIsBurningFuel.DataRef)
-            {
-                this.EngineCombustion1 = (int)newValue == 1;
-                this.EngineCombustion2 = (int)newValue == 1;
-                this.EngineCombustion3 = (int)newValue == 1;
-                this.EngineCombustion4 = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.GraphicsAnimationGroundTrafficTowbarHeadingDeg.DataRef)
-            {
-                this.Pushback = newValue != 0 ? Pushback.Straight : Pushback.NoPushback; // todo check
-            }
-            if (sender.DataRef == DataRefs.Cockpit2ElectricalAPURunning.DataRef)
-            {
-                this.ApuGenerator = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalBeaconLightsOn.DataRef)
-            {
-                this.LightBeacon = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalNavLightsOn.DataRef)
-            {
-                this.LightNav = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalStrobeLightsOn.DataRef)
-            {
-                this.LightStrobe = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalTaxiLightOn.DataRef)
-            {
-                this.LightTaxi = (int)newValue == 1;
-            }
-            if (sender.DataRef == DataRefs.CockpitElectricalLandingLightsOn.DataRef)
-            {
-                this.LightLanding = (int)newValue == 1;
-            }
-        }
-
         public Simulator.Models.SecondaryTracking Clone()
         {
             return new Simulator.Models.SecondaryTracking
@@ -212,6 +87,198 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 SeatBeltSign = this.SeatBeltSign,
                 NoSmokingSign = this.NoSmokingSign
             };
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Register with Xplane connector.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <param name="connector">
+        /// The Xplane connector.
+        /// </param>
+        /// <param name="sampleRate">
+        /// The configured sample rate.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        public void RegisterWithConnector(XPlaneConnector connector, int sampleRate)
+        {
+            connector.Subscribe(DataRefs.TimeZuluTimeSec, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentDay, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentMonth, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalBatteryOn, 1000 / sampleRate, this.DataRefUpdated);
+            var engine1Running = DataRefs.FlightmodelEngineENGNRunning;
+            engine1Running.DataRef += "[0]";
+            connector.Subscribe(engine1Running, 1000 / sampleRate, this.DataRefUpdated);
+            var engine2Running = DataRefs.FlightmodelEngineENGNRunning;
+            engine2Running.DataRef += "[1]";
+            connector.Subscribe(engine2Running, 1000 / sampleRate, this.DataRefUpdated);
+            var engine3Running = DataRefs.FlightmodelEngineENGNRunning;
+            engine3Running.DataRef += "[2]";
+            connector.Subscribe(engine3Running, 1000 / sampleRate, this.DataRefUpdated);
+            var engine4Running = DataRefs.FlightmodelEngineENGNRunning;
+            engine4Running.DataRef += "[3]";
+            connector.Subscribe(engine4Running, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.GraphicsAnimationGroundTrafficTowbarHeadingDeg, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.Cockpit2ElectricalAPURunning, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalBeaconLightsOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalNavLightsOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalStrobeLightsOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalTaxiLightOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitElectricalLandingLightsOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.FlightmodelControlsFlaprqst, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.FlightmodelControlsFlaprat, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitSwitchesGearHandleStatus, 1000 / sampleRate, this.DataRefUpdated);
+            var gearDeploy = DataRefs.Flightmodel2GearDeployRatio;
+            gearDeploy.DataRef += "[0]";
+            connector.Subscribe(gearDeploy, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitAutopilotAutopilotMode, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.FlightmodelControlsParkbrake, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.FlightmodelControlsSbrkrqst, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitSwitchesFastenSeatBelts, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.CockpitSwitchesNoSmoking, 1000 / sampleRate, this.DataRefUpdated);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Dataref subscription updated.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 03/02/2022.
+        /// </remarks>
+        /// <param name="element">
+        /// The element.
+        /// </param>
+        /// <param name="value">
+        /// The value.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void DataRefUpdated(DataRefElement element, float value)
+        {
+            if (element.DataRef == DataRefs.TimeZuluTimeSec.DataRef)
+            {
+                this.UtcTime = value;
+            }
+
+            if (element.DataRef == DataRefs.Cockpit2ClockTimerCurrentDay.DataRef)
+            {
+                this.UtcDay = (int)value;
+            }
+
+            if (element.DataRef == DataRefs.Cockpit2ClockTimerCurrentMonth.DataRef)
+            {
+                this.UtcMonth = (int)value;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalBatteryOn.DataRef)
+            {
+                this.ElectricalMasterBattery = (int)value == 1;
+            }
+
+            if (element.DataRef.StartsWith(DataRefs.FlightmodelEngineENGNRunning.DataRef))
+            {
+                if (element.DataRef.EndsWith("[0]"))
+                {
+                    this.EngineCombustion1 = (int)value == 1;
+                }
+
+                if (element.DataRef.EndsWith("[1]"))
+                {
+                    this.EngineCombustion2 = (int)value == 1;
+                }
+
+                if (element.DataRef.EndsWith("[2]"))
+                {
+                    this.EngineCombustion3 = (int)value == 1;
+                }
+
+                if (element.DataRef.EndsWith("[3]"))
+                {
+                    this.EngineCombustion4 = (int)value == 1;
+                }
+            }
+
+            if (element.DataRef == DataRefs.GraphicsAnimationGroundTrafficTowbarHeadingDeg.DataRef)
+            {
+                this.Pushback = value != 0 ? Pushback.Straight : Pushback.NoPushback; // todo check
+            }
+
+            if (element.DataRef == DataRefs.Cockpit2ElectricalAPURunning.DataRef)
+            {
+                this.ApuGenerator = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalBeaconLightsOn.DataRef)
+            {
+                this.LightBeacon = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalNavLightsOn.DataRef)
+            {
+                this.LightNav = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalStrobeLightsOn.DataRef)
+            {
+                this.LightStrobe = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalTaxiLightOn.DataRef)
+            {
+                this.LightTaxi = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitElectricalLandingLightsOn.DataRef)
+            {
+                this.LightLanding = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.FlightmodelControlsFlaprqst.DataRef)
+            {
+                this.FlapsHandle = value * 100;
+            }
+
+            if (element.DataRef == DataRefs.FlightmodelControlsFlaprat.DataRef)
+            {
+                this.FlapsPercentage = value * 100;
+            }
+
+            if (element.DataRef == DataRefs.CockpitSwitchesGearHandleStatus.DataRef)
+            {
+                this.GearHandle = (int)value == 1;
+            }
+
+            if (element.DataRef.StartsWith(DataRefs.Flightmodel2GearDeployRatio.DataRef))
+            {
+                this.GearPercentage = value;
+            }
+
+            if (element.DataRef == DataRefs.CockpitAutopilotAutopilotMode.DataRef)
+            {
+                this.AutoPilot = (int)value == 2;
+            }
+
+            if (element.DataRef == DataRefs.FlightmodelControlsParkbrake.DataRef)
+            {
+                this.ParkingBrake = value > 0.1;
+            }
+
+            if (element.DataRef == DataRefs.FlightmodelControlsSbrkrqst.DataRef)
+            {
+                this.SpoilersArmed = value < 0;
+            }
+
+            if (element.DataRef == DataRefs.CockpitSwitchesFastenSeatBelts.DataRef)
+            {
+                this.SeatBeltSign = (int)value == 1;
+            }
+
+            if (element.DataRef == DataRefs.CockpitSwitchesNoSmoking.DataRef)
+            {
+                this.NoSmokingSign = (int)value == 1;
+            }
         }
     }
 }

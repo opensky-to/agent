@@ -367,7 +367,7 @@ namespace OpenSky.Agent.Views.Models
                     this.NotificationIcon = this.greyIcon;
                     this.NotificationStatusString = "OpenSky is trying to connect to the simulator...";
 
-                    this.DiscordRpcClient.SetPresence(new RichPresence
+                    this.DiscordRpcClient?.SetPresence(new RichPresence
                     {
                         State = "Not Connected",
                         Details = "Trying to connect to simulator",
@@ -388,7 +388,7 @@ namespace OpenSky.Agent.Views.Models
                             this.NotificationIcon = this.openSkyIcon;
                             this.NotificationStatusString = "OpenSky is connected to the sim but not tracking a flight";
 
-                            this.DiscordRpcClient.SetPresence(new RichPresence
+                            this.DiscordRpcClient?.SetPresence(new RichPresence
                             {
                                 State = "Idle",
                                 Details = "Waiting for a flight",
@@ -405,7 +405,7 @@ namespace OpenSky.Agent.Views.Models
                             this.NotificationIcon = this.openSkyIcon;
                             this.NotificationStatusString = $"OpenSky is preparing to track flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}";
 
-                            this.DiscordRpcClient.SetPresence(new RichPresence
+                            this.DiscordRpcClient?.SetPresence(new RichPresence
                             {
                                 State = Agent.Simulator.Simulator.Instance.TrackingStatus.ToString(),
                                 Details = $"Preparing flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",
@@ -423,7 +423,7 @@ namespace OpenSky.Agent.Views.Models
                         this.NotificationIcon = this.pauseIcon;
                         this.NotificationStatusString = $"OpenSky tracking and your flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber} are paused";
 
-                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        this.DiscordRpcClient?.SetPresence(new RichPresence
                         {
                             State = $"Paused, {Agent.Simulator.Simulator.Instance.FlightPhase}",
                             Details = $"Tracking flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",
@@ -442,7 +442,7 @@ namespace OpenSky.Agent.Views.Models
                         this.redFlashing = true;
                         this.NotificationStatusString = $"OpenSky is tracking your flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}";
 
-                        this.DiscordRpcClient.SetPresence(new RichPresence
+                        this.DiscordRpcClient?.SetPresence(new RichPresence
                         {
                             State = $"Recording, {Agent.Simulator.Simulator.Instance.FlightPhase}",
                             Details = $"Tracking flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",

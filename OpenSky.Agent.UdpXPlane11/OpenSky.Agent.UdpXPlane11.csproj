@@ -62,8 +62,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\AircraftIdentityDataRef.cs" />
+    <Compile Include="Models\FuelTanksDataRef.cs" />
+    <Compile Include="Models\LandingAnalysisDataRef.cs" />
+    <Compile Include="Models\PayloadStationsDataRef.cs" />
     <Compile Include="Models\PrimaryTrackingDataRef.cs" />
     <Compile Include="Models\SecondaryTrackingDataRef.cs" />
+    <Compile Include="Models\WeightAndBalanceDataRef.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UdpXPlane11.cs" />
   </ItemGroup>

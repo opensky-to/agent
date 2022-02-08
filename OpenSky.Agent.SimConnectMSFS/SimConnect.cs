@@ -174,7 +174,7 @@ namespace OpenSky.Agent.SimConnectMSFS
             if (this.fsConnect.Connected)
             {
                 var planeRegistry = new PlaneRegistry { AtcID = registry };
-                this.fsConnect.UpdateData(Requests.PlaneRegistry, planeRegistry);
+                this.fsConnect.UpdateData(Requests.AircraftRegistry, planeRegistry);
             }
             else
             {
@@ -527,10 +527,10 @@ namespace OpenSky.Agent.SimConnectMSFS
                     this.LastReceivedTimes[Requests.PayloadStations] = DateTime.UtcNow;
                 }
 
-                if (simConnectObject is AircraftIdentity isPlaneIdentity)
+                if (simConnectObject is AircraftIdentity isAircraftIdentity)
                 {
-                    this.AircraftIdentity = isPlaneIdentity.Convert();
-                    this.LastReceivedTimes[Requests.PlaneIdentity] = DateTime.UtcNow;
+                    this.AircraftIdentity = isAircraftIdentity.Convert();
+                    this.LastReceivedTimes[Requests.AircraftIdentity] = DateTime.UtcNow;
                     new Thread(this.ProcessAircraftIdentity) { Name = "OpenSky.ProcessAircraftIdentity" }.Start();
                 }
 
@@ -591,11 +591,11 @@ namespace OpenSky.Agent.SimConnectMSFS
                             this.fsConnect.RegisterDataDefinition<SecondaryTracking>(Requests.Secondary, SecondaryTrackingDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<FuelTanks>(Requests.FuelTanks, FuelTanksDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<PayloadStations>(Requests.PayloadStations, PayloadStationsDefinition.Definition);
-                            this.fsConnect.RegisterDataDefinition<AircraftIdentity>(Requests.PlaneIdentity, AircraftIdentityDefinition.Definition);
+                            this.fsConnect.RegisterDataDefinition<AircraftIdentity>(Requests.AircraftIdentity, AircraftIdentityDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<WeightAndBalance>(Requests.WeightAndBalance, WeightAndBalanceDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<LandingAnalysis>(Requests.LandingAnalysis, LandingAnalysisDefinition.Definition);
                             this.fsConnect.RegisterDataDefinition<SlewAircraftIntoPosition>(Requests.SlewPlaneIntoPosition, SlewAircraftIntoPositionDefinition.Definition);
-                            this.fsConnect.RegisterDataDefinition<PlaneRegistry>(Requests.PlaneRegistry, PlaneRegistryDefinition.Definition);
+                            this.fsConnect.RegisterDataDefinition<PlaneRegistry>(Requests.AircraftRegistry, PlaneRegistryDefinition.Definition);
 
                             // Register client events
                             this.fsConnect.MapClientEventToSimEvent(ClientEvents.SetTime, ClientEvents.SetZuluYears, "ZULU_YEAR_SET");

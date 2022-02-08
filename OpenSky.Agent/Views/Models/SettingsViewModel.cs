@@ -201,6 +201,11 @@ namespace OpenSky.Agent.Views.Models
                 this.SimConnectMSFSChecked = true;
             }
 
+            if (UdpXPlane11.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.UdpXplaneChecked = true;
+            }
+
             // Load profile image
             if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
             {

@@ -72,7 +72,14 @@ namespace OpenSky.Agent.UdpXPlane11
         /// -------------------------------------------------------------------------------------------------
         public static string SimulatorInterfaceName => "UdpXPlane11";
 
-        public override bool IsPaused { get; }
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether the sim is paused (proper pause, not ESC menu and definitely
+        /// not active pause).
+        /// </summary>
+        /// <seealso cref="OpenSky.Agent.Simulator.Simulator.IsPaused"/>
+        /// -------------------------------------------------------------------------------------------------
+        public override bool IsPaused => this.PrimaryTracking?.SimulationRate == 0;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -141,6 +148,21 @@ namespace OpenSky.Agent.UdpXPlane11
                 var secondaryTracking = new SecondaryTrackingDataRef();
                 secondaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Secondary]);
 
+                var aircraftIdentity = new AircraftIdentityDataRef();
+                aircraftIdentity.RegisterWithConnector(this.connector, this.SampleRates[Requests.AircraftIdentity]);
+
+                var fuelTanks = new FuelTanksDataRef();
+                fuelTanks.RegisterWithConnector(this.connector, this.SampleRates[Requests.FuelTanks]);
+
+                var payloadStations = new PayloadStationsDataRef();
+                payloadStations.RegisterWithConnector(this.connector, this.SampleRates[Requests.PayloadStations]);
+
+                var weightAndBalance = new WeightAndBalanceDataRef();
+                weightAndBalance.RegisterWithConnector(this.connector, this.SampleRates[Requests.WeightAndBalance]);
+
+                var landingAnalysis = new LandingAnalysisDataRef();
+                landingAnalysis.RegisterWithConnector(this.connector, this.SampleRates[Requests.LandingAnalysis]);
+
                 this.connector.Start();
                 while (!this.close)
                 {
@@ -179,6 +201,55 @@ namespace OpenSky.Agent.UdpXPlane11
 
                                         this.SecondaryTracking = clone;
                                         this.LastReceivedTimes[Requests.Secondary] = DateTime.UtcNow;
+                                    }
+
+                                    if (request == Requests.AircraftIdentity)
+                                    {
+                                        this.AircraftIdentity = aircraftIdentity.Clone();
+                                        this.LastReceivedTimes[Requests.AircraftIdentity] = DateTime.UtcNow;
+                                        new Thread(this.ProcessAircraftIdentity) { Name = "OpenSky.ProcessAircraftIdentity" }.Start();
+                                    }
+
+                                    if (request == Requests.FuelTanks)
+                                    {
+                                        this.FuelTanks = fuelTanks.Clone();
+                                        this.LastReceivedTimes[Requests.FuelTanks] = DateTime.UtcNow;
+                                    }
+
+                                    if (request == Requests.PayloadStations)
+                                    {
+                                        new Thread(
+                                                () =>
+                                                {
+                                                    var clone = payloadStations.Clone();
+                                                    this.ProcessPayloadStations(this.PayloadStations, clone);
+                                                    this.PayloadStations = clone;
+                                                })
+                                        { Name = "OpenSky.ProcessPayloadStations" }.Start();
+                                        this.LastReceivedTimes[Requests.PayloadStations] = DateTime.UtcNow;
+                                    }
+
+                                    if (request == Requests.WeightAndBalance)
+                                    {
+                                        new Thread(
+                                                () =>
+                                                {
+                                                    var clone = weightAndBalance.Clone();
+                                                    this.ProcessWeightAndBalance(this.WeightAndBalance, clone);
+                                                    this.WeightAndBalance = clone;
+                                                })
+                                        { Name = "OpenSky.ProcessWeightAndBalance" }.Start();
+                                        this.LastReceivedTimes[Requests.WeightAndBalance] = DateTime.UtcNow;
+                                    }
+
+                                    if (request == Requests.LandingAnalysis)
+                                    {
+                                        var clone = landingAnalysis.Clone();
+                                        this.landingAnalysisProcessingQueue.Enqueue(new ProcessLandingAnalysis { Old = this.LandingAnalysis, New = clone });
+                                        this.OnPropertyChanged(nameof(this.LandingAnalysisProcessingQueueLength));
+
+                                        this.LandingAnalysis = clone;
+                                        this.LastReceivedTimes[Requests.LandingAnalysis] = DateTime.UtcNow;
                                     }
                                 }
                             }

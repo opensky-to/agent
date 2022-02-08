@@ -449,9 +449,7 @@
       <Name>OpenSky.Agent.UdpXPlane11</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"
