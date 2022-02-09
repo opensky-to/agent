@@ -25,6 +25,34 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The heading relative to the flown path (yaw).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private double betaAngle;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The heading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float heading;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The wind degrees.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float windDegrees;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The wind speed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private float windSpeed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Makes a copy of this object.
         /// </summary>
         /// <remarks>
@@ -80,10 +108,8 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.FlightmodelPositionTrueAirspeed, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionGroundspeed, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionBeta, 1000 / sampleRate, this.DataRefUpdated);
-            // speed lat
-            // speed long
             connector.Subscribe(DataRefs.Flightmodel2MiscGforceNormal, 1000 / sampleRate, this.DataRefUpdated);
-            // landing rate seconds
+            connector.Subscribe(DataRefs.FlightmodelPositionVhInd, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTruePhi, 1000 / sampleRate, this.DataRefUpdated);
         }
 
@@ -136,19 +162,18 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             if (element.DataRef == DataRefs.FlightmodelPositionBeta.DataRef)
             {
                 this.betaAngle = value / (Math.PI / 180);
-                Debug.WriteLine($"beta: {betaAngle}");
+                Debug.WriteLine($"beta: {this.betaAngle}");
             }
-
-
-            // speed lat
-            // speed long
 
             if (element.DataRef == DataRefs.Flightmodel2MiscGforceNormal.DataRef)
             {
                 this.Gforce = value;
             }
 
-            // landing rate seconds
+            if (element.DataRef == DataRefs.FlightmodelPositionVhInd.DataRef)
+            {
+                this.LandingRateSeconds = value * 3.281;
+            }
 
             if (element.DataRef == DataRefs.FlightmodelPositionTruePhi.DataRef)
             {
@@ -159,10 +184,12 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             {
                 this.heading = value;
             }
+
             if (element.DataRef == DataRefs.WeatherWindDirectionDegt.DataRef)
             {
                 this.windDegrees = value;
             }
+
             if (element.DataRef == DataRefs.WeatherWindSpeedKt.DataRef)
             {
                 this.windSpeed = value * 1.944f;
@@ -172,37 +199,8 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             this.WindLat = Math.Sin((Math.PI / 180) * windDelta) * this.windSpeed;
             this.WindLong = Math.Cos((Math.PI / 180) * windDelta) * this.windSpeed;
 
-            var speedDetla = Math.Abs(this.heading - this.betaAngle);
-            this.SpeedLat = Math.Sin((Math.PI / 180) * speedDetla) * this.GroundSpeed;
-            this.SpeedLong = Math.Cos((Math.PI / 180) * speedDetla) * this.GroundSpeed;
-            Debug.WriteLine($"LAT: {this.SpeedLat}");
-            Debug.WriteLine($"LONG: {this.SpeedLong}");
-
-            var sideSlipAngle = Math.Atan(SpeedLong / SpeedLat) * 180.0 / Math.PI;
-            Debug.WriteLine($"Sideslip: {sideSlipAngle}");
+            this.SpeedLat = Math.Sin((Math.PI / 180) * this.betaAngle) * this.GroundSpeed;
+            this.SpeedLong = Math.Cos((Math.PI / 180) * this.betaAngle) * this.GroundSpeed;
         }
-
-        private double betaAngle;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The heading.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private float heading;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The wind degrees.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private float windDegrees;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The wind speed.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private float windSpeed;
     }
 }
