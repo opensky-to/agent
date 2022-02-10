@@ -18,6 +18,7 @@ namespace OpenSky.Agent.UdpXPlane11
     using OpenSkyApi;
 
     using XPlaneConnector;
+    using XPlaneConnector.DataRefs;
 
     using Simulator = Simulator.Simulator;
 
@@ -59,8 +60,6 @@ namespace OpenSky.Agent.UdpXPlane11
         {
             this.connector = new XPlaneConnector(simulatorIPAddress, (int)simulatorPort);
 
-
-
             // Start our worker thread
             new Thread(this.ReadFromXPlane) { Name = "UdpXPlane11.ReadFromXPlane" }.Start();
         }
@@ -96,7 +95,19 @@ namespace OpenSky.Agent.UdpXPlane11
 
         public override void SetAircraftRegistry(string registry)
         {
+            var chars = registry.ToCharArray();
+            for (var i = 0; i < 40; i++)
+            {
+                var character = '\0';
+                if (i < chars.Length - 1)
+                {
+                    character = chars[i];
+                }
 
+                var tailNum = DataRefs.AircraftViewAcfTailnum;
+                tailNum.DataRef += $"[{i}]";
+                this.connector.SetDataRefValue(tailNum, character);
+            }
         }
 
         public override void SetFuelAndPayloadFromSave()
@@ -106,12 +117,20 @@ namespace OpenSky.Agent.UdpXPlane11
 
         public override void SetFuelTanks(FuelTanks newFuelTanks)
         {
-
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[0]", (float)newFuelTanks.FuelTankLeftMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[1]", (float)newFuelTanks.FuelTankRightMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[2]", (float)newFuelTanks.FuelTankLeftTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[3]", (float)newFuelTanks.FuelTankRightTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[4]", (float)newFuelTanks.FuelTankLeftAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[5]", (float)newFuelTanks.FuelTankRightAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[6]", (float)newFuelTanks.FuelTankCenterQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[7]", (float)newFuelTanks.FuelTankCenter2Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[8]", (float)newFuelTanks.FuelTankCenter3Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
         }
 
         public override void SetPayloadStations(PayloadStations newPayloadStations)
         {
-
+            this.connector.SetDataRefValue(DataRefs.FlightmodelWeightMFixed, (float)newPayloadStations.Weight1 / 2.205f);
         }
 
         public override void SetSlew(bool enable)
@@ -121,7 +140,9 @@ namespace OpenSky.Agent.UdpXPlane11
 
         public override void SetTime(DateTime time)
         {
-
+            this.connector.SetDataRefValue(DataRefs.Cockpit2ClockTimerCurrentDay, time.Day);
+            this.connector.SetDataRefValue(DataRefs.Cockpit2ClockTimerCurrentMonth, time.Month);
+            this.connector.SetDataRefValue(DataRefs.TimeZuluTimeSec, time.Hour * 60 * 60 + time.Minute * 60 + time.Second);
         }
 
         public override void SlewPlaneToFlightPosition()

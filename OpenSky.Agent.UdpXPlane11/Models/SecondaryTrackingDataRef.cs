@@ -27,6 +27,13 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Number of engines.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int numberOfEngines;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="SecondaryTrackingDataRef"/> class.
         /// </summary>
         /// <remarks>
@@ -109,6 +116,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentDay, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentMonth, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitElectricalBatteryOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(DataRefs.AircraftEngineAcfNumEngines, 1000 / sampleRate, this.DataRefUpdated);
             var engine1Running = DataRefs.FlightmodelEngineENGNRunning;
             engine1Running.DataRef += "[0]";
             connector.Subscribe(engine1Running, 1000 / sampleRate, this.DataRefUpdated);
@@ -177,26 +185,50 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 this.ElectricalMasterBattery = (int)value == 1;
             }
 
+            if (element.DataRef == DataRefs.AircraftEngineAcfNumEngines.DataRef)
+            {
+                this.numberOfEngines = (int)value;
+                if (this.numberOfEngines < 1)
+                {
+                    this.EngineCombustion1 = false;
+                }
+
+                if (this.numberOfEngines < 2)
+                {
+                    this.EngineCombustion2 = false;
+                }
+
+                if (this.numberOfEngines < 3)
+                {
+                    this.EngineCombustion3 = false;
+                }
+
+                if (this.numberOfEngines < 4)
+                {
+                    this.EngineCombustion4 = false;
+                }
+            }
+
             if (element.DataRef.StartsWith(DataRefs.FlightmodelEngineENGNRunning.DataRef))
             {
                 if (element.DataRef.EndsWith("[0]"))
                 {
-                    this.EngineCombustion1 = (int)value == 1;
+                    this.EngineCombustion1 = (int)value == 1 && this.numberOfEngines >= 1;
                 }
 
                 if (element.DataRef.EndsWith("[1]"))
                 {
-                    this.EngineCombustion2 = (int)value == 1;
+                    this.EngineCombustion2 = (int)value == 1 && this.numberOfEngines >= 2;
                 }
 
                 if (element.DataRef.EndsWith("[2]"))
                 {
-                    this.EngineCombustion3 = (int)value == 1;
+                    this.EngineCombustion3 = (int)value == 1 && this.numberOfEngines >= 3;
                 }
 
                 if (element.DataRef.EndsWith("[3]"))
                 {
-                    this.EngineCombustion4 = (int)value == 1;
+                    this.EngineCombustion4 = (int)value == 1 && this.numberOfEngines >= 4;
                 }
             }
 
