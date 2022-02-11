@@ -237,6 +237,32 @@ namespace OpenSky.Agent.Simulator.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Updates the capacities from a modified dictionary.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/02/2022.
+        /// </remarks>
+        /// <param name="modifiedDictionary">
+        /// The modified dictionary containing the new capacity values.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        public void UpdateCapactiesFromDictionary(Dictionary<FuelTank, double> modifiedDictionary)
+        {
+            this.FuelTankCenterCapacity = modifiedDictionary[FuelTank.Center];
+            this.FuelTankCenter2Capacity = modifiedDictionary[FuelTank.Center2];
+            this.FuelTankCenter3Capacity = modifiedDictionary[FuelTank.Center3];
+            this.FuelTankLeftMainCapacity = modifiedDictionary[FuelTank.LeftMain];
+            this.FuelTankLeftAuxCapacity = modifiedDictionary[FuelTank.LeftAux];
+            this.FuelTankLeftTipCapacity = modifiedDictionary[FuelTank.LeftTip];
+            this.FuelTankRightMainCapacity = modifiedDictionary[FuelTank.RightMain];
+            this.FuelTankRightAuxCapacity = modifiedDictionary[FuelTank.RightAux];
+            this.FuelTankRightTipCapacity = modifiedDictionary[FuelTank.RightTip];
+            this.FuelTankExternal1Capacity = modifiedDictionary[FuelTank.External1];
+            this.FuelTankExternal2Capacity = modifiedDictionary[FuelTank.External2];
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Updates the quantities from a modified dictionary.
         /// </summary>
         /// <remarks>

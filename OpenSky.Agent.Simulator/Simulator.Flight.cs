@@ -28,7 +28,7 @@ namespace OpenSky.Agent.Simulator
     using OpenSkyApi;
 
     using PositionReport = OpenSkyApi.PositionReport;
-    using TrackingEventMarker = OpenSky.Agent.Simulator.Models.TrackingEventMarker;
+    using TrackingEventMarker = Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -261,13 +261,13 @@ namespace OpenSky.Agent.Simulator
                         }
                     };
 
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected =
+                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected =
                         $"{value.FuelGallons:F1} gal, {value.FuelGallons * 3.78541:F1} liters ▶ {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {value.FuelGallons * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].Expected = $"{value.PayloadPounds:F1} lbs, {value.PayloadPounds * 0.453592:F1} kg";
+                    this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Expected = $"{value.Aircraft.Type.Name} (v{value.Aircraft.Type.VersionNumber})";
 
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
-                    this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
+                    this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
+                    this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
 
                     if (!value.Resume)
                     {
@@ -332,12 +332,13 @@ namespace OpenSky.Agent.Simulator
                                 PitchAngle = value.PitchAngle,
                                 OnGround = value.OnGround,
                                 AirspeedTrue = value.AirspeedTrue ?? 0,
+                                Altitude = value.Altitude ?? 0,
                                 RadioHeight = value.RadioHeight ?? 0,
                                 VerticalSpeedSeconds = value.VerticalSpeedSeconds
                             }
                         };
 
-                        this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.Fuel].Expected =
+                        this.TrackingConditions[(int)Models.TrackingConditions.Fuel].Expected =
                             $"{this.flightLoadingTempModels.FuelTanks.TotalQuantity:F1} gal, {this.flightLoadingTempModels.FuelTanks.TotalQuantity * 3.78541:F1} liters ▶ {this.flightLoadingTempModels.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon:F1} lbs, {this.flightLoadingTempModels.FuelTanks.TotalQuantity * value.Aircraft.Type.FuelWeightPerGallon * 0.453592:F1} kg";
                     }
                 }
@@ -531,7 +532,7 @@ namespace OpenSky.Agent.Simulator
                     this.TrackingConditions[(int)condition].Reset();
                 }
 
-                this.TrackingConditions[(int)Agent.Simulator.Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1";
+                this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=0 or 1";
             }
 
             if (!resumeLater)

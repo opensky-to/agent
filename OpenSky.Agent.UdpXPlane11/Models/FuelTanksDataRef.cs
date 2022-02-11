@@ -6,6 +6,12 @@
 
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using OpenSky.Agent.Simulator.Enums;
+
     using XPlaneConnector;
     using XPlaneConnector.DataRefs;
 
@@ -22,6 +28,13 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The tank indices.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        internal Dictionary<FuelTank, int> tankIndices = new();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// (Immutable) The current fuel weight for each tank.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -32,7 +45,14 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// (Immutable) The fuel tank rations.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly float[] tankRatios = new float[9];
+        private readonly float[] tankRatios = { -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, };
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// (Immutable) the fuel tank X-axis coordinates.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly float[] tankX = { -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999 };
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -111,6 +131,10 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 var tankWeight = DataRefs.FlightmodelWeightMFuel;
                 tankWeight.DataRef += $"[{i}]";
                 connector.Subscribe(tankWeight, 1000 / sampleRate, this.DataRefUpdated);
+
+                var tankXRef = DataRefs.AircraftOverflowAcfTankX;
+                tankXRef.DataRef += $"[{i}]";
+                connector.Subscribe(tankXRef, 1000 / sampleRate, this.DataRefUpdated);
             }
 
             connector.Subscribe(DataRefs.AircraftWeightAcfMFuelTot, 1000 / sampleRate, this.DataRefUpdated);
@@ -137,6 +161,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         {
             var updateCapacities = false;
             var updateQuantities = false;
+            var updateIndices = false;
             if (element.DataRef.StartsWith(DataRefs.AircraftOverflowAcfTankRat.DataRef))
             {
                 if (element.DataRef.Contains("[") && element.DataRef.EndsWith("]"))
@@ -159,6 +184,19 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                     {
                         this.tankFuelWeight[index] = value;
                         updateQuantities = true;
+                    }
+                }
+            }
+
+            if (element.DataRef.StartsWith(DataRefs.AircraftOverflowAcfTankX.DataRef))
+            {
+                if (element.DataRef.Contains("[") && element.DataRef.EndsWith("]"))
+                {
+                    var indexString = element.DataRef.Split('[')[1].Replace("]", string.Empty);
+                    if (int.TryParse(indexString, out var index) && index is >= 0 and < 9)
+                    {
+                        this.tankX[index] = value;
+                        updateIndices = true;
                     }
                 }
             }
@@ -188,34 +226,174 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 updateQuantities = true;
             }
 
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            if ((updateIndices || updateCapacities) && this.tankX.All(t => t != -9999) && this.tankRatios.All(t => t != -9999))
+            {
+                this.tankIndices.Clear();
+                var leftTanks = new List<TankIndexWithRatio>();
+                var rightTanks = new List<TankIndexWithRatio>();
+                for (var i = 0; i < 9; i++)
+                {
+                    // Is the tank used?
+                    if (this.tankRatios[i] == 0)
+                    {
+                        continue;
+                    }
+
+                    // A center tank
+                    if (this.tankX[i] < 0.5 && this.tankX[i] > -0.5)
+                    {
+                        if (!this.tankIndices.ContainsKey(FuelTank.Center))
+                        {
+                            this.tankIndices.Add(FuelTank.Center, i);
+                            continue;
+                        }
+
+                        if (!this.tankIndices.ContainsKey(FuelTank.Center2))
+                        {
+                            this.tankIndices.Add(FuelTank.Center2, i);
+                            continue;
+                        }
+
+                        if (!this.tankIndices.ContainsKey(FuelTank.Center3))
+                        {
+                            this.tankIndices.Add(FuelTank.Center3, i);
+                            continue;
+                        }
+
+                        throw new Exception("Can't support more than 3 center tanks!");
+                    }
+
+                    // A right side tank
+                    if (this.tankX[i] >= 0.5)
+                    {
+                        rightTanks.Add(new TankIndexWithRatio { Index = i, Ratio = this.tankRatios[i] });
+                        continue;
+                    }
+
+                    // A left side tank
+                    {
+                        leftTanks.Add(new TankIndexWithRatio { Index = i, Ratio = this.tankRatios[i] });
+                    }
+                }
+
+                // Add left and right tanks in order of their size
+                foreach (var tankIndexWithRatio in leftTanks.OrderByDescending(t => t.Ratio))
+                {
+                    if (!this.tankIndices.ContainsKey(FuelTank.LeftMain))
+                    {
+                        this.tankIndices.Add(FuelTank.LeftMain, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.LeftTip))
+                    {
+                        this.tankIndices.Add(FuelTank.LeftTip, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.LeftAux))
+                    {
+                        this.tankIndices.Add(FuelTank.LeftAux, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.External1))
+                    {
+                        this.tankIndices.Add(FuelTank.External1, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    throw new Exception("Can't support more than 4 left side tanks!");
+                }
+
+                foreach (var tankIndexWithRatio in rightTanks.OrderByDescending(t => t.Ratio))
+                {
+                    if (!this.tankIndices.ContainsKey(FuelTank.RightMain))
+                    {
+                        this.tankIndices.Add(FuelTank.RightMain, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.RightTip))
+                    {
+                        this.tankIndices.Add(FuelTank.RightTip, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.RightAux))
+                    {
+                        this.tankIndices.Add(FuelTank.RightAux, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    if (!this.tankIndices.ContainsKey(FuelTank.External2))
+                    {
+                        this.tankIndices.Add(FuelTank.External2, tankIndexWithRatio.Index);
+                        continue;
+                    }
+
+                    throw new Exception("Can't support more than 4 right side tanks!");
+                }
+            }
+
             if (updateCapacities)
             {
-                // todo need to check with larger plane if these tank index assignments make sense
+                var capacities = new Dictionary<FuelTank, double>();
+                foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
+                {
+                    capacities.Add(tank, 0);
+                }
+
                 var totalCapacityGallons = (this.fuelMaxWeight * 2.205) / this.fuelWeight;
-                this.FuelTankLeftMainCapacity = this.tankRatios[0] * totalCapacityGallons;
-                this.FuelTankRightMainCapacity = this.tankRatios[1] * totalCapacityGallons;
-                this.FuelTankLeftTipCapacity = this.tankRatios[2] * totalCapacityGallons;
-                this.FuelTankRightTipCapacity = this.tankRatios[3] * totalCapacityGallons;
-                this.FuelTankLeftAuxCapacity = this.tankRatios[4] * totalCapacityGallons;
-                this.FuelTankRightAuxCapacity = this.tankRatios[5] * totalCapacityGallons;
-                this.FuelTankCenterCapacity = this.tankRatios[6] * totalCapacityGallons;
-                this.FuelTankCenter2Capacity = this.tankRatios[7] * totalCapacityGallons;
-                this.FuelTankCenter3Capacity = this.tankRatios[8] * totalCapacityGallons;
+                foreach (var tankIndex in this.tankIndices)
+                {
+                    capacities[tankIndex.Key] = this.tankRatios[tankIndex.Value] * totalCapacityGallons;
+                }
+
+                this.UpdateCapactiesFromDictionary(capacities);
             }
 
             if (updateQuantities)
             {
-                // todo need to check with larger plane if these tank index assignments make sense
-                this.FuelTankLeftMainQuantity = this.tankFuelWeight[0] * 2.205 / this.fuelWeight;
-                this.FuelTankRightMainQuantity = this.tankFuelWeight[1] * 2.205 / this.fuelWeight;
-                this.FuelTankLeftTipQuantity = this.tankFuelWeight[2] * 2.205 / this.fuelWeight;
-                this.FuelTankRightTipQuantity = this.tankFuelWeight[3] * 2.205 / this.fuelWeight;
-                this.FuelTankLeftAuxQuantity = this.tankFuelWeight[4] * 2.205 / this.fuelWeight;
-                this.FuelTankRightAuxQuantity = this.tankFuelWeight[5] * 2.205 / this.fuelWeight;
-                this.FuelTankCenterQuantity = this.tankFuelWeight[6] * 2.205 / this.fuelWeight;
-                this.FuelTankCenter2Quantity = this.tankFuelWeight[7] * 2.205 / this.fuelWeight;
-                this.FuelTankCenter3Quantity = this.tankFuelWeight[8] * 2.205 / this.fuelWeight;
+                var quantities = new Dictionary<FuelTank, double>();
+                foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
+                {
+                    quantities.Add(tank, 0);
+                }
+
+                foreach (var tankIndex in this.tankIndices)
+                {
+                    quantities[tankIndex.Key] = this.tankFuelWeight[tankIndex.Value] * 2.205 / this.fuelWeight;
+                }
+
+                this.UpdateQuantitiesFromDictionary(quantities);
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// A tank index with ratio (for sorting).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 11/02/2022.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private class TankIndexWithRatio
+        {
+            /// -------------------------------------------------------------------------------------------------
+            /// <summary>
+            /// Gets or sets the zero-based index of the fuel tank.
+            /// </summary>
+            /// -------------------------------------------------------------------------------------------------
+            public int Index { get; set; }
+
+            /// -------------------------------------------------------------------------------------------------
+            /// <summary>
+            /// Gets or sets the ratio.
+            /// </summary>
+            /// -------------------------------------------------------------------------------------------------
+            public float Ratio { get; set; }
         }
     }
 }

@@ -27,6 +27,13 @@ namespace OpenSky.Agent.Simulator.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the altitude.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Altitude { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The bank angle in degrees.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -109,6 +116,7 @@ namespace OpenSky.Agent.Simulator.Models
                 Latitude = primary.Latitude,
                 Longitude = primary.Longitude,
                 RadioHeight = primary.RadioHeight,
+                Altitude = primary.Altitude,
                 Heading = primary.Heading,
                 AirspeedTrue = primary.AirspeedTrue,
                 PitchAngle = primary.PitchAngle,

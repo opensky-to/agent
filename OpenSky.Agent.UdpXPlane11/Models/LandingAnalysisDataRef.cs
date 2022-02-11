@@ -7,7 +7,6 @@
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
     using System;
-    using System.Diagnostics;
 
     using XPlaneConnector;
     using XPlaneConnector.DataRefs;
@@ -23,13 +22,6 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     /// -------------------------------------------------------------------------------------------------
     public class LandingAnalysisDataRef : Simulator.Models.LandingAnalysis
     {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The heading relative to the flown path (yaw).
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private double betaAngle;
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The heading.
@@ -50,6 +42,21 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private float windSpeed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LandingAnalysisDataRef"/> class.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 10/02/2022.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public LandingAnalysisDataRef()
+        {
+            // Todo figure out how to calculate that correctly in XP11
+            this.SpeedLat = 0;
+            this.SpeedLong = 1;
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -107,7 +114,6 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.WeatherWindSpeedKt, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTrueAirspeed, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionGroundspeed, 1000 / sampleRate, this.DataRefUpdated);
-            connector.Subscribe(DataRefs.FlightmodelPositionBeta, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Flightmodel2MiscGforceNormal, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionVhInd, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.FlightmodelPositionTruePhi, 1000 / sampleRate, this.DataRefUpdated);
@@ -159,12 +165,6 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 this.GroundSpeed = value * 1.944;
             }
 
-            if (element.DataRef == DataRefs.FlightmodelPositionBeta.DataRef)
-            {
-                this.betaAngle = value / (Math.PI / 180);
-                Debug.WriteLine($"beta: {this.betaAngle}");
-            }
-
             if (element.DataRef == DataRefs.Flightmodel2MiscGforceNormal.DataRef)
             {
                 this.Gforce = value;
@@ -198,9 +198,6 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             var windDelta = Math.Abs(this.heading - this.windDegrees);
             this.WindLat = Math.Sin((Math.PI / 180) * windDelta) * this.windSpeed;
             this.WindLong = Math.Cos((Math.PI / 180) * windDelta) * this.windSpeed;
-
-            this.SpeedLat = Math.Sin((Math.PI / 180) * this.betaAngle) * this.GroundSpeed;
-            this.SpeedLong = Math.Cos((Math.PI / 180) * this.betaAngle) * this.GroundSpeed;
         }
     }
 }

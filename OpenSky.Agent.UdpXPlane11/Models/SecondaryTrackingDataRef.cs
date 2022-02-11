@@ -7,6 +7,7 @@
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
     using System;
+    using System.Diagnostics;
 
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.FlightLogXML;
@@ -147,7 +148,16 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.FlightmodelControlsSbrkrqst, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitSwitchesFastenSeatBelts, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitSwitchesNoSmoking, 1000 / sampleRate, this.DataRefUpdated);
+
+            for (var i = 0; i < 40; i++)
+            {
+                var tailNum = DataRefs.AircraftViewAcfTailnum;
+                tailNum.DataRef += $"[{i}]";
+                connector.Subscribe(tailNum, 1000 / sampleRate, this.DataRefUpdated);
+            }
         }
+
+        private readonly char[] tailNumber = new char[40];
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -165,6 +175,20 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// -------------------------------------------------------------------------------------------------
         private void DataRefUpdated(DataRefElement element, float value)
         {
+            if (element.DataRef.StartsWith(DataRefs.AircraftViewAcfTailnum.DataRef))
+            {
+                if (element.DataRef.Contains("[") && element.DataRef.EndsWith("]"))
+                {
+                    var indexString = element.DataRef.Split('[')[1].Replace("]", string.Empty);
+                    if (int.TryParse(indexString, out var index) && index is >= 0 and < 40)
+                    {
+                        this.tailNumber[index] = (char)value;
+                        var tailString = new string(this.tailNumber).Replace("\0", string.Empty);
+                        Debug.WriteLine($"Registry: {tailString}");
+                    }
+                }
+            }
+
             if (element.DataRef == DataRefs.TimeZuluTimeSec.DataRef)
             {
                 this.UtcTime = value;
