@@ -251,6 +251,11 @@ namespace OpenSky.Agent
                 Simulator.Simulator.SetSimulatorInstance(new SimConnect(Settings.Default.SimConnectHostName, Settings.Default.SimConnectPort, AgentOpenSkyService.Instance));
             }
 
+            if (UdpXPlane11.UdpXPlane11.SimulatorInterfaceName.Equals(simulatorInterface, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Simulator.Simulator.SetSimulatorInstance(new UdpXPlane11.UdpXPlane11(Settings.Default.XPlaneIPAddress, Settings.Default.XPlanePort, AgentOpenSkyService.Instance));
+            }
+
             if (Simulator.Simulator.Instance != null)
             {
                 Simulator.Simulator.Instance.LandingReported += (_, landingReportNotification) =>
@@ -324,7 +329,7 @@ namespace OpenSky.Agent
         private void PerformShutdown()
         {
             // Check if we are currently tracking a flight
-            if (Agent.Simulator.Simulator.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
+            if (Simulator.Simulator.Instance.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 Debug.WriteLine("User requested shutdown, but flight tracking is still in progress...");
                 MessageBoxResult? answer = MessageBoxResult.None;

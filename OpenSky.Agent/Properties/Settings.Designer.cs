@@ -203,25 +203,25 @@ namespace OpenSky.Agent.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string SimulatorHostName {
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string XPlaneIPAddress {
             get {
-                return ((string)(this["SimulatorHostName"]));
+                return ((string)(this["XPlaneIPAddress"]));
             }
             set {
-                this["SimulatorHostName"] = value;
+                this["XPlaneIPAddress"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public string SimulatorPort {
+        [global::System.Configuration.DefaultSettingValueAttribute("49000")]
+        public uint XPlanePort {
             get {
-                return ((string)(this["SimulatorPort"]));
+                return ((uint)(this["XPlanePort"]));
             }
             set {
-                this["SimulatorPort"] = value;
+                this["XPlanePort"] = value;
             }
         }
     }

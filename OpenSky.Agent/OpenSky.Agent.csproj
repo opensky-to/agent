@@ -392,13 +392,13 @@
       <Version>0.1.5</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
-      <Version>19.4.0.48</Version>
+      <Version>19.4.0.50</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfProgressBar.WPF">
-      <Version>19.4.0.48</Version>
+      <Version>19.4.0.50</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.Themes.MaterialDark.WPF">
-      <Version>19.4.0.48</Version>
+      <Version>19.4.0.50</Version>
     </PackageReference>
     <PackageReference Include="TomsToolbox.Wpf">
       <Version>2.7.4</Version>
@@ -444,10 +444,12 @@
       <Project>{30c467e8-2eee-41e5-be01-0142a61ba171}</Project>
       <Name>OpenSky.Agent.Simulator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenSky.Agent.UdpXPlane11\OpenSky.Agent.UdpXPlane11.csproj">
+      <Project>{dfbda2b8-5775-4766-be86-d729fcf20de1}</Project>
+      <Name>OpenSky.Agent.UdpXPlane11</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"

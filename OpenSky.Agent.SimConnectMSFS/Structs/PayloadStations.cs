@@ -402,7 +402,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 Weight17 = stations.Weight17,
                 Weight18 = stations.Weight18,
                 Weight19 = stations.Weight19,
-                Weight20 = stations.Weight20,
+                Weight20 = stations.Weight20
             };
         }
 
@@ -464,7 +464,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 Weight17 = stations.Weight17,
                 Weight18 = stations.Weight18,
                 Weight19 = stations.Weight19,
-                Weight20 = stations.Weight20,
+                Weight20 = stations.Weight20
             };
         }
     }

@@ -40,6 +40,13 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The altitude in feet.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Altitude { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The radio height in feet.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -118,6 +125,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
             {
                 Latitude = position.Latitude,
                 Longitude = position.Longitude,
+                Altitude = position.Altitude,
                 RadioHeight = position.RadioHeight,
                 Heading = position.Heading,
                 AirspeedTrue = position.AirspeedTrue,
@@ -148,6 +156,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
             {
                 Latitude = position.Latitude,
                 Longitude = position.Longitude,
+                Altitude = position.Altitude,
                 RadioHeight = position.RadioHeight,
                 Heading = position.Heading,
                 AirspeedTrue = position.AirspeedTrue,
@@ -179,6 +188,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
             {
                 new SimVar("PLANE LATITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE LONGITUDE", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
+                new SimVar("PLANE ALTITUDE", "Feet", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE ALT ABOVE GROUND", "Feet", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("PLANE HEADING DEGREES MAGNETIC", "Degrees", SIMCONNECT_DATATYPE.FLOAT64),
                 new SimVar("AIRSPEED TRUE", "Knots", SIMCONNECT_DATATYPE.FLOAT64),

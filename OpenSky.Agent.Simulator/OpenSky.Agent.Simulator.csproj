@@ -128,6 +128,7 @@
     <Compile Include="Simulator.SaveLoadXML.cs" />
     <Compile Include="Simulator.simBrief.cs" />
     <Compile Include="SpeechSoundPacks.cs" />
+    <Compile Include="Tools\AircraftRegistryExtensions.cs" />
     <Compile Include="Tools\ColorExtensions.cs" />
     <Compile Include="Tools\SleepScheduler.cs" />
     <Compile Include="Tools\StringEnumExtension.cs" />

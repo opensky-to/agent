@@ -121,27 +121,54 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <GroupBox>
-            <GroupBox.Header>
-                <RadioButton GroupName="SimulatorInterface" FontSize="15" FontWeight="DemiBold" VerticalAlignment="Center" IsChecked="{Binding SimConnectMSFSChecked}">Microsoft Flight Simulator (SimConnect)</RadioButton>
-            </GroupBox.Header>
-            <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,10">Use these settings if you are running the OpenSky Agent on a different computer than your simulator. If you both are running on the same computer leave these settings unchanged.</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Simulator host name</TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Simulator network port</TextBlock>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimulatorHostName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimulatorPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
-        </GroupBox>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="0">
+                <GroupBox.Header>
+                    <RadioButton GroupName="SimulatorInterface" FontSize="15" FontWeight="DemiBold" VerticalAlignment="Center" IsChecked="{Binding SimConnectMSFSChecked}">Microsoft Flight Simulator (SimConnect)</RadioButton>
+                </GroupBox.Header>
+                <Grid Margin="5" IsEnabled="{Binding SimConnectMSFSChecked}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,10">Use these settings if you are running the OpenSky Agent on a different computer than your simulator. If you both are running on the same computer leave these settings unchanged.</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Simulator host name</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Simulator network port</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimConnectHostName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding SimConnectPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Column="1">
+                <GroupBox.Header>
+                    <RadioButton GroupName="SimulatorInterface" FontSize="15" FontWeight="DemiBold" VerticalAlignment="Center" IsChecked="{Binding UdpXplaneChecked}">X-Plane 11 (UDP)</RadioButton>
+                </GroupBox.Header>
+                <Grid Margin="5" IsEnabled="{Binding UdpXplaneChecked}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,10">Use these settings if you are running the OpenSky Agent on a different computer than your simulator. If you both are running on the same computer leave these settings unchanged.</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Simulator IP address</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Simulator network port</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding XplaneIPAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding XplanePort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </GroupBox>
+        </Grid>
         <GroupBox>
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Notifications</TextBlock>

@@ -115,7 +115,7 @@ namespace OpenSky.Agent.Simulator
                 { Requests.Secondary, 500 },
                 { Requests.FuelTanks, 15000 },
                 { Requests.PayloadStations, 15000 },
-                { Requests.PlaneIdentity, 15000 },
+                { Requests.AircraftIdentity, 15000 },
                 { Requests.WeightAndBalance, 15000 },
                 { Requests.LandingAnalysis, 500 }
             };
@@ -128,12 +128,12 @@ namespace OpenSky.Agent.Simulator
 
             this.TrackingConditions = new Dictionary<int, TrackingCondition>
             {
-                { (int)Agent.Simulator.Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
-                { (int)Agent.Simulator.Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
-                { (int)Agent.Simulator.Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
-                { (int)Agent.Simulator.Models.TrackingConditions.PlaneModel, new TrackingCondition() },
-                { (int)Agent.Simulator.Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=1" } },
-                { (int)Agent.Simulator.Models.TrackingConditions.Location, new TrackingCondition() }
+                { (int)Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
+                { (int)Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
+                { (int)Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
+                { (int)Models.TrackingConditions.PlaneModel, new TrackingCondition() },
+                { (int)Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=0 or 1" } },
+                { (int)Models.TrackingConditions.Location, new TrackingCondition() }
             };
 
             // Start our worker threads

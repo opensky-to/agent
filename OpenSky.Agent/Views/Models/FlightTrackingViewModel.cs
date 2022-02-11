@@ -898,7 +898,7 @@ namespace OpenSky.Agent.Views.Models
                     }
 
                     // Set the plane registration
-                    this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry);
+                    this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry.RemoveSimPrefix());
 
                     // Wait a bit to make sure all structs have updated, especially time in sim
                     Thread.Sleep(this.Simulator.SampleRates[Requests.Secondary] + 1000);
@@ -1093,7 +1093,7 @@ namespace OpenSky.Agent.Views.Models
                     this.Simulator.SetFuelAndPayloadFromSave();
 
                     // Set the plane registration
-                    this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry);
+                    this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry.RemoveSimPrefix());
 
                     // Start five second countdown?
                     if (this.Simulator.PrimaryTracking.SlewActive)

@@ -202,7 +202,7 @@ namespace OpenSky.Agent.Simulator
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.Play();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedSimMainMenu);
-                    this.StopTracking(false);
+                    this.StopTracking(true);
                 }
             }
 

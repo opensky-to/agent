@@ -103,7 +103,7 @@ namespace OpenSky.Agent.Simulator
                 var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.Play();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedSlew);
-                this.StopTracking(false);
+                this.StopTracking(true);
             }
 
             // Teleport to another position?
@@ -119,7 +119,7 @@ namespace OpenSky.Agent.Simulator
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.Play();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTeleport);
-                    this.StopTracking(false);
+                    this.StopTracking(true);
                 }
             }
         }
@@ -154,7 +154,7 @@ namespace OpenSky.Agent.Simulator
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedEnginesGroundHandling);
-                    this.StopTracking(false);
+                    this.StopTracking(true);
                 }
 
                 // Was the beacon light off when the engine was started?
@@ -231,7 +231,7 @@ namespace OpenSky.Agent.Simulator
                 var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                 player.PlaySync();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedPushbackGroundHandling);
-                this.StopTracking(false);
+                this.StopTracking(true);
             }
 
             // Pushback start?
@@ -345,7 +345,7 @@ namespace OpenSky.Agent.Simulator
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeBackwards);
-                    this.StopTracking(false);
+                    this.StopTracking(true);
                 }
 
                 if (timeDelta.TotalSeconds > 30)
@@ -355,7 +355,7 @@ namespace OpenSky.Agent.Simulator
                     var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
                     player.PlaySync();
                     SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeChanged);
-                    this.StopTracking(false);
+                    this.StopTracking(true);
                 }
             }
         }

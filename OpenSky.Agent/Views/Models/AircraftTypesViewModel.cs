@@ -996,7 +996,8 @@ namespace OpenSky.Agent.Views.Models
                 MinPrice = this.MinimumPrice,
                 MaxPrice = this.MaximumPrice,
                 MaxPayloadDeltaAllowed = this.MaxPayloadDeltaAllowed,
-                Comments = this.Comments
+                Comments = this.Comments,
+                Simulator = this.Simulator.SimulatorType
             };
 
             this.LoadingText = "Adding new aircraft type";
