@@ -23,7 +23,9 @@ namespace OpenSky.Agent
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
+#if DEBUG
     using OpenSky.Agent.Tools;
+#endif
 
     using OpenSkyApi;
 

@@ -17,7 +17,9 @@ namespace OpenSky.Agent.Views.Models
     using System.Windows.Media.Imaging;
 
     using DiscordRPC;
+#if DEBUG
     using DiscordRPC.Logging;
+#endif
 
     using JetBrains.Annotations;
 
