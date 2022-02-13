@@ -99,6 +99,17 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         protected Simulator(OpenSkyService openSkyServiceInstance)
         {
+            Debug.WriteLine($"Simulator interface of type {this.GetType().Name} starting...");
+
+            // Initialize empty data structures, to prevent NullReferenceExceptions
+            this.PrimaryTracking = new PrimaryTracking();
+            this.SecondaryTracking = new SecondaryTracking();
+            this.FuelTanks = new FuelTanks();
+            this.PayloadStations = new PayloadStations();
+            this.AircraftIdentity = new AircraftIdentity();
+            this.WeightAndBalance = new WeightAndBalance();
+
+            // Create queues and collections
             this.openSkyServiceInstance = openSkyServiceInstance;
             this.primaryTrackingProcessingQueue = new ConcurrentQueue<ProcessPrimaryTracking>();
             this.secondaryTrackingProcessingQueue = new ConcurrentQueue<ProcessSecondaryTracking>();
@@ -233,6 +244,7 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         public static void SetSimulatorInstance(Simulator simulator)
         {
+            Instance?.Close();
             Instance = simulator;
         }
 
@@ -246,7 +258,7 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         public void Close()
         {
-            Debug.WriteLine("SimConnect simulator interface closing down...");
+            Debug.WriteLine($"Simulator interface of type {this.GetType().Name} closing down...");
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 this.StopTracking(false);
