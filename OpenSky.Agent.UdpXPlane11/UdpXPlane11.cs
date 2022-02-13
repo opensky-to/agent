@@ -77,14 +77,6 @@ namespace OpenSky.Agent.UdpXPlane11
             this.simulatorIPAddress = simulatorIPAddress;
             this.simulatorPort = simulatorPort;
 
-            // Initialize empty data structures, to prevent NullReferenceExceptions
-            this.PrimaryTracking = new PrimaryTracking();
-            this.SecondaryTracking = new SecondaryTracking();
-            this.FuelTanks = new FuelTanks();
-            this.PayloadStations = new PayloadStations();
-            this.AircraftIdentity = new AircraftIdentity();
-            this.WeightAndBalance = new WeightAndBalance();
-
             // Start our worker thread
             new Thread(this.ReadFromXPlane) { Name = "UdpXPlane11.ReadFromXPlane" }.Start();
         }
