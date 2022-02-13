@@ -3,6 +3,12 @@ OpenSky Agent for MSFS Changelog
 ======================================================================================
 
 --------------------------------------------------------------------------------------
+Version 0.4.1 (ALPHA4)
+--------------------------------------------------------------------------------------
+- Added new recordings to complete both the FemaleUS and MaleUK voice packs
+- Added new setting to control aircraft position update interval on tracking view
+
+--------------------------------------------------------------------------------------
 Version 0.4.0 (ALPHA4)
 --------------------------------------------------------------------------------------
 - Common simulator interface code extracted and separated from SimConnect code
