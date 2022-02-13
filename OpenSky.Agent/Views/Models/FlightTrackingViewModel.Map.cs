@@ -35,6 +35,20 @@ namespace OpenSky.Agent.Views.Models
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The aircraft heading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private double aircraftHeading;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The aircraft location.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private Location aircraftLocation;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True to darken road map.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -49,10 +63,31 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// True to follow plane on the map.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool followPlane = true;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The import simbrief visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private Visibility importSimbriefVisibility = Visibility.Visible;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last aircraft position update.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastAircraftPositionUpdate = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last user map interaction date/time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastUserMapInteraction = DateTime.MinValue;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -84,6 +119,46 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the aircraft heading.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double AircraftHeading
+        {
+            get => this.aircraftHeading;
+            set
+            {
+                if (Equals(this.aircraftHeading, value))
+                {
+                    return;
+                }
+
+                this.aircraftHeading = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the aircraft location.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Location AircraftLocation
+        {
+            get => this.aircraftLocation;
+            set
+            {
+                if (Equals(value, this.aircraftLocation))
+                {
+                    return;
+                }
+
+                this.aircraftLocation = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets a value indicating whether to the darken the road map.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -111,17 +186,24 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The last user map interaction date/time.
+        /// Gets or sets the dark road map visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private DateTime lastUserMapInteraction = DateTime.MinValue;
+        public Visibility DarkRoadMapVisibility
+        {
+            get => this.darkRoadMapVisibility;
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// True to follow plane on the map.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool followPlane = true;
+            set
+            {
+                if (Equals(this.darkRoadMapVisibility, value))
+                {
+                    return;
+                }
+
+                this.darkRoadMapVisibility = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -147,6 +229,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the import simbrief command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand ImportSimbriefCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the date/time of the last user map interaction.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -165,34 +254,6 @@ namespace OpenSky.Agent.Views.Models
                 this.NotifyPropertyChanged();
             }
         }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the dark road map visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility DarkRoadMapVisibility
-        {
-            get => this.darkRoadMapVisibility;
-
-            set
-            {
-                if (Equals(this.darkRoadMapVisibility, value))
-                {
-                    return;
-                }
-
-                this.darkRoadMapVisibility = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the import simbrief command.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public AsynchronousCommand ImportSimbriefCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -296,12 +357,13 @@ namespace OpenSky.Agent.Views.Models
                         if (!string.IsNullOrWhiteSpace(status))
                         {
                             Debug.WriteLine("Error fetching flight plan from simBrief: " + status);
-                            this.ImportSimbriefCommand.ReportProgress(() =>
-                            {
-                                var notification = new OpenSkyNotification("Error fetching flight plan from simBrief", status, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                                notification.SetErrorColorStyle();
-                                this.ViewReference.ShowNotification(notification);
-                            });
+                            this.ImportSimbriefCommand.ReportProgress(
+                                () =>
+                                {
+                                    var notification = new OpenSkyNotification("Error fetching flight plan from simBrief", status, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                                    notification.SetErrorColorStyle();
+                                    this.ViewReference.ShowNotification(notification);
+                                });
                             return;
                         }
                     }
@@ -312,12 +374,13 @@ namespace OpenSky.Agent.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error fetching flight plan from simBrief: " + ex);
-                this.ImportSimbriefCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error fetching flight plan from simBrief", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.ImportSimbriefCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error fetching flight plan from simBrief", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
             }
         }
 
@@ -352,45 +415,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// SimConnect simbrief waypoint marker added (forward event from SimConnect).
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 22/03/2021.
-        /// </remarks>
-        /// <param name="sender">
-        /// Source of the event.
-        /// </param>
-        /// <param name="e">
-        /// The newly added SimbriefWaypointMarker to add to the map.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void SimConnectSimbriefWaypointMarkerAdded(object sender, SimbriefWaypointMarker e)
-        {
-            this.SimbriefWaypointMarkerAdded?.Invoke(sender, e);
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// SimConnect tracking event marker added (forward event from SimConnect).
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 16/03/2021.
-        /// </remarks>
-        /// <param name="sender">
-        /// Source of the event.
-        /// </param>
-        /// <param name="e">
-        /// The newly added TrackingEventMarker to add to the map.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void SimConnectTrackingEventMarkerAdded(object sender, TrackingEventMarker e)
-        {
-            this.TrackingEventMarkerAdded?.Invoke(sender, e);
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// SimConnect plane location changed.
+        /// Simulator aircraft location changed.
         /// </summary>
         /// <remarks>
         /// sushi.at, 24/03/2021.
@@ -402,13 +427,58 @@ namespace OpenSky.Agent.Views.Models
         /// A Location to process.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void SimConnectLocationChanged(object sender, Location e)
+        private void SimulatorLocationChanged(object sender, Location e)
         {
+            if ((DateTime.UtcNow - this.lastAircraftPositionUpdate).TotalMilliseconds > Properties.Settings.Default.AircraftPositionUpdateInterval)
+            {
+                this.lastAircraftPositionUpdate = DateTime.UtcNow;
+                this.AircraftLocation = e;
+                this.AircraftHeading = this.Simulator.PrimaryTracking?.Heading ?? 0;
+            }
+
             if (this.FollowPlane && (DateTime.UtcNow - this.LastUserMapInteraction).TotalSeconds > 10)
             {
                 UpdateGUIDelegate sendEvent = () => this.MapPositionUpdated?.Invoke(this, new MapPositionUpdate(e));
                 Application.Current.Dispatcher.BeginInvoke(sendEvent);
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Simulator simbrief waypoint marker added (forward event from Simulator).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 22/03/2021.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// The newly added SimbriefWaypointMarker to add to the map.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SimulatorSimbriefWaypointMarkerAdded(object sender, SimbriefWaypointMarker e)
+        {
+            this.SimbriefWaypointMarkerAdded?.Invoke(sender, e);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Simulator tracking event marker added (forward event from Simulator).
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 16/03/2021.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// The newly added TrackingEventMarker to add to the map.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SimulatorTrackingEventMarkerAdded(object sender, TrackingEventMarker e)
+        {
+            this.TrackingEventMarkerAdded?.Invoke(sender, e);
         }
     }
 }

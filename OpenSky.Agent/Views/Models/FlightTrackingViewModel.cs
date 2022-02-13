@@ -181,11 +181,11 @@ namespace OpenSky.Agent.Views.Models
             }
 
             // Set up event log listeners
-            this.Simulator.TrackingEventMarkerAdded += this.SimConnectTrackingEventMarkerAdded;
-            this.Simulator.SimbriefWaypointMarkerAdded += this.SimConnectSimbriefWaypointMarkerAdded;
-            this.Simulator.TrackingStatusChanged += this.SimConnectTrackingStatusChanged;
-            this.Simulator.FlightChanged += this.SimConnectFlightChanged;
-            this.Simulator.LocationChanged += this.SimConnectLocationChanged;
+            this.Simulator.TrackingEventMarkerAdded += this.SimulatorTrackingEventMarkerAdded;
+            this.Simulator.SimbriefWaypointMarkerAdded += this.SimulatorSimbriefWaypointMarkerAdded;
+            this.Simulator.TrackingStatusChanged += this.SimulatorTrackingStatusChanged;
+            this.Simulator.FlightChanged += this.SimulatortFlightChanged;
+            this.Simulator.LocationChanged += this.SimulatorLocationChanged;
 
             // Create commands
             this.SetFuelAndPayloadCommand = new Command(this.SetFuelAndPayload);
@@ -206,8 +206,8 @@ namespace OpenSky.Agent.Views.Models
             this.SkipGroundHandlingCommand = new Command(this.SkipGroundHandling);
 
             // Are we already preparing/resuming/tracking?
-            this.SimConnectTrackingStatusChanged(this, this.Simulator.TrackingStatus);
-            this.SimConnectFlightChanged(this, this.Simulator.Flight);
+            this.SimulatorTrackingStatusChanged(this, this.Simulator.TrackingStatus);
+            this.SimulatortFlightChanged(this, this.Simulator.Flight);
             if (this.Simulator.SimbriefOfpLoaded)
             {
                 this.ImportSimbriefVisibility = Visibility.Collapsed;
@@ -650,7 +650,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// SimConnect flight changed.
+        /// Simulator flight changed.
         /// </summary>
         /// <remarks>
         /// sushi.at, 20/03/2021.
@@ -662,7 +662,7 @@ namespace OpenSky.Agent.Views.Models
         /// A Flight to process.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void SimConnectFlightChanged(object sender, Flight e)
+        private void SimulatortFlightChanged(object sender, Flight e)
         {
             UpdateGUIDelegate updateCommands = () =>
             {
@@ -683,7 +683,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// SimConnect tracking status changed.
+        /// Simulator tracking status changed.
         /// </summary>
         /// <remarks>
         /// sushi.at, 18/03/2021.
@@ -695,7 +695,7 @@ namespace OpenSky.Agent.Views.Models
         /// The new TrackingStatus.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void SimConnectTrackingStatusChanged(object sender, TrackingStatus e)
+        private void SimulatorTrackingStatusChanged(object sender, TrackingStatus e)
         {
             if (e == TrackingStatus.Preparing)
             {

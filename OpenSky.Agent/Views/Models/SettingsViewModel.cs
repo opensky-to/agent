@@ -146,6 +146,33 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The aircraft position update interval.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int aircraftPositionUpdateInterval;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the aircraft position update interval.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int AircraftPositionUpdateInterval
+        {
+            get => this.aircraftPositionUpdateInterval;
+            set
+            {
+                if (Equals(this.aircraftPositionUpdateInterval, value))
+                {
+                    return;
+                }
+
+                this.aircraftPositionUpdateInterval = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Initializes a new instance of the <see cref="SettingsViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -182,6 +209,7 @@ namespace OpenSky.Agent.Views.Models
             this.SimConnectPort = Settings.Default.SimConnectPort;
             this.XplaneIPAddress = Settings.Default.XPlaneIPAddress;
             this.XplanePort = Settings.Default.XPlanePort;
+            this.AircraftPositionUpdateInterval = Settings.Default.AircraftPositionUpdateInterval;
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Settings.Default.LandingReportNotification);
@@ -794,6 +822,7 @@ namespace OpenSky.Agent.Views.Models
                 Settings.Default.XPlanePort = this.XplanePort;
                 Settings.Default.LandingReportNotification = this.SelectedLandingReportNotification?.NotificationID ?? 1;
                 Settings.Default.SoundPack = this.SelectedSoundPack;
+                Settings.Default.AircraftPositionUpdateInterval = this.AircraftPositionUpdateInterval;
                 SpeechSoundPacks.Instance.SelectedSoundPack = this.SelectedSoundPack;
                 Settings.Default.TextToSpeechVoice = this.SelectedTextToSpeechVoice;
                 if (!string.IsNullOrEmpty(this.SelectedTextToSpeechVoice))

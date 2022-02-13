@@ -56,5 +56,14 @@
     <Setting Name="XPlanePort" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">49000</Value>
     </Setting>
+    <Setting Name="SimulatorHostName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="SimulatorPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="AircraftPositionUpdateInterval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -224,5 +224,41 @@ namespace OpenSky.Agent.Properties {
                 this["XPlanePort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string SimulatorHostName {
+            get {
+                return ((string)(this["SimulatorHostName"]));
+            }
+            set {
+                this["SimulatorHostName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public string SimulatorPort {
+            get {
+                return ((string)(this["SimulatorPort"]));
+            }
+            set {
+                this["SimulatorPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int AircraftPositionUpdateInterval {
+            get {
+                return ((int)(this["AircraftPositionUpdateInterval"]));
+            }
+            set {
+                this["AircraftPositionUpdateInterval"] = value;
+            }
+        }
     }
 }
