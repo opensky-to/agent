@@ -106,6 +106,7 @@
     <Compile Include="Models\VerticalProfile.cs" />
     <Compile Include="Models\WeightAndBalance.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\AircraftType.cs" />
+    <Compile Include="OpenAPIs\ModelExtensions\AircraftManufacturer.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\Airport.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\Flight.cs" />
     <Compile Include="OpenAPIs\OpenSkyService.cs" />

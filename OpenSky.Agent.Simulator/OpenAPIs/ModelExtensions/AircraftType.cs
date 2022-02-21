@@ -9,6 +9,9 @@
 namespace OpenSkyApi
 {
     using System;
+    using System.Collections.Generic;
+
+    using TomsToolbox.Essentials;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -70,6 +73,7 @@ namespace OpenSkyApi
             this.MaxPrice = copyFrom.MaxPrice;
             this.MinPrice = copyFrom.MinPrice;
             this.Name = copyFrom.Name;
+            this.ManufacturerID = copyFrom.ManufacturerID;
             this.Manufacturer = copyFrom.Manufacturer;
             this.NeedsCoPilot = copyFrom.NeedsCoPilot;
             this.NeedsFlightEngineer = copyFrom.NeedsFlightEngineer;
@@ -81,6 +85,34 @@ namespace OpenSkyApi
             this.UploaderName = copyFrom.UploaderName;
             this.VersionNumber = copyFrom.VersionNumber;
             this.MaxPayloadDeltaAllowed = copyFrom.MaxPayloadDeltaAllowed;
+            this.HasAircraftImage = copyFrom.HasAircraftImage;
+            this.EngineModel = copyFrom.EngineModel;
+            this.OverrideFuelType = copyFrom.OverrideFuelType;
+            this.IsHistoric = copyFrom.IsHistoric;
+            this.DeliveryLocations = new List<AircraftManufacturerDeliveryLocation>();
+            this.DeliveryLocations.AddRange(copyFrom.DeliveryLocations);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the manufacturer delivery location ICAO(s).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string ManufacturerDeliveryLocationICAOs
+        {
+            get
+            {
+                var icaos = string.Empty;
+                if (this.DeliveryLocations != null)
+                {
+                    foreach (var deliveryLocation in this.DeliveryLocations)
+                    {
+                        icaos += $"{deliveryLocation.AirportICAO},";
+                    }
+                }
+
+                return icaos.TrimEnd(',');
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------

@@ -7,11 +7,15 @@
 namespace OpenSky.Agent.Views.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Windows;
+
+    using Microsoft.Win32;
 
     using OpenSky.Agent.Controls;
     using OpenSky.Agent.Controls.Models;
@@ -20,6 +24,8 @@ namespace OpenSky.Agent.Views.Models
     using OpenSky.Agent.Tools;
 
     using OpenSkyApi;
+
+    using TomsToolbox.Essentials;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -90,10 +96,24 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The engine model.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string engineModel;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True to include, false to exclude the type in the world population.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private bool includeInWorldPopulation;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// True if is historic, false if not.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool isHistoric;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -118,10 +138,10 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The manufacturer.
+        /// The manufacturer delivery airport ICAO(s) (comma separated).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string manufacturer;
+        private string manufacturerDeliveryAirportICAOs;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -135,7 +155,7 @@ namespace OpenSky.Agent.Views.Models
         /// The maximum payload delta allowed.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private int maxPayloadDeltaAllowed;
+        private int maxPayloadDeltaAllowed = 5;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -174,6 +194,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The override fuel type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private FuelType overrideFuelType;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// True if requires manual fuelling.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -195,6 +222,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The selected manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private AircraftManufacturer selectedManufacturer;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The version number.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -212,6 +246,7 @@ namespace OpenSky.Agent.Views.Models
         {
             this.ExistingAircraftTypes = new ObservableCollection<AircraftType>();
             this.SelectedAircraftTypes = new ObservableCollection<AircraftType>();
+            this.Manufacturers = new ObservableCollection<AircraftManufacturer>();
 
             this.GetUserRolesCommand = new AsynchronousCommand(this.GetUserRoles);
             this.RefreshAircraftTypesCommand = new AsynchronousCommand(this.RefreshAircraftTypes);
@@ -231,8 +266,11 @@ namespace OpenSky.Agent.Views.Models
             this.ClearNextVersionOfEditedCommand = new Command(this.ClearNextVersionOfEdited);
             this.SaveEditedAircraftTypeCommand = new AsynchronousCommand(this.SaveEditedAircraftType, false);
             this.IdentifyAircraftCommand = new Command(this.IdentifyAircraft);
+            this.UploadImageCommand = new AsynchronousCommand(this.UploadImage);
+            this.GetAircraftManufacturersCommand = new AsynchronousCommand(this.GetAircraftManufacturers);
 
             this.GetUserRolesCommand.DoExecute(null);
+            this.GetAircraftManufacturersCommand.DoExecute(null);
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -493,10 +531,38 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the engine model.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string EngineModel
+        {
+            get => this.engineModel;
+
+            set
+            {
+                if (Equals(this.engineModel, value))
+                {
+                    return;
+                }
+
+                this.engineModel = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets a list of of the existing aircraft types.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public ObservableCollection<AircraftType> ExistingAircraftTypes { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the get aircraft manufacturers command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand GetAircraftManufacturersCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -530,6 +596,27 @@ namespace OpenSky.Agent.Views.Models
                 }
 
                 this.includeInWorldPopulation = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether this aircraft is historic.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IsHistoric
+        {
+            get => this.isHistoric;
+
+            set
+            {
+                if (Equals(this.isHistoric, value))
+                {
+                    return;
+                }
+
+                this.isHistoric = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -599,24 +686,31 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the manufacturer.
+        /// Gets or sets the manufacturer delivery airport ICAO(s) (comma separated).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public string Manufacturer
+        public string ManufacturerDeliveryAirportICAOs
         {
-            get => this.manufacturer;
+            get => this.manufacturerDeliveryAirportICAOs;
 
             set
             {
-                if (Equals(this.manufacturer, value))
+                if (Equals(this.manufacturerDeliveryAirportICAOs, value))
                 {
                     return;
                 }
 
-                this.manufacturer = value;
+                this.manufacturerDeliveryAirportICAOs = value;
                 this.NotifyPropertyChanged();
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the manufacturers.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<AircraftManufacturer> Manufacturers { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -767,6 +861,27 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the override fuel type.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public FuelType OverrideFuelType
+        {
+            get => this.overrideFuelType;
+
+            set
+            {
+                if (Equals(this.overrideFuelType, value))
+                {
+                    return;
+                }
+
+                this.overrideFuelType = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the refresh aircraft types command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -848,6 +963,7 @@ namespace OpenSky.Agent.Views.Models
                     this.EnableDetailedChecksCommand.CanExecute = value != null;
                     this.DisableDetailedChecksCommand.CanExecute = value != null;
                     this.StartEditAircraftCommand.CanExecute = value != null;
+                    this.UploadImageCommand.CanExecute = value != null;
                 }
 
                 if (UserSessionService.Instance.IsAdmin)
@@ -863,6 +979,27 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public ObservableCollection<AircraftType> SelectedAircraftTypes { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the selected manufacturer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AircraftManufacturer SelectedManufacturer
+        {
+            get => this.selectedManufacturer;
+
+            set
+            {
+                if (Equals(this.selectedManufacturer, value))
+                {
+                    return;
+                }
+
+                this.selectedManufacturer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -884,6 +1021,13 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command StartEditAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the upload image command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand UploadImageCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -918,12 +1062,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (!this.Simulator.Connected)
             {
-                this.AddAircraftTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error ", "Not connected to sim!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.AddAircraftTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error ", "Not connected to sim!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -939,10 +1084,7 @@ namespace OpenSky.Agent.Views.Models
                             MessageBoxButton.YesNo,
                             ExtendedMessageBoxImage.Hand);
                         messageBox.SetWarningColorStyle();
-                        messageBox.Closed += (_, _) =>
-                        {
-                            answer = messageBox.Result;
-                        };
+                        messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                         this.ViewReference.ShowMessageBox(messageBox);
                     });
                 while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -958,12 +1100,13 @@ namespace OpenSky.Agent.Views.Models
 
             if (string.IsNullOrEmpty(this.Name) || this.Name.Length < 5)
             {
-                this.AddAircraftTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Name not specified or less than 5 characters!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.AddAircraftTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Name not specified or less than 5 characters!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -983,7 +1126,7 @@ namespace OpenSky.Agent.Views.Models
                 IsGearRetractable = this.Simulator.AircraftIdentity.GearRetractable,
                 Name = this.Name,
                 VersionNumber = this.VersionNumber,
-                Manufacturer = this.Manufacturer,
+                ManufacturerID = this.SelectedManufacturer.Id,
                 Category = this.Category,
                 IsVanilla = this.IsVanilla,
                 IncludeInWorldPopulation = this.IncludeInWorldPopulation,
@@ -997,8 +1140,29 @@ namespace OpenSky.Agent.Views.Models
                 MaxPrice = this.MaximumPrice,
                 MaxPayloadDeltaAllowed = this.MaxPayloadDeltaAllowed,
                 Comments = this.Comments,
-                Simulator = this.Simulator.SimulatorType
+                Simulator = this.Simulator.SimulatorType,
+                EngineModel = this.EngineModel,
+                OverrideFuelType = this.OverrideFuelType,
+                IsHistoric = this.IsHistoric
             };
+
+            if (!string.IsNullOrEmpty(this.ManufacturerDeliveryAirportICAOs))
+            {
+                var icaos = this.ManufacturerDeliveryAirportICAOs.Split(',');
+                foreach (var icao in icaos)
+                {
+                    if (!string.IsNullOrEmpty(icao.Trim()))
+                    {
+                        newAircraftType.DeliveryLocations.Add(
+                            new AircraftManufacturerDeliveryLocation
+                            {
+                                AircraftTypeID = Guid.Empty,
+                                ManufacturerID = "empty",
+                                AirportICAO = icao.Trim()
+                            });
+                    }
+                }
+            }
 
             this.LoadingText = "Adding new aircraft type";
             try
@@ -1056,7 +1220,7 @@ namespace OpenSky.Agent.Views.Models
 
             this.Name = null;
             this.VersionNumber = 1;
-            this.Manufacturer = null;
+            this.SelectedManufacturer = null;
             this.Category = AircraftTypeCategory.SEP;
             this.IsVanilla = false;
             this.IncludeInWorldPopulation = false;
@@ -1148,12 +1312,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (this.SelectedAircraftTypes.Count != 1)
             {
-                this.DeleteTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.DeleteTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -1166,10 +1331,7 @@ namespace OpenSky.Agent.Views.Models
                         $"Are you sure you want to delete the aircraft type: {this.SelectedAircraftType}",
                         MessageBoxButton.YesNo,
                         ExtendedMessageBoxImage.Question);
-                    messageBox.Closed += (_, _) =>
-                    {
-                        answer = messageBox.Result;
-                    };
+                    messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                     this.ViewReference.ShowMessageBox(messageBox);
                 });
             while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1230,12 +1392,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (this.SelectedAircraftTypes.Count != 1)
             {
-                this.DisableDetailedChecksCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.DisableDetailedChecksCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -1287,12 +1450,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (this.SelectedAircraftTypes.Count != 1)
             {
-                this.DisableTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.DisableTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -1344,12 +1508,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (this.SelectedAircraftTypes.Count != 1)
             {
-                this.EnableDetailedChecksCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.EnableDetailedChecksCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -1401,12 +1566,13 @@ namespace OpenSky.Agent.Views.Models
         {
             if (this.SelectedAircraftTypes.Count != 1)
             {
-                this.EnableTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.EnableTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
@@ -1448,6 +1614,56 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the list of aircraft manufacturers.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 20/02/2022.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void GetAircraftManufacturers()
+        {
+            this.LoadingText = "Fetching aircraft manufacturers";
+            try
+            {
+                var result = AgentOpenSkyService.Instance.GetAircraftManufacturersAsync().Result;
+                if (!result.IsError)
+                {
+                    this.GetAircraftManufacturersCommand.ReportProgress(
+                        () =>
+                        {
+                            this.Manufacturers.Clear();
+                            this.Manufacturers.AddRange(result.Data);
+                        });
+                }
+                else
+                {
+                    this.GetAircraftManufacturersCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error fetching aircraft manufacturers: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            var notification = new OpenSkyNotification("Error fetching aircraft manufacturers", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.ViewReference, this.GetAircraftManufacturersCommand, "Error fetching aircraft manufacturers");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the user's OpenSky roles.
         /// </summary>
         /// <remarks>
@@ -1464,12 +1680,13 @@ namespace OpenSky.Agent.Views.Models
             }
             else
             {
-                this.GetUserRolesCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Error fetching your user roles.", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.GetUserRolesCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Error fetching your user roles.", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
             }
 
             this.LoadingText = null;
@@ -1583,17 +1800,38 @@ namespace OpenSky.Agent.Views.Models
 
             if (string.IsNullOrEmpty(this.EditedAircraftType.Name) || this.EditedAircraftType.Name.Length < 5)
             {
-                this.SaveEditedAircraftTypeCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification("Error", "Name not specified or less than 5 characters!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.SaveEditedAircraftTypeCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Name not specified or less than 5 characters!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 return;
             }
 
             this.EditedAircraftType.IsVariantOf = this.EditedIsVariantOf?.Id;
             this.EditedAircraftType.NextVersion = this.EditedNextVersion?.Id;
+            this.EditedAircraftType.ManufacturerID = this.EditedAircraftType.Manufacturer?.Id;
+
+            this.EditedAircraftType.DeliveryLocations = new List<AircraftManufacturerDeliveryLocation>();
+            if (!string.IsNullOrEmpty(this.ManufacturerDeliveryAirportICAOs))
+            {
+                var icaos = this.ManufacturerDeliveryAirportICAOs.Split(',');
+                foreach (var icao in icaos)
+                {
+                    if (!string.IsNullOrEmpty(icao.Trim()))
+                    {
+                        this.EditedAircraftType.DeliveryLocations.Add(
+                            new AircraftManufacturerDeliveryLocation
+                            {
+                                AircraftTypeID = Guid.Empty,
+                                ManufacturerID = "empty",
+                                AirportICAO = icao.Trim()
+                            });
+                    }
+                }
+            }
 
             this.LoadingText = "Saving changed aircraft type";
             try
@@ -1714,6 +1952,100 @@ namespace OpenSky.Agent.Views.Models
             if (this.SelectedAircraftType.NextVersion.HasValue)
             {
                 this.EditedNextVersion = this.ExistingAircraftTypes.SingleOrDefault(t => t.Id == this.SelectedAircraftType.NextVersion);
+            }
+
+            this.ManufacturerDeliveryAirportICAOs = string.Empty;
+            if (this.SelectedAircraftType.DeliveryLocations != null)
+            {
+                foreach (var deliveryLocation in this.SelectedAircraftType.DeliveryLocations)
+                {
+                    this.ManufacturerDeliveryAirportICAOs += $"{deliveryLocation.AirportICAO},";
+                }
+            }
+
+            this.ManufacturerDeliveryAirportICAOs = this.ManufacturerDeliveryAirportICAOs.TrimEnd(',');
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Upload aircraft type image.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 19/02/2022.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void UploadImage()
+        {
+            if (this.SelectedAircraftTypes.Count != 1)
+            {
+                this.UploadImageCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification("Error", "Please select exactly one aircraft type!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
+                return;
+            }
+
+            bool? answer = null;
+            string fileName = null;
+            this.UploadImageCommand.ReportProgress(
+                () =>
+                {
+                    var openDialog = new OpenFileDialog
+                    {
+                        Title = "Select new aircraft image",
+                        CheckFileExists = true,
+                        Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg"
+                    };
+
+                    answer = openDialog.ShowDialog();
+                    if (answer == true)
+                    {
+                        fileName = openDialog.FileName;
+                    }
+                },
+                true);
+
+            if (answer != true || string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            try
+            {
+                var result = AgentOpenSkyService.Instance.UpdateAircraftTypeImageAsync(this.SelectedAircraftType.Id, new FileParameter(File.OpenRead(fileName), fileName, fileName.ToLowerInvariant().EndsWith(".png") ? "image/png" : "image/jpeg"))
+                                                .Result;
+                if (result.IsError)
+                {
+                    this.UploadImageCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error uploading aircraft image: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            var notification = new OpenSkyNotification("Error uploading aircraft image", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
+                }
+                else
+                {
+                    this.UploadImageCommand.ReportProgress(
+                        () =>
+                        {
+                            var notification = new OpenSkyNotification("Aircraft image upload", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 10);
+                            this.ViewReference.ShowNotification(notification);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.ViewReference, this.UploadImageCommand, "Error uploading aircraft image.");
             }
         }
     }
