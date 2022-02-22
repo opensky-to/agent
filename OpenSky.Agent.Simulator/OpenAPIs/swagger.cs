@@ -1790,6 +1790,80 @@ namespace OpenSkyApi
             }
         }
     
+        /// <summary>Get the list aircraft manufacturers.</summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<AircraftManufacturerIEnumerableApiResponse> GetAircraftManufacturersAsync()
+        {
+            return GetAircraftManufacturersAsync(System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>Get the list aircraft manufacturers.</summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<AircraftManufacturerIEnumerableApiResponse> GetAircraftManufacturersAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/AircraftType/manufacturers");
+    
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AircraftManufacturerIEnumerableApiResponse>(response_, headers_).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+    
         /// <summary>Get image for the specified aircraft type.</summary>
         /// <param name="typeID">Identifier for the type.</param>
         /// <returns>Success</returns>
@@ -2086,80 +2160,6 @@ namespace OpenSkyApi
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<AircraftTypeIEnumerableApiResponse>(response_, headers_).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-    
-        /// <summary>Get the list aircraft manufacturers.</summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<AircraftManufacturerIEnumerableApiResponse> GetAircraftManufacturersAsync()
-        {
-            return GetAircraftManufacturersAsync(System.Threading.CancellationToken.None);
-        }
-    
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>Get the list aircraft manufacturers.</summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<AircraftManufacturerIEnumerableApiResponse> GetAircraftManufacturersAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/AircraftType/manufacturers");
-    
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
-    
-                    PrepareRequest(client_, request_, urlBuilder_);
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-                    PrepareRequest(client_, request_, url_);
-    
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-    
-                        ProcessResponse(client_, response_);
-    
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<AircraftManufacturerIEnumerableApiResponse>(response_, headers_).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6016,27 +6016,23 @@ namespace OpenSkyApi
         }
     
         /// <summary>Start flight.</summary>
-        /// <param name="flightID">Identifier for the flight plan to start.</param>
+        /// <param name="body">The start flight model.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<StringApiResponse> StartFlightAsync(System.Guid flightID)
+        public System.Threading.Tasks.Task<StartFlightStatusApiResponse> StartFlightAsync(StartFlight body)
         {
-            return StartFlightAsync(flightID, System.Threading.CancellationToken.None);
+            return StartFlightAsync(body, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Start flight.</summary>
-        /// <param name="flightID">Identifier for the flight plan to start.</param>
+        /// <param name="body">The start flight model.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<StringApiResponse> StartFlightAsync(System.Guid flightID, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<StartFlightStatusApiResponse> StartFlightAsync(StartFlight body, System.Threading.CancellationToken cancellationToken)
         {
-            if (flightID == null)
-                throw new System.ArgumentNullException("flightID");
-    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Flight/start/{flightID}");
-            urlBuilder_.Replace("{flightID}", System.Uri.EscapeDataString(ConvertToString(flightID, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Flight/start");
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -6044,7 +6040,9 @@ namespace OpenSkyApi
             {
                 using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "text/plain");
+                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(body, _settings.Value));
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
     
@@ -6069,7 +6067,7 @@ namespace OpenSkyApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<StringApiResponse>(response_, headers_).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<StartFlightStatusApiResponse>(response_, headers_).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7319,6 +7317,10 @@ namespace OpenSkyApi
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(5, MinimumLength = 3)]
         public string AirportICAO { get; set; }
+    
+        /// <summary>Gets the name of the airport.</summary>
+        [Newtonsoft.Json.JsonProperty("airportName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AirportName { get; set; }
     
         /// <summary>Gets or sets the identifier of the manufacturer.</summary>
         [Newtonsoft.Json.JsonProperty("manufacturerID", Required = Newtonsoft.Json.Required.Always)]
@@ -8790,7 +8792,7 @@ namespace OpenSkyApi
     
     }
     
-    /// <summary>Financial categories. 0 = None, 1 = Aircraft, 2 = Fuel, 3 = Maintenance, 4 = AirportFees, 5 = Salaries, 6 = Loan, 7 = Interest, 8 = Shares, 9 = Dividend, 10 = FBO, 11 = Cargo, 12 = Passengers, 13 = SpecialtyJobs, 14 = Fines, -1 = Flight</summary>
+    /// <summary>Financial categories. 0 = None, 1 = Aircraft, 2 = Fuel, 3 = Maintenance, 4 = AirportFees, 5 = Salaries, 6 = Loan, 7 = Interest, 8 = Shares, 9 = Dividend, 10 = FBO, 11 = Cargo, 12 = Passengers, 13 = SpecialtyJobs, 14 = Fines, 15 = Ferry, -1 = Flight</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public enum FinancialCategory
     {
@@ -8823,6 +8825,8 @@ namespace OpenSkyApi
         SpecialtyJobs = 13,
     
         Fines = 14,
+    
+        Ferry = 15,
     
         Flight = -1,
     
@@ -9878,6 +9882,18 @@ namespace OpenSkyApi
     
     }
     
+    /// <summary>New aircraft delivery options. 0 = ManufacturerDeliveryAirport, 1 = ManufacturerFerry, 2 = OutsourceFerry</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum NewAircraftDeliveryOption
+    {
+        ManufacturerDeliveryAirport = 0,
+    
+        ManufacturerFerry = 1,
+    
+        OutsourceFerry = 2,
+    
+    }
+    
     /// <summary>Payload model.</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public partial class Payload 
@@ -10141,16 +10157,31 @@ namespace OpenSkyApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
     public partial class PurchaseNewAircraft 
     {
-        /// <summary>Gets or sets the airport ICAO.</summary>
-        [Newtonsoft.Json.JsonProperty("airportICAO", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AirportICAO { get; set; }
-    
         [Newtonsoft.Json.JsonProperty("country", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Country Country { get; set; }
+    
+        /// <summary>Gets or sets the delivery airport ICAO.</summary>
+        [Newtonsoft.Json.JsonProperty("deliveryAirportICAO", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DeliveryAirportICAO { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("deliveryOption", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public NewAircraftDeliveryOption DeliveryOption { get; set; }
+    
+        /// <summary>Gets or sets the ferry airport ICAO.</summary>
+        [Newtonsoft.Json.JsonProperty("ferryAirportICAO", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FerryAirportICAO { get; set; }
     
         /// <summary>Gets or sets a value indicating whether to purchase the aircraft for the airline or the user.</summary>
         [Newtonsoft.Json.JsonProperty("forAirline", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool ForAirline { get; set; }
+    
+        /// <summary>Gets or sets the number of aircraft to purchase.</summary>
+        [Newtonsoft.Json.JsonProperty("numberOfAircraft", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int NumberOfAircraft { get; set; }
+    
+        /// <summary>Gets or sets the outsource ferry rate (SkyBucks / NM).</summary>
+        [Newtonsoft.Json.JsonProperty("outsourceFerryRate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int OutsourceFerryRate { get; set; }
     
         /// <summary>Gets or sets the identifier of the type.</summary>
         [Newtonsoft.Json.JsonProperty("typeID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -10443,6 +10474,65 @@ namespace OpenSkyApi
         MSFS = 0,
     
         XPlane11 = 1,
+    
+    }
+    
+    /// <summary>Start flight model.</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public partial class StartFlight 
+    {
+        /// <summary>Gets or sets the identifier of the flight.</summary>
+        [Newtonsoft.Json.JsonProperty("flightID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid FlightID { get; set; }
+    
+        /// <summary>Gets or sets a list of states to override the checks for.</summary>
+        [Newtonsoft.Json.JsonProperty("overrideStates", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<StartFlightStatus> OverrideStates { get; set; }
+    
+    
+    }
+    
+    /// <summary>Start flight status. 0 = Started, 1 = AircraftNotAtOrigin, 2 = OriginDoesntSellAvGas, 3 = OriginDoesntSellJetFuel, 4 = NonFlightPlanPayloadsFound, -1 = Error</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum StartFlightStatus
+    {
+        Started = 0,
+    
+        AircraftNotAtOrigin = 1,
+    
+        OriginDoesntSellAvGas = 2,
+    
+        OriginDoesntSellJetFuel = 3,
+    
+        NonFlightPlanPayloadsFound = 4,
+    
+        Error = -1,
+    
+    }
+    
+    /// <summary>API standard response model.</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public partial class StartFlightStatusApiResponse 
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public StartFlightStatus Data { get; set; }
+    
+        /// <summary>Gets or sets the error details (NULL if no error).</summary>
+        [Newtonsoft.Json.JsonProperty("errorDetails", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ErrorDetails { get; set; }
+    
+        /// <summary>Gets or sets a value indicating whether this response is reporting an error.</summary>
+        [Newtonsoft.Json.JsonProperty("isError", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsError { get; set; }
+    
+        /// <summary>Gets or sets the message.</summary>
+        [Newtonsoft.Json.JsonProperty("message", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Message { get; set; }
+    
+        /// <summary>Gets or sets the status.</summary>
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Status { get; set; }
+    
     
     }
     
