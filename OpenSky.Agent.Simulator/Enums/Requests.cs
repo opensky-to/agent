@@ -21,18 +21,15 @@ namespace OpenSky.Agent.Simulator.Enums
         /// </summary>
         Primary = 0,
 
-
         /// <summary>
         /// Secondary tracking request
         /// </summary>
         Secondary = 1,
 
-
         /// <summary>
         /// Fuel tanks request
         /// </summary>
         FuelTanks = 2,
-
 
         /// <summary>
         /// Payload stations request

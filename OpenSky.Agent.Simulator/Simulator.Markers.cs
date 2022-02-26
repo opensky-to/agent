@@ -167,7 +167,7 @@ namespace OpenSky.Agent.Simulator
         /// The event text (what happened?).
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, FlightTrackingEventType type, Color color, string text)
+        protected void AddTrackingEvent(PrimaryTracking primary, SecondaryTracking secondary, FlightTrackingEventType type, Color color, string text)
         {
             if (this.TrackingStatus != TrackingStatus.Tracking && this.TrackingStatus != TrackingStatus.GroundOperations)
             {

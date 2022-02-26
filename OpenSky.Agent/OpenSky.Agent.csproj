@@ -103,6 +103,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\CustomModules\A32NX.xaml.cs">
+      <DependentUpon>A32NX.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\FuelTankControl.xaml.cs">
       <DependentUpon>FuelTankControl.xaml</DependentUpon>
     </Compile>
@@ -172,6 +175,7 @@
       <DependentUpon>LoginNotification.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Models\FlightTrackingViewModel.cs" />
+    <Compile Include="Views\Models\FlightTrackingViewModel.CustomModules.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.FuelTanks.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.Graphs.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.Map.cs" />
@@ -203,6 +207,10 @@
     <Compile Include="Views\AutoUpdate.xaml.cs">
       <DependentUpon>AutoUpdate.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\CustomModules\A32NX.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\FuelTankControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
