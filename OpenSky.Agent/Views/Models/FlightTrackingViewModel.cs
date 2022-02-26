@@ -14,10 +14,12 @@ namespace OpenSky.Agent.Views.Models
     using System.Reflection;
     using System.Threading;
     using System.Windows;
+    using System.Windows.Data;
 
     using JetBrains.Annotations;
 
     using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.CustomModules;
     using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator.Enums;
@@ -676,6 +678,30 @@ namespace OpenSky.Agent.Views.Models
                 this.SetPayloadStationsCommand.CanExecute = e != null && !e.Aircraft.Type.RequiresManualLoading;
                 this.SetFuelAndPayloadCommand.CanExecute = e != null && (!e.Aircraft.Type.RequiresManualFuelling || !e.Aircraft.Type.RequiresManualLoading);
                 this.ToggleAdvancedWeightAndBalanceCommand.CanExecute = e != null && (!e.Aircraft.Type.RequiresManualFuelling || !e.Aircraft.Type.RequiresManualLoading);
+
+                // Show/hide any custom modules?
+                if (e != null && e.Aircraft.Type.CustomAgentModule == "A32NX")
+                {
+                    this.CustomModuleContent = new A32NX();
+                    var payloadBinding = new Binding
+                    {
+                        Source = this,
+                        Path = new PropertyPath("Simulator.Flight.PayloadPounds"),
+                    };
+                    BindingOperations.SetBinding(this.CustomModuleContent, A32NX.PayloadToLoadProperty, payloadBinding);
+                    var currentPayloadBinding = new Binding
+                    {
+                        Source = this,
+                        Path = new PropertyPath("Simulator.WeightAndBalance.PayloadWeight")
+                    };
+                    BindingOperations.SetBinding(this.CustomModuleContent, A32NX.CurrentPayloadProperty, currentPayloadBinding);
+                    this.CustomModuleVisibility = Visibility.Visible;
+                }
+                else
+                {
+                    this.CustomModuleVisibility = Visibility.Collapsed;
+                    this.CustomModuleContent = null;
+                }
             };
 
             Application.Current.Dispatcher.BeginInvoke(updateCommands);
