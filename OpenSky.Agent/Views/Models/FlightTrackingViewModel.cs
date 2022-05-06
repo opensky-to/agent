@@ -908,7 +908,7 @@ namespace OpenSky.Agent.Views.Models
                     // Set time in sim?
                     if (this.Simulator.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.Simulator.Flight != null)
                     {
-                        this.Simulator.SetTime(DateTime.UtcNow.AddHours(this.Simulator.Flight.UtcOffset));
+                        this.Simulator.SetTime(DateTime.UtcNow);
                     }
 
                     // Set fuel?
@@ -1112,7 +1112,7 @@ namespace OpenSky.Agent.Views.Models
                     // Set time in sim?
                     if (this.Simulator.TrackingConditions[(int)TrackingConditions.DateTime].AutoSet && this.Simulator.Flight != null)
                     {
-                        this.Simulator.SetTime(DateTime.UtcNow.AddHours(this.Simulator.Flight.UtcOffset));
+                        this.Simulator.SetTime(DateTime.UtcNow);
                     }
 
                     // Set fuel and payload back to what they were when we saved the flight

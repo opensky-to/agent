@@ -4705,7 +4705,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/components/schemas/AirlinePermission"
-              }
+              },
+              "nullable": true
             },
             "description": "Gets or sets the embedded data of type T.",
             "nullable": true
@@ -4862,6 +4863,14 @@
             "type": "integer",
             "description": "Gets or sets the altitude of the airport in feet.",
             "format": "int32"
+          },
+          "approaches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Approach"
+            },
+            "description": "Gets the approaches.",
+            "nullable": true
           },
           "atisFrequency": {
             "type": "integer",
@@ -5169,6 +5178,48 @@
         },
         "additionalProperties": false,
         "description": "Application token model."
+      },
+      "Approach": {
+        "required": [
+          "airportICAO",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "airportICAO": {
+            "maxLength": 5,
+            "minLength": 3,
+            "type": "string",
+            "description": "Gets or sets the airport ICAO."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the approach ID.",
+            "format": "int32"
+          },
+          "runwayName": {
+            "maxLength": 6,
+            "minLength": 0,
+            "type": "string",
+            "description": "Gets or sets the name of the runway (can be NULL if approach doesn't specify a runway).",
+            "nullable": true
+          },
+          "suffix": {
+            "maxLength": 1,
+            "minLength": 0,
+            "type": "string",
+            "description": "Gets or sets the approach type suffix (Y, Z, etc.).",
+            "nullable": true
+          },
+          "type": {
+            "maxLength": 25,
+            "minLength": 0,
+            "type": "string",
+            "description": "Gets or sets the approach type (ILS, RNAV, etc.)."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Approach model."
       },
       "ByteArrayApiResponse": {
         "type": "object",
@@ -6656,11 +6707,6 @@
             "description": "Gets or sets the time-warp time saved (in seconds).",
             "format": "int32"
           },
-          "utcOffset": {
-            "type": "number",
-            "description": "Gets or sets the UTC offset for the flight.",
-            "format": "double"
-          },
           "verticalSpeedSeconds": {
             "type": "number",
             "description": "The vertical speed in feet per second.",
@@ -6879,11 +6925,6 @@
             "type": "integer",
             "description": "Gets or sets the time-warp time saved (in seconds).",
             "format": "int32"
-          },
-          "utcOffset": {
-            "type": "number",
-            "description": "Gets or sets the UTC offset for the flight.",
-            "format": "double"
           }
         },
         "additionalProperties": false,
@@ -7198,11 +7239,6 @@
             "type": "string",
             "description": "Gets or sets the route.",
             "nullable": true
-          },
-          "utcOffset": {
-            "type": "number",
-            "description": "Gets or sets the UTC offset for the flight.",
-            "format": "double"
           }
         },
         "additionalProperties": false,
@@ -7747,7 +7783,8 @@
           "flights": {
             "type": "object",
             "additionalProperties": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "description": "Gets or sets the flights the payload is planned to fly on.",
             "nullable": true

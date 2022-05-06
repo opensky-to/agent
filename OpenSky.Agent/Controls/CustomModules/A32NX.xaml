@@ -31,8 +31,9 @@
         <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" FontWeight="SemiBold"><Underline>A32NX payload helper:</Underline></TextBlock>
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10">
             Payloads of up to 9400 kg can be loaded into the cargo hold, above<LineBreak/>
-            use the suggested PAX number, start boarding and add the remaining<LineBreak/>
-            payload as cargo.
+            use the suggested PAX number, start boarding. Then set the cargo to 0,<LineBreak/>
+            start boarding. Finally add the remaining payload as cargo and<LineBreak/>
+            board one last time.
         </TextBlock>
         <TextBlock Grid.Row="2" Grid.Column="0">Flight payload:</TextBlock>
         <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,6,0">Passenger count:</TextBlock>

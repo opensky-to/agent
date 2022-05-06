@@ -218,6 +218,8 @@ namespace OpenSky.Agent.Views.Models
             if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
             {
                 var image = new BitmapImage();
+                
+                // ReSharper disable once AssignNullToNotNullAttribute
                 using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
                 {
                     image.BeginInit();
@@ -980,6 +982,8 @@ namespace OpenSky.Agent.Views.Models
                     if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
                     {
                         var image = new BitmapImage();
+                        
+                        // ReSharper disable once AssignNullToNotNullAttribute
                         using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
                         {
                             image.BeginInit();
@@ -1045,6 +1049,8 @@ namespace OpenSky.Agent.Views.Models
                                 if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
                                 {
                                     var image = new BitmapImage();
+
+                                    // ReSharper disable once AssignNullToNotNullAttribute
                                     using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
                                     {
                                         image.BeginInit();

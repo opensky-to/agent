@@ -202,6 +202,8 @@ namespace OpenSky.Agent.Simulator
                 var fuelSecondsLeft = ((this.Flight?.FuelLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
                 var payloadSecondsLeft = ((this.Flight?.PayloadLoadingComplete ?? DateTime.UtcNow) - DateTime.UtcNow).TotalSeconds;
                 var secondsToSkip = Math.Max(fuelSecondsLeft, payloadSecondsLeft);
+                
+                // ReSharper disable once PossibleNullReferenceException
                 this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow;
                 this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow;
 
@@ -242,6 +244,8 @@ namespace OpenSky.Agent.Simulator
 
                 this.timeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate.AddSeconds(secondsToSkip);
                 this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
+               
+                // ReSharper disable once PossibleNullReferenceException
                 this.Flight.FuelLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(fuelSecondsLeft / 2);
                 this.Flight.PayloadLoadingComplete = DateTimeOffset.UtcNow.AddSeconds(payloadSecondsLeft / 2);
                 this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.SkippedHalfGroundHandling, OpenSkyColors.OpenSkyWarningOrange, "Skipped half ground handling");

@@ -197,6 +197,7 @@ namespace OpenSky.Agent.Simulator
                     return;
                 }
 
+                // ReSharper disable once PossibleNullReferenceException
                 var flightNumberDigits = flightNumber.ToCharArray().Where(char.IsDigit).ToArray();
                 if (flightNumberDigits.Length == 0)
                 {
@@ -321,10 +322,12 @@ namespace OpenSky.Agent.Simulator
                         {
                             if (async)
                             {
+                                // ReSharper disable once AssignNullToNotNullAttribute
                                 this.speech.SpeakAsync(lineToSpeek);
                             }
                             else
                             {
+                                // ReSharper disable once AssignNullToNotNullAttribute
                                 this.speech.Speak(lineToSpeek);
                             }
                         }
@@ -338,10 +341,12 @@ namespace OpenSky.Agent.Simulator
                     {
                         if (async)
                         {
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             this.speech.SpeakAsync(lineToSpeek);
                         }
                         else
                         {
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             this.speech.Speak(lineToSpeek);
                         }
                     }
@@ -375,10 +380,12 @@ namespace OpenSky.Agent.Simulator
                         {
                             if (async)
                             {
+                                // ReSharper disable once AssignNullToNotNullAttribute
                                 this.speech.SpeakAsync(lineToSpeek);
                             }
                             else
                             {
+                                // ReSharper disable once AssignNullToNotNullAttribute
                                 this.speech.Speak(lineToSpeek);
                             }
                         }
@@ -392,10 +399,12 @@ namespace OpenSky.Agent.Simulator
                     {
                         if (async)
                         {
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             this.speech.SpeakAsync(lineToSpeek);
                         }
                         else
                         {
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             this.speech.Speak(lineToSpeek);
                         }
                     }
@@ -504,12 +513,6 @@ namespace OpenSky.Agent.Simulator
 
         [StringValue(".*\\\\abort_unlimited_fuel.*\\.wav|Tracking aborted, unlimited fuel turned on.")]
         AbortedUnlimitedFuel,
-
-        [StringValue(".*\\\\abort_time_back.*\\.wav|Tracking aborted, time moved backwards.")]
-        AbortedTimeBackwards,
-
-        [StringValue(".*\\\\abort_time_changed.*\\.wav|Tracking aborted, time changed in simulator.")]
-        AbortedTimeChanged,
 
         [StringValue(".*\\\\number1.*\\.wav|1")]
         Number1,

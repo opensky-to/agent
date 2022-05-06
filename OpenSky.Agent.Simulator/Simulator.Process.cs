@@ -118,12 +118,12 @@ namespace OpenSky.Agent.Simulator
         {
             if (this.Flight != null && this.TrackingStatus == TrackingStatus.Preparing || this.TrackingStatus == TrackingStatus.Resuming)
             {
-                this.TrackingConditions[(int)Models.TrackingConditions.DateTime].Expected = $"{DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0):HH:mm dd.MM.yyyy}";
+                this.TrackingConditions[(int)Models.TrackingConditions.DateTime].Expected = $"{DateTime.UtcNow:HH:mm dd.MM.yyyy}";
                 this.TrackingConditions[(int)Models.TrackingConditions.DateTime].Current = $"{secondary.UtcDateTime:HH:mm dd.MM.yyyy}";
                 this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].Current = this.AircraftIdentity.Type;
 
                 this.TrackingConditions[(int)Models.TrackingConditions.DateTime].ConditionMet =
-                    this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow.AddHours(this.Flight?.UtcOffset ?? 0) - secondary.UtcDateTime).TotalMinutes) < 1;
+                    this.TrackingConditions[(int)Models.TrackingConditions.DateTime].AutoSet || Math.Abs((DateTime.UtcNow - secondary.UtcDateTime).TotalMinutes) < 1;
                 this.TrackingConditions[(int)Models.TrackingConditions.PlaneModel].ConditionMet = this.Flight?.Aircraft.Type.MatchesAircraftInSimulator() ?? false;
 
                 if (this.TrackingStatus == TrackingStatus.Preparing)
@@ -176,7 +176,7 @@ namespace OpenSky.Agent.Simulator
                         this.TrackingConditions[(int)Models.TrackingConditions.Payload].Enabled = true;
                         this.TrackingConditions[(int)Models.TrackingConditions.Payload].Current = $"{this.PayloadStations.TotalWeight:F1} lbs, {this.PayloadStations.TotalWeight * 0.453592:F1} kg";
                         this.TrackingConditions[(int)Models.TrackingConditions.Payload].ConditionMet =
-                            this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs((double)(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds)) < 2.2; // Allow 1 kg of margin
+                            this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet || Math.Abs((double)(this.PayloadStations.TotalWeight - this.Flight?.PayloadPounds ?? 0)) < 2.2; // Allow 1 kg of margin
                     }
 
                     var currentLocation = $"{this.PrimaryTracking.GeoCoordinate.GetDistanceTo(this.flightLoadingTempModels?.SlewAircraftIntoPosition.GeoCoordinate ?? new GeoCoordinate(0, 0, 0)) / 1000:F2} km from resume location";
