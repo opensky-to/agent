@@ -42,6 +42,13 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The last time change Date/Time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastTimeChange = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Is the 250 below 10000 speed limit warning currently active?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -340,7 +347,11 @@ namespace OpenSky.Agent.Simulator
                 var timeDelta = pst.New.UtcDateTime - pst.Old.UtcDateTime;
                 if (timeDelta.TotalSeconds is < -60 or > 60)
                 {
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TimeInSimChanged, OpenSkyColors.OpenSkyTealLight, "Time in simulator changed");
+                    if ((DateTime.UtcNow - this.lastTimeChange).TotalSeconds > 10)
+                    {
+                        this.lastTimeChange = DateTime.UtcNow;
+                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TimeInSimChanged, OpenSkyColors.OpenSkyTealLight, "Time in simulator changed");
+                    }
                 }
             }
         }
