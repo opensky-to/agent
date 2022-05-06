@@ -109,6 +109,8 @@ namespace OpenSky.Agent.MVVM
             {
                 // Return errors for specific property
                 List<string> errorsForName;
+                
+                // ReSharper disable once AssignNullToNotNullAttribute
                 this.errors.TryGetValue(propertyName, out errorsForName);
                 return errorsForName ?? new List<string>();
             }

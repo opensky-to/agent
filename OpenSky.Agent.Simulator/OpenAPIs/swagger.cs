@@ -7915,6 +7915,10 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("altitude", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Altitude { get; set; }
     
+        /// <summary>Gets the approaches.</summary>
+        [Newtonsoft.Json.JsonProperty("approaches", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<Approach> Approaches { get; set; }
+    
         /// <summary>Gets or sets the ATIS frequency (if available).</summary>
         [Newtonsoft.Json.JsonProperty("atisFrequency", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? AtisFrequency { get; set; }
@@ -8169,6 +8173,39 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
+    
+    
+    }
+    
+    /// <summary>Approach model.</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v11.0.0.0)")]
+    public partial class Approach 
+    {
+        /// <summary>Gets or sets the airport ICAO.</summary>
+        [Newtonsoft.Json.JsonProperty("airportICAO", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(5, MinimumLength = 3)]
+        public string AirportICAO { get; set; }
+    
+        /// <summary>Gets or sets the approach ID.</summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Id { get; set; }
+    
+        /// <summary>Gets or sets the name of the runway (can be NULL if approach doesn't specify a runway).</summary>
+        [Newtonsoft.Json.JsonProperty("runwayName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(6)]
+        public string RunwayName { get; set; }
+    
+        /// <summary>Gets or sets the approach type suffix (Y, Z, etc.).</summary>
+        [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(1)]
+        public string Suffix { get; set; }
+    
+        /// <summary>Gets or sets the approach type (ILS, RNAV, etc.).</summary>
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.StringLength(25)]
+        public string Type { get; set; }
     
     
     }
@@ -9226,10 +9263,6 @@ namespace OpenSkyApi
         [Newtonsoft.Json.JsonProperty("timeWarpTimeSavedSeconds", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int TimeWarpTimeSavedSeconds { get; set; }
     
-        /// <summary>Gets or sets the UTC offset for the flight.</summary>
-        [Newtonsoft.Json.JsonProperty("utcOffset", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double UtcOffset { get; set; }
-    
         /// <summary>The vertical speed in feet per second.</summary>
         [Newtonsoft.Json.JsonProperty("verticalSpeedSeconds", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double VerticalSpeedSeconds { get; set; }
@@ -9411,10 +9444,6 @@ namespace OpenSkyApi
         /// <summary>Gets or sets the time-warp time saved (in seconds).</summary>
         [Newtonsoft.Json.JsonProperty("timeWarpTimeSavedSeconds", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int TimeWarpTimeSavedSeconds { get; set; }
-    
-        /// <summary>Gets or sets the UTC offset for the flight.</summary>
-        [Newtonsoft.Json.JsonProperty("utcOffset", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double UtcOffset { get; set; }
     
     
     }
@@ -9658,10 +9687,6 @@ namespace OpenSkyApi
         /// <summary>Gets or sets the route.</summary>
         [Newtonsoft.Json.JsonProperty("route", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Route { get; set; }
-    
-        /// <summary>Gets or sets the UTC offset for the flight.</summary>
-        [Newtonsoft.Json.JsonProperty("utcOffset", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double UtcOffset { get; set; }
     
     
     }

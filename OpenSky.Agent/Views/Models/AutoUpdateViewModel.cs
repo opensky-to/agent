@@ -334,6 +334,7 @@ namespace OpenSky.Agent.Views.Models
                 {
                     if (!string.IsNullOrEmpty((string)json?.tag_name))
                     {
+                        // ReSharper disable once PossibleNullReferenceException
                         var version = (string)json.tag_name;
                         Debug.WriteLine($"Auto update remote version: {version}");
                         this.CurrentVersion = new Version(version.Replace("v", string.Empty));
@@ -345,6 +346,7 @@ namespace OpenSky.Agent.Views.Models
                         {
                             if (!string.IsNullOrEmpty((string)json?.assets[i].browser_download_url))
                             {
+                                // ReSharper disable once PossibleNullReferenceException
                                 var url = (string)json.assets[0].browser_download_url;
                                 Debug.WriteLine($"Auto update asset URL: {url}");
                                 if (url.ToLowerInvariant().EndsWith(".msi"))
@@ -357,6 +359,7 @@ namespace OpenSky.Agent.Views.Models
 
                     if (!string.IsNullOrEmpty((string)json?.body))
                     {
+                        // ReSharper disable once PossibleNullReferenceException
                         var mdBody = (string)json.body;
                         Debug.WriteLine($"Auto update changelog MD: {mdBody}");
                         this.ChangeLogMarkup = mdBody;
@@ -364,6 +367,7 @@ namespace OpenSky.Agent.Views.Models
 
                     if (!string.IsNullOrEmpty((string)json?.name))
                     {
+                        // ReSharper disable once PossibleNullReferenceException
                         var name = (string)json.name;
                         Debug.WriteLine($"Auto update name: {name}");
                         this.UpdateName = $" for {name}";

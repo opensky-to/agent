@@ -338,24 +338,9 @@ namespace OpenSky.Agent.Simulator
             if (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking)
             {
                 var timeDelta = pst.New.UtcDateTime - pst.Old.UtcDateTime;
-                if (timeDelta.TotalSeconds < -5)
+                if (timeDelta.TotalSeconds is < -60 or > 60)
                 {
-                    Debug.WriteLine("OpenSky Warning: Tracking aborted, time moved backwards!");
-                    var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
-                    player.PlaySync();
-                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeBackwards);
-                    this.StopTracking(true);
-                }
-
-                if (timeDelta.TotalSeconds > 30)
-                {
-                    Debug.WriteLine("OpenSky Warning: Tracking aborted, time changed in sim!");
-                    var assembly = Assembly.GetExecutingAssembly();
-                    var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
-                    player.PlaySync();
-                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedTimeChanged);
-                    this.StopTracking(true);
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TimeInSimChanged, OpenSkyColors.OpenSkyTealLight, "Time in simulator changed");
                 }
             }
         }

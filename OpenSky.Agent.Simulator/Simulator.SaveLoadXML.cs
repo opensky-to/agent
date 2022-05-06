@@ -74,7 +74,6 @@ namespace OpenSky.Agent.Simulator
 
                     FlightID = this.Flight.Id,
                     AircraftRegistry = this.Flight.Aircraft.Registry,
-                    UtcOffset = this.Flight.UtcOffset,
 
                     Origin = new FlightLogAirport
                     {
