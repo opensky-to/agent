@@ -123,7 +123,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
         /// Is the APU running?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool ApuGenerator { get; set; }
+        public bool ApuRunning { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -265,7 +265,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 EngineCombustion3 = secondary.EngineCombustion3,
                 EngineCombustion4 = secondary.EngineCombustion4,
                 Pushback = secondary.Pushback,
-                ApuGenerator = secondary.ApuGenerator,
+                ApuRunning = secondary.ApuRunning,
                 LightBeacon = secondary.LightBeacon,
                 LightNav = secondary.LightNav,
                 LightStrobe = secondary.LightStrobe,
@@ -315,7 +315,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 new SimVar("GENERAL ENG COMBUSTION:3", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("GENERAL ENG COMBUSTION:4", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("PUSHBACK STATE", "Enum", SIMCONNECT_DATATYPE.INT32),
-                new SimVar("APU GENERATOR ACTIVE", "Bool", SIMCONNECT_DATATYPE.INT32),
+                new SimVar("APU SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("LIGHT BEACON", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("LIGHT NAV", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("LIGHT STROBE", "Bool", SIMCONNECT_DATATYPE.INT32),

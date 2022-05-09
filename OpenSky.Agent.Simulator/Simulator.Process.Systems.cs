@@ -302,9 +302,9 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Was the APU turned on/off?
-            if (pst.Old.ApuGenerator != pst.New.ApuGenerator)
+            if (pst.Old.ApuRunning != pst.New.ApuRunning)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.APU, OpenSkyColors.OpenSkyTealLight, pst.New.ApuGenerator ? "APU started" : "APU shut down");
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.APU, OpenSkyColors.OpenSkyTealLight, pst.New.ApuRunning ? "APU started" : "APU shut down");
             }
 
             // Were the seatbelt signs turned on/off

@@ -26,7 +26,7 @@ namespace OpenSky.Agent.Simulator.Models
         /// Is the APU running?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public bool ApuGenerator { get; set; }
+        public bool ApuRunning { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

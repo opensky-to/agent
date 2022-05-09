@@ -79,7 +79,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 EngineCombustion3 = this.EngineCombustion3,
                 EngineCombustion4 = this.EngineCombustion4,
                 Pushback = this.Pushback,
-                ApuGenerator = this.ApuGenerator,
+                ApuRunning = this.ApuRunning,
                 LightBeacon = this.LightBeacon,
                 LightNav = this.LightNav,
                 LightStrobe = this.LightStrobe,
@@ -263,7 +263,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             if (element.DataRef == DataRefs.Cockpit2ElectricalAPURunning.DataRef)
             {
-                this.ApuGenerator = (int)value == 1;
+                this.ApuRunning = (int)value == 1;
             }
 
             if (element.DataRef == DataRefs.CockpitElectricalBeaconLightsOn.DataRef)

@@ -127,7 +127,7 @@
         <TextBlock Grid.Column="2" Grid.Row="17" VerticalAlignment="Center" HorizontalAlignment="Right">AutoPilot?</TextBlock>
         <TextBlock Grid.Column="2" Grid.Row="18" VerticalAlignment="Center" HorizontalAlignment="Right">Parking brake?</TextBlock>
         <TextBlock Grid.Column="2" Grid.Row="19" VerticalAlignment="Center" HorizontalAlignment="Right">Spoilers armed?</TextBlock>
-        <TextBlock Grid.Column="2" Grid.Row="20" VerticalAlignment="Center" HorizontalAlignment="Right">APU Generator</TextBlock>
+        <TextBlock Grid.Column="2" Grid.Row="20" VerticalAlignment="Center" HorizontalAlignment="Right">APU running?</TextBlock>
         <TextBox Grid.Column="3" Grid.Row="2" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.LightBeacon, Mode=OneWay}" />
         <TextBox Grid.Column="3" Grid.Row="3" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.LightNav, Mode=OneWay}" />
         <TextBox Grid.Column="3" Grid.Row="4" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.LightStrobe, Mode=OneWay}" />
@@ -146,7 +146,7 @@
         <TextBox Grid.Column="3" Grid.Row="17" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.AutoPilot, Mode=OneWay}" />
         <TextBox Grid.Column="3" Grid.Row="18" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.ParkingBrake, Mode=OneWay}" />
         <TextBox Grid.Column="3" Grid.Row="19" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.SpoilersArmed, Mode=OneWay}" />
-        <TextBox Grid.Column="3" Grid.Row="20" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.ApuGenerator, Mode=OneWay}" />
+        <TextBox Grid.Column="3" Grid.Row="20" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.SecondaryTracking.ApuRunning, Mode=OneWay}" />
 
         <TextBlock Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center">Tracking Status</TextBlock>
         <TextBlock Grid.Column="4" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">Connected to sim?</TextBlock>
