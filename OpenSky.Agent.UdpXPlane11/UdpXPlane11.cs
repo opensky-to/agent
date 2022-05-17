@@ -161,19 +161,25 @@ namespace OpenSky.Agent.UdpXPlane11
                 }
 
                 Debug.WriteLine("UdpXplane11 setting fuel and payload stations from temp structs restored from save");
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[0]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[1]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[2]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[3]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[4]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[5]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[6]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenterQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[7]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenter2Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[8]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenter3Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
-                this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFixed, (float)this.flightLoadingTempModels.PayloadStations.Weight1 / 2.205f);
+                if (this.Flight?.Aircraft.Type.RequiresManualFuelling == false)
+                {
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[0]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[1]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightMainQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[2]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[3]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightTipQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[4]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankLeftAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[5]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankRightAuxQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[6]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenterQuantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[7]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenter2Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFuel.DataRef + "[8]", (float)this.flightLoadingTempModels.FuelTanks.FuelTankCenter3Quantity / 2.205f * (float)this.WeightAndBalance.FuelWeightPerGallon);
+                    this.RefreshModelNow(Requests.FuelTanks);
+                }
 
-                this.RefreshModelNow(Requests.FuelTanks);
-                this.RefreshModelNow(Requests.PayloadStations);
+                if (this.Flight?.Aircraft.Type.RequiresManualLoading == false)
+                {
+                    this.connector?.SetDataRefValue(DataRefs.FlightmodelWeightMFixed, (float)this.flightLoadingTempModels.PayloadStations.Weight1 / 2.205f);
+                    this.RefreshModelNow(Requests.PayloadStations);
+                }
             }
             else
             {

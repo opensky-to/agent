@@ -209,6 +209,7 @@ namespace OpenSky.Agent.SimConnectMSFS
                     this.fsConnect.UpdateData(Requests.FuelTanks, this.flightLoadingTempModels.FuelTanks.ConvertBack());
                     this.RefreshModelNow(Requests.FuelTanks);
                 }
+
                 if (this.Flight?.Aircraft.Type.RequiresManualLoading == false)
                 {
                     this.fsConnect.UpdateData(Requests.PayloadStations, this.flightLoadingTempModels.PayloadStations.ConvertBack());
