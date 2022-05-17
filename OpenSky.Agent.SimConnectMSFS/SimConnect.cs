@@ -204,10 +204,17 @@ namespace OpenSky.Agent.SimConnectMSFS
                 }
 
                 Debug.WriteLine("SimConnect setting fuel and payload stations from temp structs restored from save");
-                this.fsConnect.UpdateData(Requests.FuelTanks, this.flightLoadingTempModels.FuelTanks.ConvertBack());
-                this.fsConnect.UpdateData(Requests.PayloadStations, this.flightLoadingTempModels.PayloadStations.ConvertBack());
-                this.RefreshModelNow(Requests.FuelTanks);
-                this.RefreshModelNow(Requests.PayloadStations);
+                if (this.Flight?.Aircraft.Type.RequiresManualFuelling == false)
+                {
+                    this.fsConnect.UpdateData(Requests.FuelTanks, this.flightLoadingTempModels.FuelTanks.ConvertBack());
+                    this.RefreshModelNow(Requests.FuelTanks);
+                }
+
+                if (this.Flight?.Aircraft.Type.RequiresManualLoading == false)
+                {
+                    this.fsConnect.UpdateData(Requests.PayloadStations, this.flightLoadingTempModels.PayloadStations.ConvertBack());
+                    this.RefreshModelNow(Requests.PayloadStations);
+                }
             }
             else
             {

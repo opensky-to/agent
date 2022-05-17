@@ -519,7 +519,7 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         public void StopTracking(bool resumeLater)
         {
-            Debug.WriteLine($"SimConnect asked to stop tracking...resume: {resumeLater}");
+            Debug.WriteLine($"Asked to stop tracking...resume: {resumeLater}");
 
             this.TrackingStatus = this.Flight != null ? (this.Flight.Resume ? TrackingStatus.Resuming : TrackingStatus.Preparing) : TrackingStatus.NotTracking;
 
