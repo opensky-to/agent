@@ -512,6 +512,8 @@
                                     <Button Padding="3" Command="{Binding SetPayloadStationsCommand}" HorizontalAlignment="Stretch">Set in sim</Button>
                                 </StackPanel>
                             </Grid>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="550" HorizontalAlignment="Left" Margin="5,10,5,0">Use the slider below to move the suggested payload distribution forward or aft to adjust the CG of the aircraft.</TextBlock>
+                            <Slider Margin="5,0" Value="{Binding PayloadForwardAft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="10" />
                             <StackPanel Orientation="Vertical" Name="PayloadStationsPanel" />
                         </StackPanel>
                     </Expander>
