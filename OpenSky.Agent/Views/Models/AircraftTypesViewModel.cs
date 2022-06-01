@@ -1148,6 +1148,7 @@ namespace OpenSky.Agent.Views.Models
 
             if (!string.IsNullOrEmpty(this.ManufacturerDeliveryAirportICAOs))
             {
+                newAircraftType.DeliveryLocations = new List<AircraftManufacturerDeliveryLocation>();
                 var icaos = this.ManufacturerDeliveryAirportICAOs.Split(',');
                 foreach (var icao in icaos)
                 {
