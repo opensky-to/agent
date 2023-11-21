@@ -29,7 +29,7 @@
         <Rectangle Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Fill="#404040" Stroke="Gray" RadiusX="1.5" RadiusY="1.5" />
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Center" Margin="5,0" Text="{Binding ElementName=FuelTank, Path=FuelTankName, Mode=OneWay}" />
         <Slider Grid.Row="0" Grid.Column="1" MinWidth="100" Margin="10,5,10,0" TickFrequency="0.5" IsSnapToTickEnabled="True" Value="{Binding ElementName=FuelTank, Path=FuelTankQuantity, Mode=TwoWay}" Maximum="{Binding ElementName=FuelTank, Path=FuelTankCapacity, Mode=OneWay}" />
-        <TextBox Grid.Row="0" Grid.Column="2" Margin="0,5,5,0" Text="{Binding ElementName=FuelTank, Path=FuelTankQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox Grid.Row="0" Grid.Column="2" Margin="0,5,5,0" Text="{Binding ElementName=FuelTank, Path=FuelTankQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" />
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,2,5,5" FontSize="10" HorizontalAlignment="Right" Text="{Binding ElementName=FuelTank, Path=FuelTankInfo, Mode=OneWay}" />
     </Grid>
 </UserControl>

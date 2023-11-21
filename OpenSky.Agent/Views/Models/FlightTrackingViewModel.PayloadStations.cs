@@ -156,8 +156,6 @@ namespace OpenSky.Agent.Views.Models
             }
         }
 
-        private double[] sliderPositionStarts = new[] { 2, 1.8, 1.6, 1.4, 1.2, 1, 0.8, 0.6, 0.4, 0.2, 0 };
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Suggest payload loading.
@@ -175,7 +173,7 @@ namespace OpenSky.Agent.Views.Models
             var nonPilotStations = 0;
             for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
             {
-                if (this.Simulator.PayloadStations.Names[i].Contains("PILOT"))
+                if (this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot"))
                 {
                     var payload = Math.Min(170, payloadToLoad);
                     this.PayloadStationWeights[i] = payload;
@@ -212,7 +210,7 @@ namespace OpenSky.Agent.Views.Models
                 var nonPilotIndex = 0;
                 for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
                 {
-                    if (!this.Simulator.PayloadStations.Names[i].Contains("PILOT") || nonPilotOverride)
+                    if (!this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot") || nonPilotOverride)
                     {
                         this.PayloadStationWeights[i] = payloadShare * payloadMultipliers[nonPilotIndex++];
                         payloadToLoad -= payloadShare;

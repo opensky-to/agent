@@ -247,11 +247,13 @@ namespace OpenSky.Agent.Views.Models
             this.ExistingAircraftTypes = new ObservableCollection<AircraftType>();
             this.SelectedAircraftTypes = new ObservableCollection<AircraftType>();
             this.Manufacturers = new ObservableCollection<AircraftManufacturer>();
+            this.AircraftUpgrades = new ObservableCollection<AircraftTypeUpgrade>();
 
             this.GetUserRolesCommand = new AsynchronousCommand(this.GetUserRoles);
             this.RefreshAircraftTypesCommand = new AsynchronousCommand(this.RefreshAircraftTypes);
             this.AddAircraftTypeCommand = new AsynchronousCommand(this.AddAircraftType);
             this.StartAddAircraftCommand = new Command(this.StartAddAircraft);
+            this.StartUpdateAircraftCommand = new Command(this.StartUpdateAircraft, false);
             this.CancelAddAircraftCommand = new Command(this.CancelAddAircraft);
             this.ClearVariantOfNewCommand = new Command(this.ClearVariantOfNew);
             this.ClearTypeSelectionCommand = new Command(this.ClearTypeSelection);
@@ -268,10 +270,133 @@ namespace OpenSky.Agent.Views.Models
             this.IdentifyAircraftCommand = new Command(this.IdentifyAircraft);
             this.UploadImageCommand = new AsynchronousCommand(this.UploadImage);
             this.GetAircraftManufacturersCommand = new AsynchronousCommand(this.GetAircraftManufacturers);
+            this.GetAircraftUpgradesCommand = new AsynchronousCommand(this.GetAircraftUpgrades, false);
+            this.CloseUpgradeAircraftCommand = new Command(this.CloseUpgradeAircraft);
+            this.UpdateAircraftTypeCommand = new AsynchronousCommand(this.UpdateAircraftType);
 
             this.GetUserRolesCommand.DoExecute(null);
             this.GetAircraftManufacturersCommand.DoExecute(null);
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Perform the specified aircraft type upgrade.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 29/11/2021.
+        /// </remarks>
+        /// <param name="parameter">
+        /// The parameter.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void UpdateAircraftType(object parameter)
+        {
+            if (parameter is AircraftTypeUpgrade upgrade)
+            {
+                this.LoadingText = "Upgrading aircraft...";
+                try
+                {
+                    var result = AgentOpenSkyService.Instance.UpgradeAircraftTypeAsync(upgrade).Result;
+                    if (!result.IsError)
+                    {
+                        this.UpdateAircraftTypeCommand.ReportProgress(() => this.GetAircraftUpgradesCommand.DoExecute(null));
+                    }
+                    else
+                    {
+                        this.UpdateAircraftTypeCommand.ReportProgress(
+                            () =>
+                            {
+                                Debug.WriteLine("Error performing aircraft type upgrade: " + result.Message);
+                                if (!string.IsNullOrEmpty(result.ErrorDetails))
+                                {
+                                    Debug.WriteLine(result.ErrorDetails);
+                                }
+
+                                var notification = new OpenSkyNotification("Error performing aircraft type upgrade", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                                notification.SetErrorColorStyle();
+                                this.ViewReference.ShowNotification(notification);
+                            });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleApiCallException(this.ViewReference, this.UpdateAircraftTypeCommand, "Error performing aircraft type upgrade");
+                }
+                finally
+                {
+                    this.LoadingText = null;
+                }
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the update aircraft type command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand UpdateAircraftTypeCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The upgrade aircraft visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private Visibility upgradeAircraftVisibility = Visibility.Collapsed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the upgrade aircraft visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Visibility UpgradeAircraftVisibility
+        {
+            get => this.upgradeAircraftVisibility;
+
+            set
+            {
+                if (Equals(this.upgradeAircraftVisibility, value))
+                {
+                    return;
+                }
+
+                this.upgradeAircraftVisibility = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the close upgrade aircraft command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command CloseUpgradeAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Closes the upgrade aircraft view and clears the upgrades collection.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 29/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public void CloseUpgradeAircraft()
+        {
+            this.UpgradeAircraftVisibility = Visibility.Collapsed;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the get aircraft upgrades command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand GetAircraftUpgradesCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the aircraft upgrades.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<AircraftTypeUpgrade> AircraftUpgrades { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -955,6 +1080,7 @@ namespace OpenSky.Agent.Views.Models
                 this.selectedAircraftType = value;
                 this.NotifyPropertyChanged();
                 this.AircraftTypeDetailsVisibility = value != null ? Visibility.Visible : Visibility.Collapsed;
+                this.StartUpdateAircraftCommand.CanExecute = value != null;
 
                 if (UserSessionService.Instance.IsModerator)
                 {
@@ -1021,6 +1147,13 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command StartEditAircraftCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the start update aircraft command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command StartUpdateAircraftCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1165,6 +1298,13 @@ namespace OpenSky.Agent.Views.Models
                 }
             }
 
+            // The special "Missing" manufacturer was selected
+            if (this.SelectedManufacturer.Id == "miss")
+            {
+                newAircraftType.ManufacturerID = null;
+                newAircraftType.DeliveryLocations = null;
+            }
+
             this.LoadingText = "Adding new aircraft type";
             try
             {
@@ -1299,6 +1439,95 @@ namespace OpenSky.Agent.Views.Models
         private void ClearVariantOfNew()
         {
             this.IsVariantOf = null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Copies the selected aircraft type to be updated using the add aircraft panel.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 20/11/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CopySelectedTypeToBeUpdated()
+        {
+            this.Name = this.SelectedAircraftType.Name;
+            this.VersionNumber = this.SelectedAircraftType.VersionNumber + 1;
+            this.SelectedManufacturer = this.SelectedAircraftType.Manufacturer;
+            this.ManufacturerDeliveryAirportICAOs = this.SelectedAircraftType.ManufacturerDeliveryLocationICAOs;
+            this.Category = this.SelectedAircraftType.Category;
+            this.IsVanilla = this.SelectedAircraftType.IsVanilla;
+            this.IncludeInWorldPopulation = this.SelectedAircraftType.IncludeInWorldPopulation;
+            this.NeedsCoPilot = this.SelectedAircraftType.NeedsCoPilot;
+            this.NeedsFlightEngineer = this.SelectedAircraftType.NeedsFlightEngineer;
+            this.RequiresManualFuelling = this.SelectedAircraftType.RequiresManualFuelling;
+            this.RequiresManualLoading = this.SelectedAircraftType.RequiresManualLoading;
+            this.MinimumRunwayLength = this.SelectedAircraftType.MinimumRunwayLength;
+            this.MinimumPrice = this.SelectedAircraftType.MinPrice;
+            this.MaximumPrice = this.SelectedAircraftType.MaxPrice;
+            this.MaxPayloadDeltaAllowed = this.SelectedAircraftType.MaxPayloadDeltaAllowed;
+            this.Comments = this.SelectedAircraftType.Comments;
+            this.EngineModel = this.SelectedAircraftType.EngineModel;
+            this.OverrideFuelType = this.SelectedAircraftType.OverrideFuelType;
+            this.IsHistoric = this.SelectedAircraftType.IsHistoric;
+
+            this.AddAircraftVisibility = Visibility.Visible;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the available aircraft upgrades.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 29/11/2021.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void GetAircraftUpgrades()
+        {
+            if (!UserSessionService.Instance.IsModerator)
+            {
+                return;
+            }
+
+            this.LoadingText = "Checking for available aircraft type upgrades...";
+            try
+            {
+                var result = AgentOpenSkyService.Instance.GetAircraftTypeUpgradesAsync().Result;
+                if (!result.IsError)
+                {
+                    this.GetAircraftUpgradesCommand.ReportProgress(
+                        () =>
+                        {
+                            this.AircraftUpgrades.Clear();
+                            this.AircraftUpgrades.AddRange(result.Data);
+                            this.UpgradeAircraftVisibility = Visibility.Visible;
+                        });
+                }
+                else
+                {
+                    this.GetAircraftUpgradesCommand.ReportProgress(
+                        () =>
+                        {
+                            Debug.WriteLine("Error checking for aircraft type upgrades: " + result.Message);
+                            if (!string.IsNullOrEmpty(result.ErrorDetails))
+                            {
+                                Debug.WriteLine(result.ErrorDetails);
+                            }
+
+                            var notification = new OpenSkyNotification("Error checking for aircraft type upgrades", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleApiCallException(this.ViewReference, this.GetAircraftUpgradesCommand, "Error checking for aircraft type upgrades");
+            }
+            finally
+            {
+                this.LoadingText = null;
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1678,6 +1907,7 @@ namespace OpenSky.Agent.Views.Models
             if (result)
             {
                 this.GetUserRolesCommand.ReportProgress(() => this.RefreshAircraftTypesCommand.DoExecute(null));
+                this.GetAircraftUpgradesCommand.CanExecute = UserSessionService.Instance.IsModerator;
             }
             else
             {
@@ -1687,6 +1917,8 @@ namespace OpenSky.Agent.Views.Models
                         var notification = new OpenSkyNotification("Error", "Error fetching your user roles.", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
                         notification.SetErrorColorStyle();
                         this.ViewReference.ShowNotification(notification);
+
+                        this.GetAircraftUpgradesCommand.CanExecute = false;
                     });
             }
 
@@ -1751,7 +1983,7 @@ namespace OpenSky.Agent.Views.Models
                         () =>
                         {
                             this.ExistingAircraftTypes.Clear();
-                            foreach (var type in result.Data)
+                            foreach (var type in result.Data.OrderBy(t => t.Name).ThenBy(t => t.VersionNumber))
                             {
                                 this.ExistingAircraftTypes.Add(type);
                             }
@@ -1965,6 +2197,56 @@ namespace OpenSky.Agent.Views.Models
             }
 
             this.ManufacturerDeliveryAirportICAOs = this.ManufacturerDeliveryAirportICAOs.TrimEnd(',');
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Starts updating the selected aircraft type.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 20/11/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void StartUpdateAircraft()
+        {
+            if (!this.Simulator.Connected)
+            {
+                var notification = new OpenSkyNotification("Update aircraft type", "Not connected to sim!", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                notification.SetErrorColorStyle();
+                this.ViewReference.ShowNotification(notification);
+                return;
+            }
+
+            AircraftType matchedType = null;
+            foreach (var type in this.ExistingAircraftTypes)
+            {
+                if (type.MatchesAircraftInSimulator())
+                {
+                    matchedType = type;
+                    break;
+                }
+            }
+
+            if (matchedType != null)
+            {
+                var messageBox = new OpenSkyMessageBox(
+                    "Update aircraft type",
+                    $"The aircraft currently loaded in the sim seems to be a match for the existing type: {matchedType}\r\n\r\nAre you sure you an update is necessary?",
+                    MessageBoxButton.YesNo,
+                    ExtendedMessageBoxImage.Question);
+                messageBox.Closed += (_, _) =>
+                {
+                    if (messageBox.Result == ExtendedMessageBoxResult.Yes)
+                    {
+                        this.CopySelectedTypeToBeUpdated();
+                    }
+                };
+                this.ViewReference.ShowMessageBox(messageBox);
+            }
+            else
+            {
+                this.CopySelectedTypeToBeUpdated();
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------

@@ -337,6 +337,8 @@ namespace OpenSky.Agent.Simulator
             }
         }
 
+        private DateTime lastLocationUpdate=DateTime.MinValue;
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Process the primary tracking data (old vs new).
@@ -362,8 +364,9 @@ namespace OpenSky.Agent.Simulator
                             this.TrackFlight(ppt);
 
                             // Fire the location changed event?
-                            if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation))
+                            if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation) || (DateTime.Now-this.lastLocationUpdate).TotalSeconds>5)
                             {
+                                this.lastLocationUpdate = DateTime.Now;
                                 newLocation = ppt.New.MapLocation;
                             }
 

@@ -25,6 +25,7 @@ namespace OpenSky.Agent.Native.PInvoke.Structs
         /// Empty Rect structure.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
+        // ReSharper disable once UnassignedReadonlyField
         public static readonly Rect Empty;
 
         /// -------------------------------------------------------------------------------------------------
