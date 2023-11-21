@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FuelTankControl.xaml.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,28 +21,28 @@ namespace OpenSky.Agent.Controls
         /// The fuel tangent capacity property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty FuelTankCapacityProperty = DependencyProperty.Register("FuelTankCapacity", typeof(double), typeof(FuelTankControl), new UIPropertyMetadata(0.0));
+        public static readonly DependencyProperty FuelTankCapacityProperty = DependencyProperty.Register(nameof(FuelTankCapacity), typeof(double), typeof(FuelTankControl), new UIPropertyMetadata(0.0));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The fuel tank name property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty FuelTankNameProperty = DependencyProperty.Register("FuelTankName", typeof(string), typeof(FuelTankControl), new UIPropertyMetadata("Unknown tank"));
+        public static readonly DependencyProperty FuelTankNameProperty = DependencyProperty.Register(nameof(FuelTankName), typeof(string), typeof(FuelTankControl), new UIPropertyMetadata("Unknown tank"));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The fuel tank info property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty FuelTankInfoProperty = DependencyProperty.Register("FuelTankInfo", typeof(string), typeof(FuelTankControl), new UIPropertyMetadata("??"));
+        public static readonly DependencyProperty FuelTankInfoProperty = DependencyProperty.Register(nameof(FuelTankInfo), typeof(string), typeof(FuelTankControl), new UIPropertyMetadata("??"));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The fuel tank quantity property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty FuelTankQuantityProperty = DependencyProperty.Register("FuelTankQuantity", typeof(double), typeof(FuelTankControl), new UIPropertyMetadata(0.0));
+        public static readonly DependencyProperty FuelTankQuantityProperty = DependencyProperty.Register(nameof(FuelTankQuantity), typeof(double), typeof(FuelTankControl), new UIPropertyMetadata(0.0));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

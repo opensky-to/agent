@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -301,13 +301,13 @@ namespace OpenSky.Agent
             crashReport += "\r\n\r\n";
 
             Debug.WriteLine(crashReport);
-            var filePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\OpenSky.Agent.Crash.txt";
+            var filePath = Environment.ExpandEnvironmentVariables("%localappdata%\\OpenSky\\agent_crash.log");
 
             try
             {
                 File.AppendAllText(filePath, crashReport);
                 ModernWpf.MessageBox.Show(
-                    e.Exception.Message + "\r\n\r\nPlease check OpenSky.Agent.Crash.txt for details!",
+                    e.Exception.Message + "\r\n\r\nPlease check agent_crash.log for details!",
                     "Unexpected error!",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FlightTrackingViewModel.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -91,6 +91,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The skip ground handling visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private Visibility skipGroundHandlingVisibility = Visibility.Collapsed;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The start/resume tracking button text.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -126,36 +133,6 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The skip ground handling visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private Visibility skipGroundHandlingVisibility = Visibility.Collapsed;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the skip ground handling visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility SkipGroundHandlingVisibility
-        {
-            get => this.skipGroundHandlingVisibility;
-
-            set
-            {
-                if (Equals(this.skipGroundHandlingVisibility, value))
-                {
-                    return;
-                }
-
-                this.skipGroundHandlingVisibility = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Initializes a new instance of the <see cref="FlightTrackingViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -188,6 +165,7 @@ namespace OpenSky.Agent.Views.Models
             this.Simulator.TrackingStatusChanged += this.SimulatorTrackingStatusChanged;
             this.Simulator.FlightChanged += this.SimulatortFlightChanged;
             this.Simulator.LocationChanged += this.SimulatorLocationChanged;
+            this.Simulator.SimbriefOfpLoadedChanged += this.SimulatorOfpLoadedChanged;
 
             // Create commands
             this.SetFuelAndPayloadCommand = new Command(this.SetFuelAndPayload);
@@ -423,6 +401,27 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the skip ground handling visibility.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Visibility SkipGroundHandlingVisibility
+        {
+            get => this.skipGroundHandlingVisibility;
+
+            set
+            {
+                if (Equals(this.skipGroundHandlingVisibility, value))
+                {
+                    return;
+                }
+
+                this.skipGroundHandlingVisibility = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the slew into position command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -602,10 +601,7 @@ namespace OpenSky.Agent.Views.Models
                         MessageBoxButton.YesNo,
                         ExtendedMessageBoxImage.Hand);
                     messageBox.SetWarningColorStyle();
-                    messageBox.Closed += (_, _) =>
-                    {
-                        answer = messageBox.Result;
-                    };
+                    messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                     this.ViewReference.ShowMessageBox(messageBox);
                 });
             while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -648,6 +644,25 @@ namespace OpenSky.Agent.Views.Models
         {
             this.SetFuelTanks();
             this.SetPayloadStations();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Simulator ofp loaded changed.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 18/11/2023.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="loaded">
+        /// True if the data was loaded.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SimulatorOfpLoadedChanged(object sender, bool loaded)
+        {
+            this.ImportSimbriefVisibility = loaded ? Visibility.Collapsed : Visibility.Visible;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -851,12 +866,13 @@ namespace OpenSky.Agent.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error slewing plane into position: " + ex);
-                this.SlewIntoPositionCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error slewing into position", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.SlewIntoPositionCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error slewing into position", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
             }
         }
 
@@ -895,12 +911,13 @@ namespace OpenSky.Agent.Views.Models
                     if (!this.Simulator.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
-                        this.StartTrackingCommand.ReportProgress(() =>
-                        {
-                            var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
-                            notification.SetWarningColorStyle();
-                            this.ViewReference.ShowNotification(notification);
-                        });
+                        this.StartTrackingCommand.ReportProgress(
+                            () =>
+                            {
+                                var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
+                                notification.SetWarningColorStyle();
+                                this.ViewReference.ShowNotification(notification);
+                            });
                         this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                         return;
                     }
@@ -943,10 +960,7 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) =>
-                                {
-                                    answer = messageBox.Result;
-                                };
+                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
                         while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -974,10 +988,7 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) =>
-                                {
-                                    answer = messageBox.Result;
-                                };
+                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
                         while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1005,10 +1016,7 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) =>
-                                {
-                                    answer = messageBox.Result;
-                                };
+                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
                         while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1035,10 +1043,7 @@ namespace OpenSky.Agent.Views.Models
                                     "The total weight exceeds the limits specified for this plane, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Question);
-                                messageBox.Closed += (_, _) =>
-                                {
-                                    answer = messageBox.Result;
-                                };
+                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
                         while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1065,10 +1070,7 @@ namespace OpenSky.Agent.Views.Models
                                     "Ground handling not yet completed, do you want to skip it?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Question);
-                                messageBox.Closed += (_, _) =>
-                                {
-                                    answer = messageBox.Result;
-                                };
+                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
                         while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1099,12 +1101,13 @@ namespace OpenSky.Agent.Views.Models
                     if (!this.Simulator.CanStartTracking)
                     {
                         Debug.WriteLine("Tracking conditions not met");
-                        this.StartTrackingCommand.ReportProgress(() =>
-                        {
-                            var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
-                            notification.SetWarningColorStyle();
-                            this.ViewReference.ShowNotification(notification);
-                        });
+                        this.StartTrackingCommand.ReportProgress(
+                            () =>
+                            {
+                                var notification = new OpenSkyNotification("Start tracking", "Not all tracking conditions are met, please review, correct and try again.", MessageBoxButton.OK, ExtendedMessageBoxImage.Warning, 10);
+                                notification.SetWarningColorStyle();
+                                this.ViewReference.ShowNotification(notification);
+                            });
                         this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                         return;
                     }
@@ -1153,12 +1156,13 @@ namespace OpenSky.Agent.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error starting/resuming tracking: " + ex);
-                this.StartTrackingCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error starting tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
+                this.StartTrackingCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error starting tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
                 this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
             }
         }
@@ -1184,10 +1188,7 @@ namespace OpenSky.Agent.Views.Models
                         MessageBoxButton.YesNoCancel,
                         ExtendedMessageBoxImage.Hand);
                     messageBox.SetWarningColorStyle();
-                    messageBox.Closed += (_, _) =>
-                    {
-                        answer = messageBox.Result;
-                    };
+                    messageBox.Closed += (_, _) => { answer = messageBox.Result; };
                     this.ViewReference.ShowMessageBox(messageBox);
                 });
             while (answer == null && !SleepScheduler.IsShutdownInProgress)
@@ -1209,12 +1210,13 @@ namespace OpenSky.Agent.Views.Models
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error saving flight: " + ex);
-                    this.StopTrackingCommand.ReportProgress(() =>
-                    {
-                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error saving flight", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                        notification.SetErrorColorStyle();
-                        this.ViewReference.ShowNotification(notification);
-                    });
+                    this.StopTrackingCommand.ReportProgress(
+                        () =>
+                        {
+                            var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error saving flight", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
                 }
             }
             else
@@ -1231,12 +1233,13 @@ namespace OpenSky.Agent.Views.Models
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error stopping tracking: " + ex);
-                    this.StopTrackingCommand.ReportProgress(() =>
-                    {
-                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error stopping tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                        notification.SetErrorColorStyle();
-                        this.ViewReference.ShowNotification(notification);
-                    });
+                    this.StopTrackingCommand.ReportProgress(
+                        () =>
+                        {
+                            var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error stopping tracking", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                            notification.SetErrorColorStyle();
+                            this.ViewReference.ShowNotification(notification);
+                        });
                 }
             }
         }
@@ -1273,13 +1276,13 @@ namespace OpenSky.Agent.Views.Models
             catch (Exception ex)
             {
                 Debug.WriteLine("Error pausing/resuming sim: " + ex);
-                this.ToggleFlightPauseCommand.ReportProgress(() =>
-                {
-                    var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error pausing/resuming simulator", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                    notification.SetErrorColorStyle();
-                    this.ViewReference.ShowNotification(notification);
-                });
-
+                this.ToggleFlightPauseCommand.ReportProgress(
+                    () =>
+                    {
+                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error pausing/resuming simulator", ex.Message, ExtendedMessageBoxImage.Error, 30);
+                        notification.SetErrorColorStyle();
+                        this.ViewReference.ShowNotification(notification);
+                    });
             }
         }
 

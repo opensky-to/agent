@@ -446,10 +446,10 @@ namespace OpenSky.Agent.UdpXPlane11
                             }
                             foreach (Requests request in Enum.GetValues(typeof(Requests)))
                             {
-                                if (this.SampleRates.ContainsKey(request))
+                                if (this.SampleRates.TryGetValue(request, out var rate))
                                 {
                                     var lastTime = this.LastReceivedTimes[request];
-                                    if (request != Requests.Primary && (!lastTime.HasValue || (DateTime.UtcNow - lastTime.Value).TotalMilliseconds > this.SampleRates[request]))
+                                    if (request != Requests.Primary && (!lastTime.HasValue || (DateTime.UtcNow - lastTime.Value).TotalMilliseconds > rate))
                                     {
                                         if (request == Requests.Secondary)
                                         {

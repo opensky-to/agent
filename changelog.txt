@@ -1,6 +1,19 @@
 ======================================================================================
-OpenSky Agent for MSFS Changelog
+OpenSky Flight Tracking Agent Changelog
 ======================================================================================
+
+--------------------------------------------------------------------------------------
+Version 0.5.0 (ALPHA5)
+--------------------------------------------------------------------------------------
+- Updated libraries to fix security issues and bugs
+- Added CG slider to advanced weight and balance section
+- Fixed w&b section still using simconnect instead of unified sim interface
+- New design for aircraft position arrow
+- Added update aircraft type, both for adding new updated type and added db upgrade
+  panel from client as well
+- Fixed departure range bug in flight state code
+- Added support for newly cleaned up payload station names
+- Support for actualy missing manufacturer instead of dummy one
 
 --------------------------------------------------------------------------------------
 Version 0.4.5 (ALPHA4)

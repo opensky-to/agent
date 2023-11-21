@@ -1,12 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FlightTrackingViewModel.PayloadStations.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace OpenSky.Agent.Views.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
 
@@ -32,6 +33,35 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private bool isPayloadExpanded;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The payload forward/aft distribution slider value.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private double payloadForwardAft = 5;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the payload forward/aft distribution slider value.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double PayloadForwardAft
+        {
+            get => this.payloadForwardAft;
+        
+            set
+            {
+                if(Equals(this.payloadForwardAft, value))
+                {
+                   return;
+                }
+        
+                this.payloadForwardAft = value;
+                this.NotifyPropertyChanged();
+                this.SuggestPayloadCommand.DoExecute(null);
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -143,7 +173,7 @@ namespace OpenSky.Agent.Views.Models
             var nonPilotStations = 0;
             for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
             {
-                if (this.Simulator.PayloadStations.Names[i].Contains("PILOT"))
+                if (this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot"))
                 {
                     var payload = Math.Min(170, payloadToLoad);
                     this.PayloadStationWeights[i] = payload;
@@ -155,20 +185,34 @@ namespace OpenSky.Agent.Views.Models
                 }
             }
 
-            // Distribute the rest evenly
+            // Distribute the rest evenly, taking the CG slider value into consideration
+            var nonPilotOverride = false;
             if (nonPilotStations == 0)
             {
                 nonPilotStations = this.Simulator.PayloadStations.Count;
+                nonPilotOverride = true;
             }
 
             if (nonPilotStations > 0)
             {
                 var payloadShare = payloadToLoad / nonPilotStations;
+                var payloadMultipliers = new List<double>();
+
+                var startValue = 2 - (this.PayloadForwardAft * 0.2);
+                var endValue = 2 - startValue;
+                var step = (endValue - startValue) / (nonPilotStations - 1);
+                for (var i = 0; i < nonPilotStations; i++)
+                {
+                    payloadMultipliers.Add(startValue);
+                    startValue += step;
+                }
+
+                var nonPilotIndex = 0;
                 for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
                 {
-                    if (!this.Simulator.PayloadStations.Names[i].Contains("PILOT"))
+                    if (!this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot") || nonPilotOverride)
                     {
-                        this.PayloadStationWeights[i] = payloadShare;
+                        this.PayloadStationWeights[i] = payloadShare * payloadMultipliers[nonPilotIndex++];
                         payloadToLoad -= payloadShare;
                     }
                 }

@@ -271,7 +271,8 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Departure
-            if (distanceToDepartureAirport < 10 && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
+            var approachDepartureDistance = this.AircraftIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
+            if (distanceToDepartureAirport < approachDepartureDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -286,8 +287,7 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Climb
-            var approachDistance = this.AircraftIdentity.EngineType is EngineType.Jet or EngineType.Turboprop ? 40 : 10;
-            if (distanceToDepartureAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
+            if (distanceToDepartureAirport >= approachDepartureDistance && this.VerticalProfile == VerticalProfile.Climbing && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -302,7 +302,7 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Cruise
-            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTracking.OnGround)
+            if (distanceToDestinationAirport >= approachDepartureDistance && distanceToAlternateAirport >= approachDepartureDistance && this.VerticalProfile == VerticalProfile.Level && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -317,7 +317,7 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Descent
-            if (distanceToDestinationAirport >= approachDistance && distanceToAlternateAirport >= approachDistance && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTracking.OnGround)
+            if (distanceToDestinationAirport >= approachDepartureDistance && distanceToAlternateAirport >= approachDepartureDistance && this.VerticalProfile == VerticalProfile.Descending && !this.PrimaryTracking.OnGround)
             {
                 if (unknownFlightPhase)
                 {
@@ -332,7 +332,7 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Approach
-            if ((distanceToDestinationAirport < approachDistance || distanceToAlternateAirport < approachDistance) && !this.PrimaryTracking.OnGround && this.PrimaryTracking.RadioHeight > 500)
+            if ((distanceToDestinationAirport < approachDepartureDistance || distanceToAlternateAirport < approachDepartureDistance) && !this.PrimaryTracking.OnGround && this.PrimaryTracking.RadioHeight > 500)
             {
                 if (unknownFlightPhase)
                 {

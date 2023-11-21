@@ -197,7 +197,7 @@ namespace OpenSky.Agent.Simulator
                     return;
                 }
 
-                Debug.WriteLine("SimConnect flight changing...");
+                Debug.WriteLine("Simulator flight changing...");
                 if (value != null && this.TrackingStatus != TrackingStatus.NotTracking)
                 {
                     Debug.WriteLine("Throwing error: You need to abort the current flight before changing to a new one!");
@@ -211,7 +211,7 @@ namespace OpenSky.Agent.Simulator
                 if (value != null)
                 {
                     // Start the ground handling thread for this flight
-                    new Thread(this.DoGroundHandling) { Name = "OpenSky.SimConnect.GroundHandling" }.Start();
+                    new Thread(this.DoGroundHandling) { Name = "OpenSky.Simulator.GroundHandling" }.Start();
 
                     // Add airport markers to map (do this in both new and restore, save file doesn't contain these cause the data would just be redundant)
                     UpdateGUIDelegate addAirports = () =>

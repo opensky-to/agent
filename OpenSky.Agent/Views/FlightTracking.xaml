@@ -1,7 +1,7 @@
 ﻿<!-- 
 ====================================================================================================================
 <copyright file="FlightTracking.xaml" company="OpenSky">
-  OpenSky project 2021-2022
+  OpenSky project 2021-2023
 </copyright>
 <summary>
   Flight tracking window
@@ -172,7 +172,7 @@
                 <CheckBox Grid.Row="2" Grid.Column="3" Margin="10,2,0,2" Padding="5,0" IsChecked="{Binding Simulator.TrackingConditions[2].AutoSet, Mode=TwoWay}" Visibility="{Binding Simulator.Flight.Aircraft.Type.RequiresManualLoading, Converter={StaticResource InvertedBooleanVisibilityConverter}, FallbackValue=Visible}" MinWidth="50" MinHeight="20" MaxWidth="30" MaxHeight="20">Set</CheckBox>
 
                 <CheckBox Grid.Row="3" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[3].ConditionMet}" MaxWidth="25" MinWidth="25"  />
-                <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Plane model</TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Aircraft model</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="3" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>
@@ -202,11 +202,11 @@
                     <Underline>Tips for resuming tracking while airborne:</Underline><LineBreak /><LineBreak />
                     &#x27A4; Start engines, prepare cockpit and remaining flight plan<LineBreak />
                     &#x27A4; Did you set the correct lights?<LineBreak />
-                    &#x27A4; Slew plane into position<LineBreak />
+                    &#x27A4; Slew aircraft into position<LineBreak />
                     &#x27A4; Exit slew (press Y) to adjust gear and flaps, enable AP?<LineBreak />
-                    &#x27A4; Slew plane back into position again<LineBreak />
+                    &#x27A4; Slew aircraft back into position again<LineBreak />
                     &#x27A4; "Resume tracking", starts a five second countdown<LineBreak />
-                    &#x27A4; Fly the plane &#x1F643;<LineBreak /><LineBreak />
+                    &#x27A4; Fly the aircraft &#x1F643;<LineBreak /><LineBreak />
                     If resuming on the ground you can also exit slew and resume without the five second countdown.
                 </TextBlock>
 
@@ -318,7 +318,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left" Margin="0,0,0,15">While waiting for the ground crew to finish fueling and loading your plane you can start tracking your flight. You can use this time to check your plane, prepare the cockpit and run your checklists...</TextBlock>
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left" Margin="0,0,0,15">While waiting for the ground crew to finish fueling and loading your aircraft you can start tracking your flight. You can use this time to check your aircraft, prepare the cockpit and run your checklists...</TextBlock>
                 <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Fill="#606060" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
                 <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Fill="#606060" RadiusX="1.5" RadiusY="1.5" Margin="0,1" />
                 <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="5">Fuel loading estimated completion time</TextBlock>
@@ -512,6 +512,8 @@
                                     <Button Padding="3" Command="{Binding SetPayloadStationsCommand}" HorizontalAlignment="Stretch">Set in sim</Button>
                                 </StackPanel>
                             </Grid>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="550" HorizontalAlignment="Left" Margin="5,10,5,0">Use the slider below to move the suggested payload distribution forward or aft to adjust the CG of the aircraft.</TextBlock>
+                            <Slider Margin="5,0" Value="{Binding PayloadForwardAft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="10" />
                             <StackPanel Orientation="Vertical" Name="PayloadStationsPanel" />
                         </StackPanel>
                     </Expander>
@@ -644,7 +646,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <CheckBox IsChecked="{Binding FollowPlane, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Follow plane</CheckBox>
+                        <CheckBox IsChecked="{Binding FollowPlane, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Follow aircraft</CheckBox>
                     </Border>
                     <ComboBox Name="MapType" HorizontalAlignment="Stretch" Margin="0,2,1,2" SelectionChanged="MapTypeOnSelectionChanged" SelectedValue="{Binding SelectedMapMode, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBox.Items>
@@ -671,7 +673,7 @@
         <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="8" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
-                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please assign a new flight from the OpenSky client or if you have the Alpha debugging client, create one using the "Test Flight" option from the main menu.</TextBlock>
+                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please start a new flight from the OpenSky client first.</TextBlock>
             </StackPanel>
         </Border>
     </Grid>

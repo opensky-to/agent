@@ -1,7 +1,7 @@
 ﻿<!-- 
 ====================================================================================================================
 <copyright file="PayloadStationControl.xaml" company="OpenSky">
-  OpenSky project 2021-2022
+  OpenSky project 2021-2023
 </copyright>
 <summary>
   Payload station custom control
@@ -26,6 +26,6 @@
         </Grid.ColumnDefinitions>
         <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Fill="#404040" Stroke="Gray" RadiusX="1.5" RadiusY="1.5" />
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="5,0" Text="{Binding ElementName=PayloadStation, Path=PayloadStationName, Mode=OneWay}" />
-        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding ElementName=PayloadStation, Path=PayloadStationWeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding ElementName=PayloadStation, Path=PayloadStationWeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" />
     </Grid>
 </UserControl>

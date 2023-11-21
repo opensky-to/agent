@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FlightTracking.xaml.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -102,14 +102,14 @@ namespace OpenSky.Agent.Views
             this.MapView.Children.Add(aircraftTrail);
 
             // Add aircraft position to map
-            var aircraftPosition = new Image { Width = 40, Height = 40 };
+            var aircraftPosition = new Image { Width = 30, Height = 30 };
             aircraftPosition.SetValue(Panel.ZIndexProperty, 999);
             aircraftPosition.SetValue(MapLayer.PositionOriginProperty, PositionOrigin.Center);
-            var rotateTransform = new RotateTransform { CenterX = 20, CenterY = 20 };
+            var rotateTransform = new RotateTransform { CenterX = 15, CenterY = 15 };
             var headingBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("AircraftHeading"), Mode = BindingMode.OneWay };
             BindingOperations.SetBinding(rotateTransform, RotateTransform.AngleProperty, headingBinding);
             aircraftPosition.RenderTransform = rotateTransform;
-            var aircraftDrawingImage = this.FindResource("OpenSkyLogoPointingUpForMap") as DrawingImage;
+            var aircraftDrawingImage = this.FindResource("AircraftPositionUpForMap") as DrawingImage;
             aircraftPosition.Source = aircraftDrawingImage;
             var positionBinding = new Binding { Source = this.DataContext, Path = new PropertyPath("AircraftLocation"), Mode = BindingMode.OneWay };
             BindingOperations.SetBinding(aircraftPosition, MapLayer.PositionProperty, positionBinding);
@@ -169,11 +169,11 @@ namespace OpenSky.Agent.Views
             foreach (FuelTank tank in Enum.GetValues(typeof(FuelTank)))
             {
                 var control = new FuelTankControl { FuelTankName = tank.GetStringValue(), Margin = new Thickness(5, 2, 5, 2) };
-                var capacityBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"SimConnect.FuelTanks.Capacities[{(int)tank}]"), Mode = BindingMode.OneWay };
+                var capacityBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"Simulator.FuelTanks.Capacities[{(int)tank}]"), Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(control, FuelTankControl.FuelTankCapacityProperty, capacityBinding);
                 var quantityBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"FuelTankQuantities[{(int)tank}]"), Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
                 BindingOperations.SetBinding(control, FuelTankControl.FuelTankQuantityProperty, quantityBinding);
-                var visibilityBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"SimConnect.FuelTanks.Capacities[{(int)tank}]"), Mode = BindingMode.OneWay, Converter = new FuelTankCapacityVisibilityConverter() };
+                var visibilityBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"Simulator.FuelTanks.Capacities[{(int)tank}]"), Mode = BindingMode.OneWay, Converter = new FuelTankCapacityVisibilityConverter() };
                 BindingOperations.SetBinding(control, VisibilityProperty, visibilityBinding);
                 var infoStringBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"FuelTankInfos[{(int)tank}]"), Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(control, FuelTankControl.FuelTankInfoProperty, infoStringBinding);
@@ -181,15 +181,15 @@ namespace OpenSky.Agent.Views
             }
 
             // Add payload station controls
-            for (var i = 0; i < 15; i++)
+            for (var i = 0; i < 20; i++)
             {
                 var control = new PayloadStationControl { Margin = new Thickness(5, 2, 5, 2) };
-                var nameBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"SimConnect.PayloadStations.Names[{i}]"), Mode = BindingMode.OneWay };
+                var nameBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"Simulator.PayloadStations.Names[{i}]"), Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(control, PayloadStationControl.PayloadStationNameProperty, nameBinding);
                 var weightBinding = new Binding { Source = this.DataContext, Path = new PropertyPath($"PayloadStationWeights[{i}]"), Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
                 BindingOperations.SetBinding(control, PayloadStationControl.PayloadStationWeightProperty, weightBinding);
                 var visibilityBinding = new Binding
-                    { Source = this.DataContext, Path = new PropertyPath("SimConnect.PayloadStations.Count"), Mode = BindingMode.OneWay, Converter = new PayloadStationsVisibilityConverter(), ConverterParameter = i + 1 };
+                    { Source = this.DataContext, Path = new PropertyPath("Simulator.PayloadStations.Count"), Mode = BindingMode.OneWay, Converter = new PayloadStationsVisibilityConverter(), ConverterParameter = i + 1 };
                 BindingOperations.SetBinding(control, VisibilityProperty, visibilityBinding);
                 this.PayloadStationsPanel.Children.Add(control);
             }

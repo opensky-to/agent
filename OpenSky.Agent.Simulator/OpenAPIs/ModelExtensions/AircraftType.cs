@@ -217,17 +217,17 @@ namespace OpenSkyApi
                 // Skip these checks if detailed checks are TEMPORARILY disabled
                 if (!this.DetailedChecksDisabled)
                 {
-                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.EmptyWeight - this.EmptyWeight) > 0.5)
+                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.EmptyWeight - this.EmptyWeight) > 0.05 * this.EmptyWeight)
                     {
                         return false;
                     }
 
-                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.FuelTotalCapacity - this.FuelTotalCapacity) > 0.5)
+                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.FuelTotalCapacity - this.FuelTotalCapacity) > 0.05 * this.FuelTotalCapacity)
                     {
                         return false;
                     }
 
-                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.MaxGrossWeight - this.MaxGrossWeight) > 0.5)
+                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.MaxGrossWeight - this.MaxGrossWeight) > 0.05 * this.MaxGrossWeight)
                     {
                         return false;
                     }

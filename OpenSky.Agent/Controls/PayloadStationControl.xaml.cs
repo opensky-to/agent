@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PayloadStationControl.xaml.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,14 +21,14 @@ namespace OpenSky.Agent.Controls
         /// The payload station name property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty PayloadStationNameProperty = DependencyProperty.Register("PayloadStationName", typeof(string), typeof(PayloadStationControl), new UIPropertyMetadata("Unknown"));
+        public static readonly DependencyProperty PayloadStationNameProperty = DependencyProperty.Register(nameof(PayloadStationName), typeof(string), typeof(PayloadStationControl), new UIPropertyMetadata("Unknown"));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The payload station weight property.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public static readonly DependencyProperty PayloadStationWeightProperty = DependencyProperty.Register("PayloadStationWeight", typeof(double), typeof(PayloadStationControl), new UIPropertyMetadata(0.0));
+        public static readonly DependencyProperty PayloadStationWeightProperty = DependencyProperty.Register(nameof(PayloadStationWeight), typeof(double), typeof(PayloadStationControl), new UIPropertyMetadata(0.0));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -61,9 +61,9 @@ namespace OpenSky.Agent.Controls
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         [Bindable(true)]
-        public string PayloadStationWeight
+        public double PayloadStationWeight
         {
-            get => (string)this.GetValue(PayloadStationWeightProperty);
+            get => (double)this.GetValue(PayloadStationWeightProperty);
             set => this.SetValue(PayloadStationWeightProperty, value);
         }
     }

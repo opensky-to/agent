@@ -41,6 +41,13 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Occurs when simbrief ofp loaded property changed.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public event EventHandler<bool> SimbriefOfpLoadedChanged;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Occurs when SimConnect adds a new simbrief waypoint marker.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -64,6 +71,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.simbriefOfpLoaded = value;
                 this.OnPropertyChanged();
+                this.SimbriefOfpLoadedChanged?.Invoke(this, value);
             }
         }
 
