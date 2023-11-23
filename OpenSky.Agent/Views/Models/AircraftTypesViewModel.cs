@@ -1906,8 +1906,11 @@ namespace OpenSky.Agent.Views.Models
             var result = UserSessionService.Instance.UpdateUserRoles().Result;
             if (result)
             {
-                this.GetUserRolesCommand.ReportProgress(() => this.RefreshAircraftTypesCommand.DoExecute(null));
-                this.GetAircraftUpgradesCommand.CanExecute = UserSessionService.Instance.IsModerator;
+                this.GetUserRolesCommand.ReportProgress(() =>
+                {
+                    this.RefreshAircraftTypesCommand.DoExecute(null);
+                    this.GetAircraftUpgradesCommand.CanExecute = UserSessionService.Instance.IsModerator;
+                });
             }
             else
             {
