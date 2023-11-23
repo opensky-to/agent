@@ -305,6 +305,12 @@ namespace OpenSky.Agent
 
             try
             {
+                var openSkyFolder = Environment.ExpandEnvironmentVariables("%localappdata%\\OpenSky");
+                if (!Directory.Exists(openSkyFolder))
+                {
+                    Directory.CreateDirectory(openSkyFolder);
+                }
+
                 File.AppendAllText(filePath, crashReport);
                 ModernWpf.MessageBox.Show(
                     e.Exception.Message + "\r\n\r\nPlease check agent_crash.log for details!",
