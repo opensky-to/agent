@@ -204,7 +204,7 @@ namespace OpenSky.Agent.Views.Models
         /// The override fuel type.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private FuelType overrideFuelType;
+        private FuelType overrideFuelType = FuelType.NotUsed;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1215,7 +1215,7 @@ namespace OpenSky.Agent.Views.Models
                 IsGearRetractable = this.Simulator.AircraftIdentity.GearRetractable,
                 Name = this.Name,
                 VersionNumber = this.VersionNumber,
-                ManufacturerID = this.SelectedManufacturer.Id,
+                ManufacturerID = this.SelectedManufacturer?.Id,
                 Category = this.Category,
                 IsVanilla = this.IsVanilla,
                 IncludeInWorldPopulation = this.IncludeInWorldPopulation,
@@ -1321,6 +1321,7 @@ namespace OpenSky.Agent.Views.Models
             this.MaximumPrice = 0;
             this.MinimumRunwayLength = 0;
             this.Comments = null;
+            this.OverrideFuelType = FuelType.NotUsed;
 
             this.aircraftTypeBeingUpdated = null;
         }
