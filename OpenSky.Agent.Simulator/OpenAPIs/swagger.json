@@ -119,6 +119,134 @@
         }
       }
     },
+    "/Account/profileImage/{userId}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get profile image for the specified user ID.",
+        "description": "sushi.at, 23/11/2023.",
+        "operationId": "GetProfileImage",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The ID of the OpenSky user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByteArrayApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByteArrayApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByteArrayApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Account/users": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get the list of all OpenSky users.",
+        "description": "sushi.at, 22/11/2023.",
+        "operationId": "GetUsers",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIEnumerableApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIEnumerableApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIEnumerableApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Account/moderatorRole": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Adds or removes the moderator role from the specified user.",
+        "description": "sushi.at, 21/11/2023.",
+        "operationId": "SetModeratorRole",
+        "requestBody": {
+          "description": "The moderator role model.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModeratorRole"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModeratorRole"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModeratorRole"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Account/tokenRenewalCountryVerification/{enableVerification}": {
       "put": {
         "tags": [
@@ -694,6 +822,17 @@
         "summary": "Adds a new aircraft type.",
         "description": "sushi.at, 02/06/2021.",
         "operationId": "AddAircraftType",
+        "parameters": [
+          {
+            "name": "upgradeForType",
+            "in": "query",
+            "description": "The ID of the aircraft type this one is an update for (auto adjusts next version and variants).",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "description": "The new aircraft type to add.",
           "content": {
@@ -720,17 +859,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
+                  "$ref": "#/components/schemas/GuidApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
+                  "$ref": "#/components/schemas/GuidApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StringApiResponse"
+                  "$ref": "#/components/schemas/GuidApiResponse"
                 }
               }
             }
@@ -3964,6 +4103,11 @@
         ],
         "type": "object",
         "properties": {
+          "airframeHours": {
+            "type": "number",
+            "description": "Gets or sets the airframe hours.",
+            "format": "double"
+          },
           "airlineOwnerID": {
             "maxLength": 3,
             "minLength": 0,
@@ -3981,6 +4125,26 @@
             "type": "boolean",
             "description": "Can the aircraft currently start a new flight?",
             "readOnly": true
+          },
+          "engine1Hours": {
+            "type": "number",
+            "description": "Gets or sets the engine 1 hours.",
+            "format": "double"
+          },
+          "engine2Hours": {
+            "type": "number",
+            "description": "Gets or sets the engine 2 hours.",
+            "format": "double"
+          },
+          "engine3Hours": {
+            "type": "number",
+            "description": "Gets or sets the engine 3 hours.",
+            "format": "double"
+          },
+          "engine4Hours": {
+            "type": "number",
+            "description": "Gets or sets the engine 4 hours.",
+            "format": "double"
           },
           "fuel": {
             "type": "number",
@@ -5091,10 +5255,12 @@
             "format": "date-time"
           },
           "package": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the package contents (g-zipped, base64 encoded)."
           },
           "packageHash": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the package hash (SHA-256, base64 encoded)"
           }
@@ -5172,6 +5338,7 @@
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the name of the application."
           }
@@ -5261,10 +5428,12 @@
         "type": "object",
         "properties": {
           "newPassword": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the password."
           },
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the password."
           },
@@ -6422,6 +6591,7 @@
             "nullable": true
           },
           "description": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the description of the record."
           },
@@ -7029,6 +7199,7 @@
             "format": "uuid"
           },
           "ident": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the ident of the fix."
           },
@@ -7043,6 +7214,7 @@
             "format": "double"
           },
           "type": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the type of the fix."
           }
@@ -7285,6 +7457,7 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the email.",
             "format": "email"
@@ -7352,6 +7525,37 @@
         },
         "additionalProperties": false,
         "description": "Ground operations model."
+      },
+      "GuidApiResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "Gets or sets the embedded data of type T.",
+            "format": "uuid"
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Gets or sets the error details (NULL if no error).",
+            "nullable": true
+          },
+          "isError": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether this response is reporting an error."
+          },
+          "message": {
+            "type": "string",
+            "description": "Gets or sets the message.",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Gets or sets the status.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "API standard response model."
       },
       "GuidNullableApiResponse": {
         "type": "object",
@@ -7590,6 +7794,7 @@
         "type": "object",
         "properties": {
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the password."
           },
@@ -7603,6 +7808,7 @@
             "description": "Gets or sets a value indicating whether to remember the user login (extends JWT token expiry)."
           },
           "username": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the username."
           }
@@ -7670,6 +7876,25 @@
         },
         "additionalProperties": false,
         "description": "API standard response model."
+      },
+      "ModeratorRole": {
+        "required": [
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "isModerator": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether this user should be a moderator."
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Gets or sets the username."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Moderator role model."
       },
       "NewAircraftDeliveryOption": {
         "enum": [
@@ -8009,6 +8234,7 @@
             "description": "Gets or sets a value indicating whether to purchase the aircraft for the airline or the user."
           },
           "registry": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the registry."
           },
@@ -8145,11 +8371,13 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the email.",
             "format": "email"
           },
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the password."
           },
@@ -8175,6 +8403,7 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the email.",
             "format": "email"
@@ -8197,11 +8426,13 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the email.",
             "format": "email"
           },
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the password."
           },
@@ -8215,6 +8446,7 @@
             "description": "Gets or sets a value indicating whether to reset all OpenSky api tokens."
           },
           "token": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the token."
           }
@@ -8229,6 +8461,7 @@
         "type": "object",
         "properties": {
           "token": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the OpenSky refresh token ID to invalidate."
           }
@@ -8642,6 +8875,7 @@
             "nullable": true
           },
           "registry": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the registry of the aircraft to update."
           },
@@ -8659,6 +8893,66 @@
         },
         "additionalProperties": false,
         "description": "Update aircraft model."
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "accessFailedCount": {
+            "type": "integer",
+            "description": "Gets or sets the number of failed access attempts.",
+            "format": "int32"
+          },
+          "email": {
+            "type": "string",
+            "description": "Gets or sets the email.",
+            "nullable": true
+          },
+          "emailConfirmed": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether the user confirmed the email address."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gets or sets the user identifier.",
+            "format": "uuid"
+          },
+          "lastLogin": {
+            "type": "string",
+            "description": "Gets or sets the Date/Time of the last login.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastLoginGeo": {
+            "type": "string",
+            "description": "Gets or sets the last login geo location if available.",
+            "nullable": true
+          },
+          "lastLoginIP": {
+            "type": "string",
+            "description": "Gets or sets the last login IP.",
+            "nullable": true
+          },
+          "registeredOn": {
+            "type": "string",
+            "description": "Gets or sets the Date/Time the user registered on.",
+            "format": "date-time"
+          },
+          "username": {
+            "type": "string",
+            "description": "Gets or sets the username.",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the roles of the user.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "OpenSky user model."
       },
       "UserAirline": {
         "type": "object",
@@ -8717,6 +9011,40 @@
         "additionalProperties": false,
         "description": "API standard response model."
       },
+      "UserIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "description": "Gets or sets the embedded data of type T.",
+            "nullable": true
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Gets or sets the error details (NULL if no error).",
+            "nullable": true
+          },
+          "isError": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether this response is reporting an error."
+          },
+          "message": {
+            "type": "string",
+            "description": "Gets or sets the message.",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Gets or sets the status.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "API standard response model."
+      },
       "ValidateEmail": {
         "required": [
           "email",
@@ -8725,6 +9053,7 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the email.",
             "format": "email"
@@ -8735,6 +9064,7 @@
             "nullable": true
           },
           "token": {
+            "minLength": 1,
             "type": "string",
             "description": "Gets or sets the token."
           }
