@@ -313,7 +313,7 @@ namespace OpenSky.Agent
 
                 File.AppendAllText(filePath, crashReport);
                 ModernWpf.MessageBox.Show(
-                    e.Exception.Message + "\r\n\r\nPlease check agent_crash.log for details!",
+                    $"{e.Exception.Message}\r\n\r\nPlease check {filePath} for details!",
                     "Unexpected error!",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
