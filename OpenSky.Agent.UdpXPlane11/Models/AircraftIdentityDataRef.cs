@@ -6,8 +6,6 @@
 
 namespace OpenSky.Agent.UdpXPlane11.Models
 {
-    using OpenSkyApi;
-
     using XPlaneConnector;
     using XPlaneConnector.DataRefs;
 
@@ -162,19 +160,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             if (element.DataRef.StartsWith(DataRefs.AircraftPropAcfEnType.DataRef))
             {
-                this.EngineType = (int)value switch
-                {
-                    0 => EngineType.Piston,
-                    1 => EngineType.Piston,
-                    2 => EngineType.Turboprop,
-                    3 => EngineType.Unsupported, // Electric engine
-                    4 => EngineType.Jet,
-                    5 => EngineType.Jet,
-                    6 => EngineType.Unsupported, // Rocket
-                    7 => EngineType.Unsupported, // Tip rockets
-                    8 => EngineType.Turboprop,
-                    _ => EngineType.None
-                };
+                this.EngineType = Agent.UdpXPlane11.EngineType.ConvertEngineType((int)value);
             }
 
             if (element.DataRef == DataRefs.AircraftGearAcfGearRetract.DataRef)

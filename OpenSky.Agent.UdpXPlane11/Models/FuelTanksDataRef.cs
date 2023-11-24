@@ -209,19 +209,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             if (element.DataRef.StartsWith(DataRefs.AircraftPropAcfEnType.DataRef))
             {
-                this.fuelWeight = (int)value switch
-                {
-                    0 => 6,
-                    1 => 6,
-                    2 => 6.7,
-                    3 => 0, // Electric engine
-                    4 => 6.7,
-                    5 => 6.7,
-                    6 => 0, // Rocket
-                    7 => 0, // Tip rockets
-                    8 => 6.7,
-                    _ => 0
-                };
+                this.fuelWeight = EngineType.GetFuelWeightForEngineType((int)value);
                 updateCapacities = true;
                 updateQuantities = true;
             }
