@@ -7,6 +7,7 @@ Version 0.5.4 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Fixed and centralized all XP engine type datarefs now to solve flight tracking and
   aircraft type issues
+- Restored functionality that adds OpenSky username to flight log xml files
 
 --------------------------------------------------------------------------------------
 Version 0.5.3 (ALPHA5)
