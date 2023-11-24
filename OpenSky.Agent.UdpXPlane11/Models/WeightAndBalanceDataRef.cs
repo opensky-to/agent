@@ -152,21 +152,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             if (element.DataRef.StartsWith(DataRefs.AircraftPropAcfEnType.DataRef))
             {
-                this.FuelWeightPerGallon = (int)value switch
-                {
-                    0 => 6, // Recip carb
-                    1 => 6, // Recip injected
-                    2 => 6.7, // Free turbo deprecated
-                    3 => 0, // Electric engine
-                    4 => 6.7, // Lo Bypass Jet deprecated
-                    5 => 6.7, // Single spool jet
-                    6 => 0, // Rocket
-                    7 => 6.7, // Multi spool jet
-                    8 => 6.7, // Turbo Prop Fixed deprecated
-                    9 => 6.7, // Free turbo prop
-                    10 => 6.7, // Fixed turbo prop
-                    _ => 0
-                };
+                this.FuelWeightPerGallon = EngineType.GetFuelWeightForEngineType((int)value);
                 updateFuelValues = true;
             }
 

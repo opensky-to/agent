@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EngineType.cs" />
     <Compile Include="Models\AircraftIdentityDataRef.cs" />
     <Compile Include="Models\FuelTanksDataRef.cs" />
     <Compile Include="Models\LandingAnalysisDataRef.cs" />

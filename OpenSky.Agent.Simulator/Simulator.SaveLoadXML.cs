@@ -64,7 +64,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     Agent = AgentIdentifier,
                     AgentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    OpenSkyUser = "TODO", //UserSessionService.Instance.Username, TODO restore/workaround
+                    OpenSkyUser = this.OpenSkyUserName ?? "Unknown",
                     LocalTimeZone = TimeZoneInfo.Local.BaseUtcOffset.TotalHours,
                     TrackingStarted = this.trackingStarted ?? DateTime.MinValue,
                     TrackingStopped = DateTime.UtcNow,

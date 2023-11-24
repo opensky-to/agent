@@ -29,6 +29,8 @@ namespace OpenSky.Agent.Views.Models
     using OpenSky.Agent.Simulator.Tools;
 
     using OpenSkyApi;
+
+    using Simulator = Simulator.Simulator;
 #if DEBUG
 #endif
 
@@ -168,8 +170,8 @@ namespace OpenSky.Agent.Views.Models
                 }
 
                 Instance = this;
-                Agent.Simulator.Simulator.Instance.PropertyChanged += this.SimConnectPropertyChanged;
-                Agent.Simulator.Simulator.Instance.FlightChanged += this.SimConnectFlightChanged;
+                Simulator.Instance.PropertyChanged += this.SimConnectPropertyChanged;
+                Simulator.Instance.FlightChanged += this.SimConnectFlightChanged;
                 this.notificationIcon = this.greyIcon;
 
                 if (!UserSessionService.Instance.IsUserLoggedIn)
@@ -231,14 +233,27 @@ namespace OpenSky.Agent.Views.Models
                     {
                         _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
                         _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                        Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                    }
+                    else
+                    {
+                        Simulator.Instance.OpenSkyUserName = null;
                     }
 
                     UserSessionService.Instance.PropertyChanged += (sender, e) =>
                     {
-                        if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn) && UserSessionService.Instance.IsUserLoggedIn)
+                        if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn))
                         {
-                            _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
-                            _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                            if (UserSessionService.Instance.IsUserLoggedIn)
+                            {
+                                _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                                _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                                Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                            }
+                            else
+                            {
+                                Simulator.Instance.OpenSkyUserName = null;
+                            }
                         }
                     };
 
@@ -253,24 +268,24 @@ namespace OpenSky.Agent.Views.Models
                                 {
                                     if (result.Data.Id != Guid.Empty)
                                     {
-                                        if (Agent.Simulator.Simulator.Instance.Flight == null)
+                                        if (Simulator.Instance.Flight == null)
                                         {
-                                            Agent.Simulator.Simulator.Instance.Flight = result.Data;
+                                            Simulator.Instance.Flight = result.Data;
                                         }
                                         else
                                         {
-                                            if (Agent.Simulator.Simulator.Instance.Flight.Id != result.Data.Id)
+                                            if (Simulator.Instance.Flight.Id != result.Data.Id)
                                             {
                                                 // Different flight from current one?
-                                                Agent.Simulator.Simulator.Instance.StopTracking(true);
+                                                Simulator.Instance.StopTracking(true);
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        if (Agent.Simulator.Simulator.Instance.Flight != null)
+                                        if (Simulator.Instance.Flight != null)
                                         {
-                                            Agent.Simulator.Simulator.Instance.Flight = null;
+                                            Simulator.Instance.Flight = null;
                                         }
                                     }
                                 }
@@ -285,7 +300,7 @@ namespace OpenSky.Agent.Views.Models
                             }
                         }
 
-                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(Agent.Simulator.Simulator.Instance.Flight == null ? 30 : 120));
+                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(Simulator.Instance.Flight == null ? 30 : 120));
                     }
                 })
             { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
@@ -361,9 +376,9 @@ namespace OpenSky.Agent.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SimConnectPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(Agent.Simulator.Simulator.Connected) or nameof(Agent.Simulator.Simulator.Instance.TrackingStatus) or nameof(Agent.Simulator.Simulator.Instance.IsPaused) or nameof(Agent.Simulator.Simulator.Instance.Flight) or nameof(Agent.Simulator.Simulator.Instance.FlightPhase))
+            if (e.PropertyName is nameof(Simulator.Connected) or nameof(Simulator.Instance.TrackingStatus) or nameof(Simulator.Instance.IsPaused) or nameof(Simulator.Instance.Flight) or nameof(Simulator.Instance.FlightPhase))
             {
-                if (!Agent.Simulator.Simulator.Instance.Connected)
+                if (!Simulator.Instance.Connected)
                 {
                     this.redFlashing = false;
                     this.NotificationIcon = this.greyIcon;
@@ -382,9 +397,9 @@ namespace OpenSky.Agent.Views.Models
                 }
                 else
                 {
-                    if (Agent.Simulator.Simulator.Instance.TrackingStatus is TrackingStatus.NotTracking or TrackingStatus.Preparing or TrackingStatus.Resuming)
+                    if (Simulator.Instance.TrackingStatus is TrackingStatus.NotTracking or TrackingStatus.Preparing or TrackingStatus.Resuming)
                     {
-                        if (Agent.Simulator.Simulator.Instance.Flight == null)
+                        if (Simulator.Instance.Flight == null)
                         {
                             this.redFlashing = false;
                             this.NotificationIcon = this.openSkyIcon;
@@ -405,12 +420,12 @@ namespace OpenSky.Agent.Views.Models
                         {
                             this.redFlashing = false;
                             this.NotificationIcon = this.openSkyIcon;
-                            this.NotificationStatusString = $"OpenSky is preparing to track flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}";
+                            this.NotificationStatusString = $"OpenSky is preparing to track flight {Simulator.Instance.Flight?.FullFlightNumber}";
 
                             this.DiscordRpcClient?.SetPresence(new RichPresence
                             {
-                                State = Agent.Simulator.Simulator.Instance.TrackingStatus.ToString(),
-                                Details = $"Preparing flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",
+                                State = Simulator.Instance.TrackingStatus.ToString(),
+                                Details = $"Preparing flight {Simulator.Instance.Flight?.FullFlightNumber}",
                                 Assets = new Assets
                                 {
                                     LargeImageKey = "openskylogo512",
@@ -419,16 +434,16 @@ namespace OpenSky.Agent.Views.Models
                             });
                         }
                     }
-                    else if (Agent.Simulator.Simulator.Instance.IsPaused)
+                    else if (Simulator.Instance.IsPaused)
                     {
                         this.redFlashing = false;
                         this.NotificationIcon = this.pauseIcon;
-                        this.NotificationStatusString = $"OpenSky tracking and your flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber} are paused";
+                        this.NotificationStatusString = $"OpenSky tracking and your flight {Simulator.Instance.Flight?.FullFlightNumber} are paused";
 
                         this.DiscordRpcClient?.SetPresence(new RichPresence
                         {
-                            State = $"Paused, {Agent.Simulator.Simulator.Instance.FlightPhase}",
-                            Details = $"Tracking flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",
+                            State = $"Paused, {Simulator.Instance.FlightPhase}",
+                            Details = $"Tracking flight {Simulator.Instance.Flight?.FullFlightNumber}",
                             Assets = new Assets
                             {
                                 LargeImageKey = "openskylogo512",
@@ -442,12 +457,12 @@ namespace OpenSky.Agent.Views.Models
                     {
                         this.NotificationIcon = this.redIcon;
                         this.redFlashing = true;
-                        this.NotificationStatusString = $"OpenSky is tracking your flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}";
+                        this.NotificationStatusString = $"OpenSky is tracking your flight {Simulator.Instance.Flight?.FullFlightNumber}";
 
                         this.DiscordRpcClient?.SetPresence(new RichPresence
                         {
-                            State = $"Recording, {Agent.Simulator.Simulator.Instance.FlightPhase}",
-                            Details = $"Tracking flight {Agent.Simulator.Simulator.Instance.Flight?.FullFlightNumber}",
+                            State = $"Recording, {Simulator.Instance.FlightPhase}",
+                            Details = $"Tracking flight {Simulator.Instance.Flight?.FullFlightNumber}",
                             Assets = new Assets
                             {
                                 LargeImageKey = "openskylogo512",
@@ -701,7 +716,7 @@ namespace OpenSky.Agent.Views.Models
         {
             UpdateGUIDelegate cleanUp = () =>
             {
-                Agent.Simulator.Simulator.Instance.Close();
+                Simulator.Instance.Close();
                 SleepScheduler.Shutdown();
                 this.NotificationVisibility = Visibility.Collapsed;
                 this.DiscordRpcClient.Dispose();

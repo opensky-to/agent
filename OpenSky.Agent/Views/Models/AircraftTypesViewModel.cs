@@ -1322,6 +1322,7 @@ namespace OpenSky.Agent.Views.Models
             this.MinimumRunwayLength = 0;
             this.Comments = null;
             this.OverrideFuelType = FuelType.NotUsed;
+            this.EngineModel = null;
 
             this.aircraftTypeBeingUpdated = null;
         }
