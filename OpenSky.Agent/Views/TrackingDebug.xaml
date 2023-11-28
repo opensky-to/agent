@@ -108,7 +108,7 @@
         <TextBox Grid.Column="1" Grid.Row="15" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.PrimaryTracking.OverspeedWarning, Mode=OneWay}" />
         <TextBox Grid.Column="1" Grid.Row="16" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.PrimaryTracking.GForce, Mode=OneWay, StringFormat=F1}" />
 
-        <TextBlock Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center">Plane Systems</TextBlock>
+        <TextBlock Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center">Aircraft Systems</TextBlock>
         <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">Beacon light?</TextBlock>
         <TextBlock Grid.Column="2" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right">Nav light?</TextBlock>
         <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Right">Strobe light?</TextBlock>
@@ -195,8 +195,8 @@
         <TextBox Grid.Column="7" Grid.Row="4" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.PrimaryTracking.SlewActive, Mode=OneWay}" />
         <TextBox Grid.Column="7" Grid.Row="5" Margin="5,2,20,2" FontFamily="Consolas" IsReadOnly="True" Text="{Binding Simulator.PrimaryTracking.Crash, Mode=OneWay}" />
 
-        <TextBlock Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center">Plane Identifiers</TextBlock>
-        <TextBlock Grid.Column="8" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">Plane type</TextBlock>
+        <TextBlock Grid.Column="8" Grid.ColumnSpan="2" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Center">Aircraft Identifiers</TextBlock>
+        <TextBlock Grid.Column="8" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">Aircraft type</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right">Engine type</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Right">Engine count</TextBlock>
         <TextBlock Grid.Column="8" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right">Fuel capacity</TextBlock>

@@ -123,8 +123,10 @@
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ScrollingListBox.cs" />
+    <Compile Include="Converters\AircraftRegistryConverter.cs" />
     <Compile Include="Converters\AircraftTypeEngineInfoConverter.cs" />
     <Compile Include="Converters\AircraftTypeForeignKeyConverter.cs" />
+    <Compile Include="Converters\CollectionEmptyVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="Converters\CanSetWeightAndBalancesConverter.cs" />

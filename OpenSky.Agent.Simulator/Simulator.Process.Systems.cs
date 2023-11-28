@@ -235,7 +235,7 @@ namespace OpenSky.Agent.Simulator
             {
                 Debug.WriteLine("OpenSky Warning: Tracking aborted, you cannot start your pushback while ground handling isn't complete!");
                 var assembly = Assembly.GetExecutingAssembly();
-                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
+                var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav")); // todo check if this still works, don't think so
                 player.PlaySync();
                 SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.AbortedPushbackGroundHandling);
                 this.StopTracking(true);

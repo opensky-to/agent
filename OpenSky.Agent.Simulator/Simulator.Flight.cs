@@ -73,7 +73,7 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         [CanBeNull]
         private Flight flight;
-
+        
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last active simulation rate (above 1).
@@ -172,7 +172,11 @@ namespace OpenSky.Agent.Simulator
                 {
                     if (this.TrackingConditions[(int)condition].Enabled && !this.TrackingConditions[(int)condition].ConditionMet)
                     {
-                        allConditionsMet = false;
+                        // Date time and fuel aren't strict anymore 
+                        if (condition != Models.TrackingConditions.DateTime && condition == Models.TrackingConditions.Fuel)
+                        {
+                            allConditionsMet = false;
+                        }
                     }
                 }
 

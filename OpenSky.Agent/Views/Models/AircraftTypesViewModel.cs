@@ -1169,7 +1169,7 @@ namespace OpenSky.Agent.Views.Models
                     {
                         var messageBox = new OpenSkyMessageBox(
                             "Missing ATC identification",
-                            "ATC plane model or type not set, are you connected to the simulator and is the plane loaded correctly? Are you sure you want to continue?",
+                            "ATC aircraft model or type not set, are you connected to the simulator and is the aircraft loaded correctly? Are you sure you want to continue?",
                             MessageBoxButton.YesNo,
                             ExtendedMessageBoxImage.Hand);
                         messageBox.SetWarningColorStyle();
