@@ -20,10 +20,12 @@
             xmlns:controls="clr-namespace:OpenSky.Agent.Controls"
             xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.Agent.Converters"
+            xmlns:openSkyApi="clr-namespace:OpenSkyApi;assembly=OpenSky.Agent.Simulator"
+            xmlns:ui="http://schemas.modernwpf.com/2019"
             mc:Ignorable="d" LoadingText="{Binding LoadingText}"
             Title="Flight Tracking" Height="1000" Width="1300" Loaded="FlightTrackingLoaded" Unloaded="FlightTrackingOnUnloaded" FontSize="14" HorizontalScrollBar="False" VerticalScrollBar="False">
     <Window.DataContext>
-        <models:FlightTrackingViewModel 
+        <models:FlightTrackingViewModel x:Name="ViewModel"
             TrackingEventMarkerAdded="FlightTrackingViewModelTrackingEventMarkerAdded" 
             ResetTrackingMap="FlightTrackingViewModelOnResetTrackingMap" 
             SimbriefWaypointMarkerAdded="FlightTrackingViewModelOnSimbriefWaypointMarkerAdded" 
@@ -54,6 +56,8 @@
         <converters:IsPausedButtonConverter x:Key="IsPausedButtonConverter" />
         <converters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter" />
         <converters:InvertedBooleanVisibilityConverter x:Key="InvertedBooleanVisibilityConverter" />
+        <converters:AircraftRegistryConverter x:Key="AircraftRegistryConverter" />
+        <converters:CollectionEmptyVisibilityConverter x:Key="CollectionEmptyVisibilityConverter" />
     </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -673,7 +677,38 @@
         <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="8" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
-                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="500" Margin="0,20,0,0">Please start a new flight from the OpenSky client first.</TextBlock>
+                <TextBlock HorizontalAlignment="Center" MaxWidth="550" FontSize="13">Please start a new flight from the OpenSky client first, or resume a saved one:</TextBlock>
+
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,30">
+                    <Border Width="500" Background="{StaticResource OpenSkyDarkGrayHeaderBrush}" Padding="5" CornerRadius="2" Visibility="{Binding StartupViewModel.PausedFlights, Converter={StaticResource CollectionEmptyVisibilityConverter}, ConverterParameter=invert}">
+                        <TextBlock HorizontalAlignment="Center">No saved flights</TextBlock>
+                    </Border>
+                    <ItemsControl HorizontalAlignment="Center" ItemsSource="{Binding StartupViewModel.PausedFlights}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type openSkyApi:Flight}">
+                                <Button Width="500" FontSize="12" Margin="0,0,0,5" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding StartupViewModel.ResumeFlightCommand, ElementName=ViewModel}" CommandParameter="{Binding Id}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Flight #</TextBlock>
+                                        <TextBlock Text="{Binding FlightNumber}" />
+                                        <TextBlock Text="{Binding Origin.Icao}" Margin="5,0,2,0" />
+                                        <TextBlock>▶</TextBlock>
+                                        <TextBlock Text="{Binding Destination.Icao}" Margin="2,0,10,0" />
+                                        <ui:FontIcon Glyph="&#xE709;" FontSize="13" />
+                                        <TextBlock Text="{Binding Aircraft.Registry, Converter={StaticResource AircraftRegistryConverter}}" Margin="1,0,0,0"  />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <Button Width="500" FontSize="12" FontWeight="Bold" Style="{StaticResource OpenSkyButtonStyle}" HorizontalAlignment="Center" Command="{Binding StartupViewModel.CheckForNextFlightNowCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Check now (</TextBlock>
+                        <TextBlock Text="{Binding StartupViewModel.NextFlightUpdateCheckSeconds}"></TextBlock>
+                        <TextBlock>)</TextBlock>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
     </Grid>

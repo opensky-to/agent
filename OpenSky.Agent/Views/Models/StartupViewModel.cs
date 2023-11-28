@@ -8,8 +8,10 @@ namespace OpenSky.Agent.Views.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Reflection;
     using System.Threading;
     using System.Windows;
@@ -23,6 +25,8 @@ namespace OpenSky.Agent.Views.Models
 
     using JetBrains.Annotations;
 
+    using OpenSky.Agent.Controls;
+    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
     using OpenSky.Agent.Simulator.Enums;
@@ -169,6 +173,7 @@ namespace OpenSky.Agent.Views.Models
                     throw new Exception("Only one instance of the startup view model may be created!");
                 }
 
+                // ReSharper disable HeuristicUnreachableCode
                 Instance = this;
                 Simulator.Instance.PropertyChanged += this.SimConnectPropertyChanged;
                 Simulator.Instance.FlightChanged += this.SimConnectFlightChanged;
@@ -180,6 +185,9 @@ namespace OpenSky.Agent.Views.Models
                 }
             }
 
+            // Initialize data structures
+            this.PausedFlights = new ObservableCollection<Flight>();
+
             // Initialize commands
             this.FlightTrackingCommand = new Command(this.OpenFlightTracking);
             this.TrackingDebugCommand = new Command(this.OpenTrackingDebug);
@@ -187,6 +195,8 @@ namespace OpenSky.Agent.Views.Models
             this.AircraftTypesCommand = new Command(this.OpenAircraftTypes);
             this.SettingsCommand = new Command(this.OpenSettings);
             this.QuitCommand = new Command(this.Quit);
+            this.CheckForNextFlightNowCommand = new Command(this.CheckForNextFlightNow);
+            this.ResumeFlightCommand = new AsynchronousCommand(this.ResumeFlight);
 
             // Initialize sound packs
             var soundPacks = SpeechSoundPacks.Instance.SoundPacks;
@@ -263,11 +273,15 @@ namespace OpenSky.Agent.Views.Models
                         {
                             try
                             {
+                                // Check for active flight
                                 var result = AgentOpenSkyService.Instance.GetFlightAsync().Result;
                                 if (!result.IsError)
                                 {
                                     if (result.Data.Id != Guid.Empty)
                                     {
+                                        UpdateGUIDelegate resetPausedFlights = () => this.PausedFlights.Clear();
+                                        Application.Current.Dispatcher.BeginInvoke(resetPausedFlights);
+
                                         if (Simulator.Instance.Flight == null)
                                         {
                                             Simulator.Instance.Flight = result.Data;
@@ -287,12 +301,33 @@ namespace OpenSky.Agent.Views.Models
                                         {
                                             Simulator.Instance.Flight = null;
                                         }
+
+                                        // Check for paused flights
+                                        var pausedResult = AgentOpenSkyService.Instance.GetMyFlightsAsync().Result;
+                                        if (!result.IsError)
+                                        {
+                                            UpdateGUIDelegate addPausedFlights = () =>
+                                            {
+                                                this.PausedFlights.Clear();
+                                                foreach (var flight in pausedResult.Data.Where(f => f.Paused.HasValue))
+                                                {
+                                                    this.PausedFlights.Add(flight);
+                                                }
+                                            };
+                                            Application.Current.Dispatcher.BeginInvoke(addPausedFlights);
+                                        }
+                                        else
+                                        {
+                                            Debug.WriteLine("Error checking for paused flights: " + result.Message + "\r\n" + result.ErrorDetails);
+                                        }
                                     }
                                 }
                                 else
                                 {
                                     Debug.WriteLine("Error checking for new flight: " + result.Message + "\r\n" + result.ErrorDetails);
                                 }
+
+
                             }
                             catch (Exception ex)
                             {
@@ -300,11 +335,127 @@ namespace OpenSky.Agent.Views.Models
                             }
                         }
 
-                        SleepScheduler.SleepFor(TimeSpan.FromSeconds(Simulator.Instance.Flight == null ? 30 : 120));
+                        this.NextFlightUpdateCheckSeconds = Simulator.Instance.Flight == null ? 30 : 120;
+                        while (this.NextFlightUpdateCheckSeconds > 0 && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(1000);
+                            if (this.NextFlightUpdateCheckSeconds > 0)
+                            {
+                                this.NextFlightUpdateCheckSeconds--;
+                            }
+                        }
                     }
                 })
             { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Resume the specified paused flight.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 28/11/2023.
+        /// </remarks>
+        /// <param name="parameter">
+        /// The parameter.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void ResumeFlight(object parameter)
+        {
+            if (parameter is Guid flightId)
+            {
+                try
+                {
+                    var result = AgentOpenSkyService.Instance.ResumeFlightAsync(flightId).Result;
+                    if (result.IsError)
+                    {
+                        this.ResumeFlightCommand.ReportProgress(
+                            () =>
+                            {
+                                var messageBox = new OpenSkyMessageBox("Flight resume error", $"Error resuming flight: {result.Message}", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                                messageBox.SetErrorColorStyle();
+                                FlightTracking.Instance.ShowMessageBox(messageBox);
+                            });
+                    }
+                    else
+                    {
+                        // Refresh now
+                        this.NextFlightUpdateCheckSeconds = 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.ResumeFlightCommand.ReportProgress(
+                        () =>
+                        {
+                            var messageBox = new OpenSkyMessageBox(ex, "Flight resume error", "Error resuming flight.", ExtendedMessageBoxImage.Error, 30);
+                            FlightTracking.Instance.ShowMessageBox(messageBox);
+                        });
+                }
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the paused flights.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<Flight> PausedFlights { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The seconds until the next flight update check.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int nextFlightUpdateCheckSeconds = 30;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the seconds until the next flight update check.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int NextFlightUpdateCheckSeconds
+        {
+            get => this.nextFlightUpdateCheckSeconds;
+
+            private set
+            {
+                if (Equals(this.nextFlightUpdateCheckSeconds, value))
+                {
+                    return;
+                }
+
+                this.nextFlightUpdateCheckSeconds = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the check for next flight now command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command CheckForNextFlightNowCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Check for next flight now.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 28/11/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CheckForNextFlightNow()
+        {
+            this.NextFlightUpdateCheckSeconds = 0;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the resume flight command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand ResumeFlightCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -515,7 +666,7 @@ namespace OpenSky.Agent.Views.Models
         /// Gets the single instance of the startup view model.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        [CanBeNull]
+        [NotNull]
         public static StartupViewModel Instance { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------

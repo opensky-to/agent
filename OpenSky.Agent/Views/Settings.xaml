@@ -19,7 +19,7 @@
                 xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
                 xmlns:converters="clr-namespace:OpenSky.Agent.Converters"
                 mc:Ignorable="d"
-                Title="Settings" Width="900" LoadingText="{Binding LoadingText}" Loaded="SettingsOnLoaded"
+                Title="Settings" Width="950" LoadingText="{Binding LoadingText}" Loaded="SettingsOnLoaded"
                 SizeToContent="Height" ShowMinMaxButtons="False" ResizeMode="CanResize" HorizontalScrollBar="False">
     <Window.DataContext>
         <models:SettingsViewModel />
@@ -185,7 +185,7 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Landing report</TextBlock>
                 <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Voice sound pack</TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Fallback Text-To-Speech voice</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Fallback TTS voice</TextBlock>
                 <ComboBox Grid.Row="0" Grid.Column="1" Margin="10,5,0,5" FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding LandingReportNotifications}" SelectedItem="{Binding SelectedLandingReportNotification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Grid Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
                     <ComboBox x:Name="SoundPackCombo" FontFamily="Consolas" HorizontalAlignment="Stretch" ItemsSource="{Binding SoundPacks}" SelectedItem="{Binding SelectedSoundPack, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Randomize" ui:ControlHelper.PlaceholderForeground="#666" />
