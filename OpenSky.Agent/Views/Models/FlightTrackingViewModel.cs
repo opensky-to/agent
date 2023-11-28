@@ -1041,7 +1041,7 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 var messageBox = new OpenSkyMessageBox(
                                     "CG limit",
-                                    "The current CG is outside of the limits specified for this plane, are you sure you want to continue?",
+                                    "The current CG is outside of the limits specified for this aircraft, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
@@ -1069,7 +1069,7 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 var messageBox = new OpenSkyMessageBox(
                                     "CG limit",
-                                    "The current lateral CG is outside of the limits specified for this plane, are you sure you want to continue?",
+                                    "The current lateral CG is outside of the limits specified for this aircraft, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
@@ -1097,7 +1097,7 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 var messageBox = new OpenSkyMessageBox(
                                     "Payload weight limit",
-                                    "The payload weight exceeds the limits specified for this plane, are you sure you want to continue?",
+                                    "The payload weight exceeds the limits specified for this aircraft, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
@@ -1125,7 +1125,7 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 var messageBox = new OpenSkyMessageBox(
                                     "Total weight limit",
-                                    "The total weight exceeds the limits specified for this plane, are you sure you want to continue?",
+                                    "The total weight exceeds the limits specified for this aircraft, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Question);
                                 messageBox.Closed += (_, _) => { answer = messageBox.Result; };
