@@ -20,7 +20,7 @@
                 xmlns:converters="clr-namespace:OpenSky.Agent.Converters"
                 mc:Ignorable="d"
                 Title="Settings" Width="900" LoadingText="{Binding LoadingText}" Loaded="SettingsOnLoaded"
-                SizeToContent="Height" ShowMinMaxButtons="False" ResizeMode="NoResize" HorizontalScrollBar="False">
+                SizeToContent="Height" ShowMinMaxButtons="False" ResizeMode="CanResize" HorizontalScrollBar="False">
     <Window.DataContext>
         <models:SettingsViewModel />
     </Window.DataContext>
