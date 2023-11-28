@@ -2,8 +2,7 @@ name: discord release msg
 
 on: 
   release:
-    types:
-      - created
+    types: [published]
       
 jobs:
   github-releases-to-discord:
