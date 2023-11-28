@@ -946,6 +946,83 @@ namespace OpenSky.Agent.Views.Models
                     // Wait a bit to make sure all structs have updated, especially time in sim
                     Thread.Sleep(this.Simulator.SampleRates[Requests.Secondary] + 1000);
 
+                    // Check fuel
+                    if (this.Simulator.Flight != null)
+                    {
+                        if (this.Simulator.WeightAndBalance.FuelTotalQuantity < (this.Simulator.Flight.FuelGallons ?? 0))
+                        {
+                            Debug.WriteLine("Fuel below flight plan, double checking with user...");
+                            ExtendedMessageBoxResult? answer = null;
+                            this.StartTrackingCommand.ReportProgress(
+                                () =>
+                                {
+                                    var messageBox = new OpenSkyMessageBox(
+                                        "Low fuel",
+                                        "The fuel currently loaded into the aircraft is lower then specified in the flight plan, are you sure you want to continue?",
+                                        MessageBoxButton.YesNo,
+                                        ExtendedMessageBoxImage.Warning);
+                                    messageBox.SetWarningColorStyle();
+                                    messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                    this.ViewReference.ShowMessageBox(messageBox);
+                                });
+                            while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                            {
+                                Thread.Sleep(500);
+                            }
+
+                            if (answer != ExtendedMessageBoxResult.Yes)
+                            {
+                                this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
+                                return;
+                            }
+                        }
+                        else if (this.Simulator.WeightAndBalance.FuelTotalQuantity > (this.Simulator.Flight.FuelGallons ?? 0))
+                        {
+                            var gallons = this.Simulator.WeightAndBalance.FuelTotalQuantity - (this.Simulator.Flight.FuelGallons ?? 0);
+                            Debug.WriteLine($"Aircraft has more fuel loaded then planned, charge the pilot/airline for the difference of {gallons} gallons...");
+
+                            try
+                            {
+                                var result = AgentOpenSkyService.Instance.PurchaseLastMinuteFuelAsync(this.Simulator.Flight.Id, gallons).Result;
+                                if (result.IsError)
+                                {
+                                    this.StartTrackingCommand.ReportProgress(
+                                        () =>
+                                        {
+                                            var notification = new OpenSkyNotification("Fuel error", $"Error purchasing last minute fuel: {result.Message}", MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
+                                            notification.SetErrorColorStyle();
+                                            this.ViewReference.ShowNotification(notification);
+                                        });
+
+                                    this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
+                                    return;
+                                }
+
+                                // Is ground handling still running? If yes add time to that, otherwise add it to the warp time saved
+                                if (!this.Simulator.GroundHandlingComplete && this.Simulator.Flight.FuelLoadingComplete.HasValue)
+                                {
+                                    this.Simulator.Flight.FuelLoadingComplete = this.Simulator.Flight.FuelLoadingComplete.Value.AddMinutes(result.Data);
+                                }
+                                else
+                                {
+                                    this.Simulator.Flight.TimeWarpTimeSavedSeconds += (int)(result.Data * 60);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                this.StartTrackingCommand.ReportProgress(
+                                    () =>
+                                    {
+                                        var notification = new OpenSkyNotification(new ErrorDetails { Exception = ex }, "Fuel error", "Error purchasing last minute fuel.", ExtendedMessageBoxImage.Error, 30);
+                                        this.ViewReference.ShowNotification(notification);
+                                    });
+
+                                this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
+                                return;
+                            }
+                        }
+                    }
+
                     // Check weights and balance
                     if (this.Simulator.WeightAndBalance.CgPercent < this.Simulator.WeightAndBalance.CgFwdLimit || this.Simulator.WeightAndBalance.CgPercent > this.Simulator.WeightAndBalance.CgAftLimit)
                     {

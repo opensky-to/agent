@@ -130,7 +130,7 @@
                 </Grid.ColumnDefinitions>
 
                 <CheckBox Grid.Row="0" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[0].ConditionMet}" MaxWidth="25" MinWidth="25"  />
-                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">Date and Time</TextBlock>
+                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">Realtime bonus?</TextBlock>
                 <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="5,0" FontSize="12">Sim:</TextBlock>

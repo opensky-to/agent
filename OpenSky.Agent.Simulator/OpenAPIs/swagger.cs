@@ -7327,6 +7327,105 @@ namespace OpenSkyApi
         }
 
         /// <summary>
+        /// Purchase last minute fuel before departure at increased prices.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 28/11/2023.
+        /// </remarks>
+        /// <param name="flightID">Identifier for the flight.</param>
+        /// <param name="gallons">The gallons to purchase.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<DoubleApiResponse> PurchaseLastMinuteFuelAsync(System.Guid flightID, double gallons)
+        {
+            return PurchaseLastMinuteFuelAsync(flightID, gallons, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Purchase last minute fuel before departure at increased prices.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 28/11/2023.
+        /// </remarks>
+        /// <param name="flightID">Identifier for the flight.</param>
+        /// <param name="gallons">The gallons to purchase.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<DoubleApiResponse> PurchaseLastMinuteFuelAsync(System.Guid flightID, double gallons, System.Threading.CancellationToken cancellationToken)
+        {
+            if (flightID == null)
+                throw new System.ArgumentNullException("flightID");
+
+            if (gallons == null)
+                throw new System.ArgumentNullException("gallons");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Flight/lastMinuteFuel/{flightID}/{gallons}");
+            urlBuilder_.Replace("{flightID}", System.Uri.EscapeDataString(ConvertToString(flightID, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{gallons}", System.Uri.EscapeDataString(ConvertToString(gallons, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "text/plain");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<DoubleApiResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Start flight.
         /// </summary>
         /// <remarks>
@@ -10767,6 +10866,44 @@ namespace OpenSkyApi
     {
         [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DataImportStatus Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error details (NULL if no error).
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("errorDetails", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ErrorDetails { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this response is reporting an error.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("isError", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsError { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("message", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets the status.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Status { get; set; }
+
+    }
+
+    /// <summary>
+    /// API standard response model.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public partial class DoubleApiResponse
+    {
+        /// <summary>
+        /// Gets or sets the embedded data of type T.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Data { get; set; }
 
         /// <summary>
         /// Gets or sets the error details (NULL if no error).
