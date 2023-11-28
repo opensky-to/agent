@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.2022.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <HintPath>..\packages\JetBrains.Annotations.2023.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="OpenSky.FlightLogXML, Version=0.1.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenSky.FlightLogXML.0.1.6\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
