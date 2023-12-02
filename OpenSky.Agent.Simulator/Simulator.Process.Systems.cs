@@ -133,6 +133,22 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// When did the status of the landing gear last change? PMDG 737 causes constant switches with
+        /// some hardware not in the OFF position.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastGearChange = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last gear state, or NULL if are not currently tracking a change - timeout occurred
+        /// while still different.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool? lastGearStatus;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Monitor secondary systems.
         /// </summary>
         /// <remarks>
@@ -165,9 +181,15 @@ namespace OpenSky.Agent.Simulator
                 }
 
                 // Was the beacon light off when the engine was started?
-                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
+                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon != true)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
+                }
+
+                // Was the strobe (if used for beacon) off when the engine was started?
+                if (pst.New.EngineRunning && !pst.New.LightStrobe && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon == true)
+                {
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Strobe turned off when engine was started");
                 }
 
                 // Was the taxi or landing light on when turning on/off the engine?
@@ -260,8 +282,11 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Was the landing gear lowered/raised?
-            if (pst.Old.GearHandle != pst.New.GearHandle)
+            if (((pst.Old.GearHandle != pst.New.GearHandle) || (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle)) && (DateTime.UtcNow-this.lastGearChange).TotalSeconds > 10)
             {
+                this.lastGearChange= DateTime.UtcNow;
+                this.lastGearStatus = this.lastGearStatus.HasValue ? null : pst.New.GearHandle;
+
                 if (!this.PrimaryTracking.OnGround)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingGear, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");
