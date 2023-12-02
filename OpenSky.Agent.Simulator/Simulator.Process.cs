@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Simulator.Process.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -51,6 +51,13 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         [NotNull]
         protected readonly ConcurrentQueue<ProcessSecondaryTracking> secondaryTrackingProcessingQueue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// When was the location last updated?
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastLocationUpdate = DateTime.MinValue;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -166,7 +173,7 @@ namespace OpenSky.Agent.Simulator
                         // Allow 5% of margin, as it can be very hard to get this right otherwise
                         this.TrackingConditions[(int)Models.TrackingConditions.Fuel].ConditionMet =
                             this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet ||
-                            Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.flightLoadingTempModels.FuelTanks.TotalQuantity) < this.flightLoadingTempModels.FuelTanks.TotalQuantity * 0.05; 
+                            Math.Abs(this.WeightAndBalance.FuelTotalQuantity - this.flightLoadingTempModels.FuelTanks.TotalQuantity) < this.flightLoadingTempModels.FuelTanks.TotalQuantity * 0.05;
                     }
 
                     if (this.Flight?.Aircraft.Type.RequiresManualLoading != true)
@@ -187,7 +194,8 @@ namespace OpenSky.Agent.Simulator
                     currentLocation += $"\r\nAltitude (AGL): {this.flightLoadingTempModels?.SlewAircraftIntoPosition.RadioHeight:F0}";
 
                     this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].Expected = "No unlimited fuel,\r\nCrash detection, SimRate=0 or 1";
-                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet = !secondary.UnlimitedFuel && secondary.CrashDetection && ((int)this.PrimaryTracking.SimulationRate == 0 || (int)this.PrimaryTracking.SimulationRate == 1);
+                    this.TrackingConditions[(int)Models.TrackingConditions.RealismSettings].ConditionMet =
+                        !secondary.UnlimitedFuel && secondary.CrashDetection && ((int)this.PrimaryTracking.SimulationRate == 0 || (int)this.PrimaryTracking.SimulationRate == 1);
 
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].Current = currentLocation;
                     this.TrackingConditions[(int)Models.TrackingConditions.Location].ConditionMet =
@@ -339,8 +347,6 @@ namespace OpenSky.Agent.Simulator
             }
         }
 
-        private DateTime lastLocationUpdate=DateTime.MinValue;
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Process the primary tracking data (old vs new).
@@ -366,7 +372,7 @@ namespace OpenSky.Agent.Simulator
                             this.TrackFlight(ppt);
 
                             // Fire the location changed event?
-                            if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation) || (DateTime.Now-this.lastLocationUpdate).TotalSeconds>5)
+                            if (!ppt.Old.MapLocation.Equals(ppt.New.MapLocation) || (DateTime.Now - this.lastLocationUpdate).TotalSeconds > 5)
                             {
                                 this.lastLocationUpdate = DateTime.Now;
                                 newLocation = ppt.New.MapLocation;

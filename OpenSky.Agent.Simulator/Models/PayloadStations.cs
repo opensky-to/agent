@@ -210,7 +210,7 @@ namespace OpenSky.Agent.Simulator.Models
                 this.Name17?.Replace("TT:MENU.PAYLOAD.", string.Empty),
                 this.Name18?.Replace("TT:MENU.PAYLOAD.", string.Empty),
                 this.Name19?.Replace("TT:MENU.PAYLOAD.", string.Empty),
-                this.Name20?.Replace("TT:MENU.PAYLOAD.", string.Empty),
+                this.Name20?.Replace("TT:MENU.PAYLOAD.", string.Empty)
             };
 
         /// -------------------------------------------------------------------------------------------------

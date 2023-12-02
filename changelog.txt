@@ -9,6 +9,8 @@ Version 0.5.6 (ALPHA5)
 - Added support for "Strobe for Beacon"
 - Added scroll viewers to type editor
 - Weight and fuel values are now rounded
+- Engine misfire should not lead to tracking aborts anymore, actually stopping the
+  engine before getting airborne has no effect on tracking anymore
 
 --------------------------------------------------------------------------------------
 Version 0.5.5 (ALPHA5)
