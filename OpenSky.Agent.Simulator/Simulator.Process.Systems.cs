@@ -133,6 +133,29 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// When did the status of the landing gear last change? PMDG 737 causes constant switches with
+        /// some hardware not in the OFF position.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastGearChange = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last gear state, or NULL if are not currently tracking a change - timeout occurred
+        /// while still different.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool? lastGearStatus;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last engine running change date/time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastEngineRunningChange = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Monitor secondary systems.
         /// </summary>
         /// <remarks>
@@ -147,10 +170,14 @@ namespace OpenSky.Agent.Simulator
             // Was the engine turned off/on?
             if (pst.Old.EngineRunning != pst.New.EngineRunning)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Engine, OpenSkyColors.OpenSkyTealLight, pst.New.EngineRunning ? "Engine started" : "Engine shut down");
-                if (pst.New.EngineRunning && this.TrackingStatus == TrackingStatus.Tracking)
+                if ((DateTime.UtcNow - this.lastEngineRunningChange).TotalSeconds > 5)
                 {
-                    SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.WelcomeOpenSky);
+                    this.lastEngineRunningChange = DateTime.UtcNow;
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Engine, OpenSkyColors.OpenSkyTealLight, pst.New.EngineRunning ? "Engine started" : "Engine shut down");
+                    if (pst.New.EngineRunning && this.TrackingStatus == TrackingStatus.Tracking)
+                    {
+                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.WelcomeOpenSky);
+                    }
                 }
 
                 // Was the engine turned on while we are in ground handling tracking mode?
@@ -165,9 +192,15 @@ namespace OpenSky.Agent.Simulator
                 }
 
                 // Was the beacon light off when the engine was started?
-                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
+                if (pst.New.EngineRunning && !pst.New.LightBeacon && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon != true)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off when engine was started");
+                }
+
+                // Was the strobe (if used for beacon) off when the engine was started?
+                if (pst.New.EngineRunning && !pst.New.LightStrobe && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon == true)
+                {
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Strobe turned off when engine was started");
                 }
 
                 // Was the taxi or landing light on when turning on/off the engine?
@@ -186,16 +219,7 @@ namespace OpenSky.Agent.Simulator
                 {
                     // todo expand this to battery off and proper shutdown/secure flow for extra xp (enable/disable in the settings)
 
-                    if (!this.WasAirborne)
-                    {
-                        Debug.WriteLine("Engine was turned off, but the plane was never airborne, aborting...");
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var player = new SoundPlayer(assembly.GetManifestResourceStream("OpenSky.Agent.Resources.OSnegative.wav"));
-                        player.PlaySync();
-                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.EngineOffNeverAirborne);
-                        this.StopTracking(false);
-                    }
-                    else
+                    if (this.WasAirborne)
                     {
                         Debug.WriteLine("Engine was turned off, wrapping up flight");
 
@@ -260,8 +284,11 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Was the landing gear lowered/raised?
-            if (pst.Old.GearHandle != pst.New.GearHandle)
+            if (((pst.Old.GearHandle != pst.New.GearHandle) || (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle)) && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
             {
+                this.lastGearChange = DateTime.UtcNow;
+                this.lastGearStatus = this.lastGearStatus.HasValue ? null : pst.New.GearHandle;
+
                 if (!this.PrimaryTracking.OnGround)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingGear, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");

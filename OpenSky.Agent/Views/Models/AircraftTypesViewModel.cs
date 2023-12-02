@@ -243,6 +243,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Does the aircraft use the strobe for beacon?
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool usesStrobeForBeacon;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The version number.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -1107,6 +1114,27 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets a value indicating whether this aircraft uses the strobe for the beacon.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool UsesStrobeForBeacon
+        {
+            get => this.usesStrobeForBeacon;
+
+            set
+            {
+                if (Equals(this.usesStrobeForBeacon, value))
+                {
+                    return;
+                }
+
+                this.usesStrobeForBeacon = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the version number.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -1207,10 +1235,10 @@ namespace OpenSky.Agent.Views.Models
                 AtcModel = !string.IsNullOrEmpty(this.Simulator.AircraftIdentity.AtcModel) ? this.Simulator.AircraftIdentity.AtcModel : "MISSING",
                 EngineType = this.Simulator.AircraftIdentity.EngineType,
                 EngineCount = this.Simulator.AircraftIdentity.EngineCount,
-                EmptyWeight = this.Simulator.WeightAndBalance.EmptyWeight,
-                FuelTotalCapacity = this.Simulator.WeightAndBalance.FuelTotalCapacity,
-                FuelWeightPerGallon = Math.Round(this.Simulator.WeightAndBalance.FuelWeightPerGallon, 2),
-                MaxGrossWeight = this.Simulator.WeightAndBalance.MaxGrossWeight,
+                EmptyWeight = Math.Round(this.Simulator.WeightAndBalance.EmptyWeight, 0),
+                FuelTotalCapacity = Math.Round(this.Simulator.WeightAndBalance.FuelTotalCapacity, 1),
+                FuelWeightPerGallon = Math.Round(this.Simulator.WeightAndBalance.FuelWeightPerGallon, 1),
+                MaxGrossWeight = Math.Round(this.Simulator.WeightAndBalance.MaxGrossWeight, 0),
                 FlapsAvailable = this.Simulator.AircraftIdentity.FlapsAvailable,
                 IsGearRetractable = this.Simulator.AircraftIdentity.GearRetractable,
                 Name = this.Name,
@@ -1232,7 +1260,8 @@ namespace OpenSky.Agent.Views.Models
                 Simulator = this.Simulator.SimulatorType,
                 EngineModel = this.EngineModel,
                 OverrideFuelType = this.OverrideFuelType,
-                IsHistoric = this.IsHistoric
+                IsHistoric = this.IsHistoric,
+                UsesStrobeForBeacon = this.UsesStrobeForBeacon
             };
 
             if (!string.IsNullOrEmpty(this.ManufacturerDeliveryAirportICAOs))

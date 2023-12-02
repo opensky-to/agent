@@ -49,14 +49,14 @@ namespace OpenSky.Agent.Views.Models
         public double PayloadForwardAft
         {
             get => this.payloadForwardAft;
-        
+
             set
             {
-                if(Equals(this.payloadForwardAft, value))
+                if (Equals(this.payloadForwardAft, value))
                 {
-                   return;
+                    return;
                 }
-        
+
                 this.payloadForwardAft = value;
                 this.NotifyPropertyChanged();
                 this.SuggestPayloadCommand.DoExecute(null);
@@ -166,60 +166,67 @@ namespace OpenSky.Agent.Views.Models
         /// -------------------------------------------------------------------------------------------------
         private void SuggestPayload()
         {
-            Debug.WriteLine("Calculating suggested payload distribution");
-            var payloadToLoad = this.Simulator.Flight?.PayloadPounds ?? 0.0;
-
-            // Check for pilot/copilot first
-            var nonPilotStations = 0;
-            for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
+            try
             {
-                if (this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot"))
-                {
-                    var payload = Math.Min(170, payloadToLoad);
-                    this.PayloadStationWeights[i] = payload;
-                    payloadToLoad -= payload;
-                }
-                else
-                {
-                    nonPilotStations++;
-                }
-            }
+                Debug.WriteLine("Calculating suggested payload distribution");
+                var payloadToLoad = this.Simulator.Flight?.PayloadPounds ?? 0.0;
 
-            // Distribute the rest evenly, taking the CG slider value into consideration
-            var nonPilotOverride = false;
-            if (nonPilotStations == 0)
-            {
-                nonPilotStations = this.Simulator.PayloadStations.Count;
-                nonPilotOverride = true;
-            }
-
-            if (nonPilotStations > 0)
-            {
-                var payloadShare = payloadToLoad / nonPilotStations;
-                var payloadMultipliers = new List<double>();
-
-                var startValue = 2 - (this.PayloadForwardAft * 0.2);
-                var endValue = 2 - startValue;
-                var step = (endValue - startValue) / (nonPilotStations - 1);
-                for (var i = 0; i < nonPilotStations; i++)
-                {
-                    payloadMultipliers.Add(startValue);
-                    startValue += step;
-                }
-
-                var nonPilotIndex = 0;
+                // Check for pilot/copilot first
+                var nonPilotStations = 0;
                 for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
                 {
-                    if (!this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot") || nonPilotOverride)
+                    if (this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot"))
                     {
-                        this.PayloadStationWeights[i] = payloadShare * payloadMultipliers[nonPilotIndex++];
-                        payloadToLoad -= payloadShare;
+                        var payload = Math.Min(170, payloadToLoad);
+                        this.PayloadStationWeights[i] = payload;
+                        payloadToLoad -= payload;
+                    }
+                    else
+                    {
+                        nonPilotStations++;
                     }
                 }
-            }
 
-            this.IsPayloadExpanded = true;
-            Debug.WriteLine($"Payload distribution complete, still have {payloadToLoad:F2} pounds to load!");
+                // Distribute the rest evenly, taking the CG slider value into consideration
+                var nonPilotOverride = false;
+                if (nonPilotStations == 0)
+                {
+                    nonPilotStations = this.Simulator.PayloadStations.Count;
+                    nonPilotOverride = true;
+                }
+
+                if (nonPilotStations > 0)
+                {
+                    var payloadShare = payloadToLoad / nonPilotStations;
+                    var payloadMultipliers = new List<double>();
+
+                    var startValue = 2 - (this.PayloadForwardAft * 0.2);
+                    var endValue = 2 - startValue;
+                    var step = (endValue - startValue) / (nonPilotStations - 1);
+                    for (var i = 0; i < nonPilotStations; i++)
+                    {
+                        payloadMultipliers.Add(startValue);
+                        startValue += step;
+                    }
+
+                    var nonPilotIndex = 0;
+                    for (var i = 0; i < this.Simulator.PayloadStations.Count; i++)
+                    {
+                        if (!this.Simulator.PayloadStations.Names[i].ToLowerInvariant().Contains("pilot") || nonPilotOverride)
+                        {
+                            this.PayloadStationWeights[i] = payloadShare * payloadMultipliers[nonPilotIndex++];
+                            payloadToLoad -= payloadShare;
+                        }
+                    }
+                }
+
+                this.IsPayloadExpanded = true;
+                Debug.WriteLine($"Payload distribution complete, still have {payloadToLoad:F2} pounds to load!");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Payload distribution failed: {ex}");
+            }
         }
     }
 }

@@ -6,6 +6,7 @@
 
 namespace OpenSky.Agent.Simulator
 {
+    using System;
     using System.Diagnostics;
 
     using OpenSky.Agent.Simulator.Enums;
@@ -30,6 +31,22 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// When did the status of the beacon light last change? Some aircraft seem to toggle this on and
+        /// off with every red flash, omg.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastBeaconChange = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last beacon state, or NULL if are not currently tracking a change - timeout occurred
+        /// while still different.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool? lastBeaconStatus;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Monitor lights.
         /// </summary>
         /// <remarks>
@@ -43,10 +60,22 @@ namespace OpenSky.Agent.Simulator
         {
             if (pst.Old.LightBeacon != pst.New.LightBeacon)
             {
-                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
+                if ((DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
+                {
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
+                    this.lastBeaconChange = DateTime.UtcNow;
+                    this.lastBeaconStatus = pst.New.LightBeacon;
+                }
+
+                if (this.lastBeaconStatus.HasValue && this.lastBeaconStatus.Value != pst.New.LightBeacon && (DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
+                {
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
+                    this.lastBeaconChange = DateTime.UtcNow;
+                    this.lastBeaconStatus = null;
+                }
 
                 // Engine running?
-                if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking))
+                if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon != true)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Beacon turned off while engine was running");
                 }
@@ -60,6 +89,12 @@ namespace OpenSky.Agent.Simulator
             if (pst.Old.LightStrobe != pst.New.LightStrobe)
             {
                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Strobe, OpenSkyColors.OpenSkyLightYellow, pst.New.LightStrobe ? "Strobe lights on" : "Strobe lights off");
+
+                // Engine running?
+                if (!pst.New.LightStrobe && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon == true)
+                {
+                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.BeaconOffEnginesOn, OpenSkyColors.OpenSkyRed, "Strobe turned off while engine was running");
+                }
             }
 
             if (pst.Old.LightTaxi != pst.New.LightTaxi)
@@ -76,14 +111,14 @@ namespace OpenSky.Agent.Simulator
             {
                 if (this.AircraftIdentity.EngineType is EngineType.Jet or EngineType.Turboprop)
                 {
-                    // 10000 feet landing lights (give 500 feet spare)
-                    if (this.PrimaryTracking.IndicatedAltitude < 9500 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
+                    // 10000 feet landing lights (give 1000 feet spare)
+                    if (this.PrimaryTracking.IndicatedAltitude < 9000 && !this.PrimaryTracking.OnGround && !pst.New.LightLanding)
                     {
                         if (!this.landingLightWarningActive)
                         {
                             Debug.WriteLine($"Landing lights 10K: indicated {this.PrimaryTracking.IndicatedAltitude}, alt {this.PrimaryTracking.Altitude}");
                             this.landingLightWarningActive = true;
-                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyRed, "Landing lights off below 10k feet");
+                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow10K, OpenSkyColors.OpenSkyLightYellow, "Landing lights off below 10k feet");
                         }
                     }
                     else
@@ -99,7 +134,7 @@ namespace OpenSky.Agent.Simulator
                         if (!this.landingLightWarningActive)
                         {
                             this.landingLightWarningActive = true;
-                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyRed, "Landing lights off below 300 feet AGL");
+                            this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingLightsOffBelow300AGL, OpenSkyColors.OpenSkyLightYellow, "Landing lights off below 300 feet AGL");
                         }
                     }
                     else
