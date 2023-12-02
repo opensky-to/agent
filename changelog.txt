@@ -3,6 +3,14 @@ OpenSky Flight Tracking Agent Changelog
 ======================================================================================
 
 --------------------------------------------------------------------------------------
+Version 0.5.6 (ALPHA5)
+--------------------------------------------------------------------------------------
+- Updated light and gear tracking events
+- Added support for "Strobe for Beacon"
+- Added scroll viewers to type editor
+- Weight and fuel values are now rounded
+
+--------------------------------------------------------------------------------------
 Version 0.5.5 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Rework of most tracking conditions to make pilot life easier
