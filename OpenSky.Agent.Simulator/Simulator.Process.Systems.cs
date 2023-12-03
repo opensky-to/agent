@@ -284,11 +284,27 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Was the landing gear lowered/raised?
-            if (((pst.Old.GearHandle != pst.New.GearHandle) || (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle)) && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
+            var wasGearChange = false;
+            if (pst.Old.GearHandle != pst.New.GearHandle)
+            {
+                if ((DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
+                {
+                    this.lastGearStatus = pst.New.GearHandle;
+                    wasGearChange = true;
+                }
+
+                this.lastGearChange = DateTime.UtcNow;
+            }
+
+            if (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
             {
                 this.lastGearChange = DateTime.UtcNow;
-                this.lastGearStatus = this.lastGearStatus.HasValue ? null : pst.New.GearHandle;
+                this.lastGearStatus = null;
+                wasGearChange = true;
+            }
 
+            if (wasGearChange)
+            {
                 if (!this.PrimaryTracking.OnGround)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingGear, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");

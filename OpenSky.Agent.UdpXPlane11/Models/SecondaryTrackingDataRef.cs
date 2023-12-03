@@ -183,8 +183,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                     if (int.TryParse(indexString, out var index) && index is >= 0 and < 40)
                     {
                         this.tailNumber[index] = (char)value;
-                        var tailString = new string(this.tailNumber).Replace("\0", string.Empty);
-                        Debug.WriteLine($"Registry: {tailString}");
+                        Debug.WriteLine($"Registry: {new string(this.tailNumber).Replace("\0", string.Empty)}");
                     }
                 }
             }

@@ -58,21 +58,29 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         private void MonitorLights(ProcessSecondaryTracking pst)
         {
+            // Beacon
+            var wasBeaconChange = false;
             if (pst.Old.LightBeacon != pst.New.LightBeacon)
             {
                 if ((DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
                 {
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
-                    this.lastBeaconChange = DateTime.UtcNow;
                     this.lastBeaconStatus = pst.New.LightBeacon;
+                    wasBeaconChange = true;
                 }
 
-                if (this.lastBeaconStatus.HasValue && this.lastBeaconStatus.Value != pst.New.LightBeacon && (DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
-                {
-                    this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
-                    this.lastBeaconChange = DateTime.UtcNow;
-                    this.lastBeaconStatus = null;
-                }
+                this.lastBeaconChange = DateTime.UtcNow;
+            }
+
+            if (this.lastBeaconStatus.HasValue && this.lastBeaconStatus.Value != pst.New.LightBeacon && (DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
+            {
+                this.lastBeaconChange = DateTime.UtcNow;
+                this.lastBeaconStatus = null;
+                wasBeaconChange = true;
+            }
+
+            if (wasBeaconChange)
+            {
+                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
 
                 // Engine running?
                 if (!pst.New.LightBeacon && pst.New.EngineRunning && (this.TrackingStatus is TrackingStatus.GroundOperations or TrackingStatus.Tracking) && this.Flight?.Aircraft.Type.UsesStrobeForBeacon != true)
@@ -81,6 +89,7 @@ namespace OpenSky.Agent.Simulator
                 }
             }
 
+            // Nav lights
             if (pst.Old.LightNav != pst.New.LightNav)
             {
                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.NavLights, OpenSkyColors.OpenSkyLightYellow, pst.New.LightNav ? "Nav lights on" : "Nav lights off");
