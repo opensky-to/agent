@@ -139,13 +139,8 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         private DateTime lastGearChange = DateTime.MinValue;
 
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The last gear state, or NULL if are not currently tracking a change - timeout occurred
-        /// while still different.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
         private bool? lastGearStatus;
+
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -287,20 +282,29 @@ namespace OpenSky.Agent.Simulator
             var wasGearChange = false;
             if (pst.Old.GearHandle != pst.New.GearHandle)
             {
-                if ((DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
+                Debug.WriteLine($"Gear handle moved {(pst.New.GearHandle ? "DOWN" : "UP")}");
+                if ((DateTime.UtcNow - this.lastGearChange).TotalSeconds > 3)
                 {
-                    this.lastGearStatus = pst.New.GearHandle;
-                    wasGearChange = true;
+                    if (this.lastGearStatus != pst.New.GearHandle)
+                    {
+                        wasGearChange = true;
+                        this.lastGearStatus = pst.New.GearHandle;
+                    }
                 }
 
                 this.lastGearChange = DateTime.UtcNow;
             }
 
-            if (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
+            if (this.lastGearStatus.HasValue && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 30)
             {
-                this.lastGearChange = DateTime.UtcNow;
+                Debug.WriteLine($"Gear timeout: {(DateTime.UtcNow - this.lastGearChange).TotalSeconds} seconds");
+                if (this.lastGearStatus.Value != pst.New.GearHandle)
+                {
+                    wasGearChange = true;
+
+                }
+
                 this.lastGearStatus = null;
-                wasGearChange = true;
             }
 
             if (wasGearChange)

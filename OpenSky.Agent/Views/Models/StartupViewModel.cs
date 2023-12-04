@@ -285,6 +285,7 @@ namespace OpenSky.Agent.Views.Models
                                         if (Simulator.Instance.Flight == null)
                                         {
                                             Simulator.Instance.Flight = result.Data;
+                                            Simulator.Instance.VatsimUserID = UserSessionService.Instance.LinkedAccounts?.VatsimID;
                                         }
                                         else
                                         {

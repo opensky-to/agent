@@ -122,6 +122,7 @@
                     <RowDefinition Height="{Binding Simulator.TrackingConditions[3].RowHeight}" />
                     <RowDefinition Height="{Binding Simulator.TrackingConditions[4].RowHeight}" />
                     <RowDefinition Height="{Binding Simulator.TrackingConditions[5].RowHeight}" />
+                    <RowDefinition Height="{Binding Simulator.TrackingConditions[6].RowHeight}" />
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
@@ -197,12 +198,25 @@
                 <TextBlock Grid.Row="5" Grid.Column="2" Margin="15,0,0,0" FontSize="12" Text="{Binding Simulator.TrackingConditions[5].Current}" VerticalAlignment="Center" />
                 <Button Grid.Row="5" Grid.Column="3" Margin="10,2,0,2" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding SlewIntoPositionCommand}">Slew</Button>
 
-                <Border Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Background="{StaticResource OpenSkyTealBrush}" CornerRadius="3" Margin="0,5" Visibility="{Binding CustomModuleVisibility}">
+                <CheckBox Grid.Row="6" Grid.Column="0" Style="{StaticResource RedUncheckedDisabledCheckBox}" IsEnabled="False" IsChecked="{Binding Simulator.TrackingConditions[6].ConditionMet}" MaxWidth="25" MinWidth="25" />
+                <TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">Vatsim</TextBlock>
+                <StackPanel Orientation="Vertical" Grid.Row="6" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Vatsim:</TextBlock>
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[6].Current}" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5,0" FontSize="12">Flight:</TextBlock>
+                        <TextBlock Text="{Binding Simulator.TrackingConditions[6].Expected}" FontSize="12" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Background="{StaticResource OpenSkyTealBrush}" CornerRadius="3" Margin="0,5" Visibility="{Binding CustomModuleVisibility}">
                     <ContentPresenter Content="{Binding CustomModuleContent}" />
                 </Border>
 
-                <Rectangle Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Fill="{StaticResource OpenSkyTealBrush}" RadiusX="3" RadiusY="3" Margin="0,5" Visibility="{Binding ResumeFlightTipsVisibility}" />
-                <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" TextWrapping="Wrap" MaxWidth="460" FontWeight="Normal" Foreground="White" Margin="5,10" Visibility="{Binding ResumeFlightTipsVisibility}">
+                <Rectangle Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Fill="{StaticResource OpenSkyTealBrush}" RadiusX="3" RadiusY="3" Margin="0,5" Visibility="{Binding ResumeFlightTipsVisibility}" />
+                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" TextWrapping="Wrap" MaxWidth="460" FontWeight="Normal" Foreground="White" Margin="5,10" Visibility="{Binding ResumeFlightTipsVisibility}">
                     <Underline>Tips for resuming tracking while airborne:</Underline><LineBreak /><LineBreak />
                     &#x27A4; Start engines, prepare cockpit and remaining flight plan<LineBreak />
                     &#x27A4; Did you set the correct lights?<LineBreak />
@@ -214,7 +228,7 @@
                     If resuming on the ground you can also exit slew and resume without the five second countdown.
                 </TextBlock>
 
-                <UniformGrid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="0, 5, 0, 3" Rows="1">
+                <UniformGrid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="4" Margin="0, 5, 0, 3" Rows="1">
                     <Button Margin="0,0,3,0" HorizontalAlignment="Stretch" Padding="3" Style="{StaticResource OpenSkyButtonStyle}" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding StartTrackingCommand}" Content="{Binding StartTrackingButtonText}" />
                     <Button Margin="3,0,0,0" HorizontalAlignment="Stretch" Padding="3" Style="{StaticResource OpenSkyRedButtonStyle}" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding AbortFlightCommand}">Abort Flight</Button>
                 </UniformGrid>

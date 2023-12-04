@@ -103,6 +103,7 @@
     <Compile Include="Models\TrackingEventLogEntry.cs" />
     <Compile Include="Enums\TrackingStatus.cs" />
     <Compile Include="Models\TrackingEventMarker.cs" />
+    <Compile Include="Models\VatsimClientConnection.cs" />
     <Compile Include="Models\VerticalProfile.cs" />
     <Compile Include="Models\WeightAndBalance.cs" />
     <Compile Include="OpenAPIs\ModelExtensions\AircraftType.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Simulator.Process.Systems.cs" />
     <Compile Include="Simulator.SaveLoadXML.cs" />
     <Compile Include="Simulator.simBrief.cs" />
+    <Compile Include="Simulator.Vatsim.cs" />
     <Compile Include="SpeechSoundPacks.cs" />
     <Compile Include="Tools\AircraftRegistryExtensions.cs" />
     <Compile Include="Tools\ColorExtensions.cs" />

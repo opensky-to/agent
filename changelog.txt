@@ -3,6 +3,14 @@ OpenSky Flight Tracking Agent Changelog
 ======================================================================================
 
 --------------------------------------------------------------------------------------
+Version 0.5.7 (ALPHA5)
+--------------------------------------------------------------------------------------
+- Improved beacon support for Rotate MD-11
+- Custom gear handle logic to support PMDG 737
+- Added support for tracking flights on Vatsim
+- Added vatsim CID as new linked account to settings
+
+--------------------------------------------------------------------------------------
 Version 0.5.6 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Updated light and gear tracking events

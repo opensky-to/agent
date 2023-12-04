@@ -44,6 +44,11 @@ namespace OpenSky.Agent.Simulator.Models
         /// <summary>
         /// Location condition.
         /// </summary>
-        Location = 5
+        Location = 5,
+
+        /// <summary>
+        /// Vatsim option.
+        /// </summary>
+        Vatsim = 6
     }
 }

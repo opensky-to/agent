@@ -273,6 +273,17 @@ namespace OpenSky.Agent.Simulator
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
 
+                    if (value.OnlineNetwork == OnlineNetwork.Vatsim)
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = true;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = "Unknown";
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"Connected: True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}";
+                    }
+                    else
+                    {
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = false;
+                    }
+
                     if (!value.Resume)
                     {
                         Debug.WriteLine("Preparing to track new flight");
