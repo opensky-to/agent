@@ -41,10 +41,17 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the duration of the vatsim connection(s).
+        /// Gets the duration of the online network connection(s).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public TimeSpan VatsimConnectionDuration { get; private set; }
+        public TimeSpan OnlineNetworkConnectionDuration { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the date/time the current online network connection started.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public DateTime? OnlineNetworkConnectionStarted { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -53,10 +60,14 @@ namespace OpenSky.Agent.Simulator
         /// <remarks>
         /// sushi.at, 03/12/2023.
         /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown when an exception error condition occurs.
+        /// </exception>
         /// -------------------------------------------------------------------------------------------------
         private void MonitorVatsimFlight()
         {
             using var client = new WebClient();
+            var lastDataUpdate = DateTime.MinValue;
             while (!this.close)
             {
                 if (this.Flight?.OnlineNetwork == OnlineNetwork.Vatsim && !string.IsNullOrEmpty(this.VatsimUserID))
@@ -71,6 +82,8 @@ namespace OpenSky.Agent.Simulator
                         {
                             if ((DateTime.UtcNow - updateTime.Value).TotalMinutes < 1)
                             {
+                                lastDataUpdate = DateTime.UtcNow;
+                                var foundPilot = false;
                                 if (json.pilots.Count > 0)
                                 {
                                     for (var i = 0; i < json.pilots.Count; i++)
@@ -78,6 +91,7 @@ namespace OpenSky.Agent.Simulator
                                         if (this.VatsimUserID.Equals((string)json.pilots[i].cid))
                                         {
                                             Debug.WriteLine($"Found active vatsim client connection for user {this.VatsimUserID}");
+                                            foundPilot = true;
 
                                             this.VatsimClientConnection ??= new VatsimClientConnection
                                             {
@@ -91,13 +105,37 @@ namespace OpenSky.Agent.Simulator
                                             this.VatsimClientConnection.LastUpdated = (DateTime)json.pilots[i].last_updated;
                                             this.VatsimClientConnection.Latitude = (double)json.pilots[i].latitude;
                                             this.VatsimClientConnection.Longitude = (double)json.pilots[i].longitude;
+
+                                            this.OnlineNetworkConnectionStarted ??= DateTime.UtcNow;
                                         }
+                                    }
+                                }
+
+                                // CID not connected as pilot?
+                                if (!foundPilot)
+                                {
+                                    this.VatsimClientConnection = null;
+                                    if (this.OnlineNetworkConnectionStarted.HasValue)
+                                    {
+                                        this.OnlineNetworkConnectionDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                                        this.OnlineNetworkConnectionStarted = null;
                                     }
                                 }
                             }
                             else
                             {
-                                throw new Exception("Data is too old.");
+                                Debug.WriteLine("Vatsim data received is stale.");
+                            }
+                        }
+
+                        // Did our connection time-out?
+                        if ((this.VatsimClientConnection!=null || this.OnlineNetworkConnectionStarted.HasValue) && (DateTime.UtcNow - lastDataUpdate).TotalMinutes > 5)
+                        {
+                            this.VatsimClientConnection = null;
+                            if (this.OnlineNetworkConnectionStarted.HasValue)
+                            {
+                                this.OnlineNetworkConnectionDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                                this.OnlineNetworkConnectionStarted = null;
                             }
                         }
 

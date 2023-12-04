@@ -6982,10 +6982,10 @@
           "onlineNetwork": {
             "$ref": "#/components/schemas/OnlineNetwork"
           },
-          "onlineNetworkConnectedMinutes": {
-            "type": "number",
-            "description": "Gets or sets the minutes the player was connected to the online network for, used to\r\ncalculate 80% online requirement.",
-            "format": "double"
+          "onlineNetworkConnectedSeconds": {
+            "type": "integer",
+            "description": "Gets or sets the seconds the player was connected to the online network for, used to\r\ncalculate 80% online requirement.",
+            "format": "int32"
           },
           "operatorName": {
             "type": "string",
@@ -8278,6 +8278,11 @@
             "type": "number",
             "description": "The bank angle in degrees.",
             "format": "double"
+          },
+          "connectedToOnlineNetworkSeconds": {
+            "type": "integer",
+            "description": "Gets or sets the number of seconds the user was connected to an online network (in seconds).",
+            "format": "int32"
           },
           "flightPhase": {
             "$ref": "#/components/schemas/FlightPhase"

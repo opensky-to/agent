@@ -71,6 +71,7 @@ namespace OpenSky.Agent.Simulator
                     WasAirborne = this.WasAirborne,
                     TimeSavedBecauseOfSimRate = this.timeSavedBecauseOfSimRate,
                     TotalPaused = this.totalPaused,
+                    TimeConenctedToOnlineNetwork = TimeSpan.Zero,
 
                     FlightID = this.Flight.Id,
                     AircraftRegistry = this.Flight.Aircraft.Registry,
@@ -101,6 +102,15 @@ namespace OpenSky.Agent.Simulator
                     Payload = this.Flight.PayloadSummary,
                     PayloadPounds = this.Flight.PayloadPounds
                 };
+
+                if (this.Flight.OnlineNetwork != OnlineNetwork.Offline)
+                {
+                    log.TimeConenctedToOnlineNetwork = this.OnlineNetworkConnectionDuration;
+                    if (this.OnlineNetworkConnectionStarted.HasValue)
+                    {
+                        log.TimeConenctedToOnlineNetwork += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                    }
+                }
 
                 log.TrackingEventLogEntries.AddRange(this.TrackingEventLogEntries);
                 lock (this.trackingEventMarkers)
@@ -171,6 +181,10 @@ namespace OpenSky.Agent.Simulator
             this.timeSavedBecauseOfSimRate = log.TimeSavedBecauseOfSimRate;
             this.WarpInfo = this.timeSavedBecauseOfSimRate.TotalSeconds >= 1 ? $"Yes, saved {this.timeSavedBecauseOfSimRate:hh\\:mm\\:ss} [*]" : "No [*]";
             this.totalPaused = log.TotalPaused;
+            if (this.Flight.OnlineNetwork != OnlineNetwork.Offline)
+            {
+                this.OnlineNetworkConnectionDuration = log.TimeConenctedToOnlineNetwork;
+            }
 
             // Restore aircraft trail locations
             UpdateGUIDelegate restorePositionReports = () =>

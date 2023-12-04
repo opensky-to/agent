@@ -11,6 +11,7 @@ namespace OpenSky.Agent.Simulator
     using System.Diagnostics;
     using System.IO;
     using System.IO.Compression;
+    using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Windows;
@@ -73,7 +74,7 @@ namespace OpenSky.Agent.Simulator
         /// -------------------------------------------------------------------------------------------------
         [CanBeNull]
         private Flight flight;
-        
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last active simulation rate (above 1).
@@ -172,8 +173,9 @@ namespace OpenSky.Agent.Simulator
                 {
                     if (this.TrackingConditions[(int)condition].Enabled && !this.TrackingConditions[(int)condition].ConditionMet)
                     {
-                        // Date time and fuel aren't strict anymore 
-                        if (condition != Models.TrackingConditions.DateTime && condition == Models.TrackingConditions.Fuel)
+                        // Date time and fuel aren't strict anymore, neither is new Vatsim one
+                        var nonStrict = new[] { Models.TrackingConditions.DateTime, Models.TrackingConditions.Fuel, Models.TrackingConditions.Vatsim };
+                        if (!nonStrict.Contains(condition))
                         {
                             allConditionsMet = false;
                         }
@@ -273,6 +275,7 @@ namespace OpenSky.Agent.Simulator
                     this.TrackingConditions[(int)Models.TrackingConditions.Fuel].AutoSet = !value.Aircraft.Type.RequiresManualFuelling;
                     this.TrackingConditions[(int)Models.TrackingConditions.Payload].AutoSet = !value.Aircraft.Type.RequiresManualLoading;
 
+                    this.OnlineNetworkConnectionDuration = TimeSpan.Zero;
                     if (value.OnlineNetwork == OnlineNetwork.Vatsim)
                     {
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = true;
@@ -518,6 +521,12 @@ namespace OpenSky.Agent.Simulator
 
                     this.trackingStarted = DateTime.UtcNow;
                 }
+            }
+
+            // Is the pilot already connected to Vatsim?
+            if (this.Flight?.OnlineNetwork == OnlineNetwork.Vatsim && this.VatsimClientConnection != null)
+            {
+                this.OnlineNetworkConnectionStarted = DateTime.UtcNow;
             }
         }
 
@@ -814,7 +823,13 @@ namespace OpenSky.Agent.Simulator
             {
                 try
                 {
-                    Debug.WriteLine("Creating final position report...1");
+                    Debug.WriteLine("Creating final position report...");
+                    var onlineForDuration = this.OnlineNetworkConnectionDuration;
+                    if (this.OnlineNetworkConnectionStarted.HasValue)
+                    {
+                        onlineForDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                    }
+
                     var positionReport = new PositionReport
                     {
                         Id = this.Flight.Id,
@@ -831,6 +846,7 @@ namespace OpenSky.Agent.Simulator
                         RadioHeight = this.PrimaryTracking.RadioHeight,
                         VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
                         TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
+                        ConnectedToOnlineNetworkSeconds = (int)onlineForDuration.TotalSeconds,
 
                         FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
                         FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
@@ -1026,7 +1042,7 @@ namespace OpenSky.Agent.Simulator
                             Debug.WriteLine("Error pausing flight: " + ex);
                         }
                     })
-                { Name = "SimConnect.Flight.Pause" }.Start();
+            { Name = "SimConnect.Flight.Pause" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1119,7 +1135,7 @@ namespace OpenSky.Agent.Simulator
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.SaveFlight" }.Start();
+            { Name = "SimConnect.Flight.SaveFlight" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1285,7 +1301,7 @@ namespace OpenSky.Agent.Simulator
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
+            { Name = "SimConnect.Flight.UploadAutoSave" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -1313,6 +1329,12 @@ namespace OpenSky.Agent.Simulator
                                 return;
                             }
 
+                            var onlineForDuration = this.OnlineNetworkConnectionDuration;
+                            if (this.OnlineNetworkConnectionStarted.HasValue)
+                            {
+                                onlineForDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                            }
+
                             var positionReport = new PositionReport
                             {
                                 Id = this.Flight.Id,
@@ -1329,6 +1351,7 @@ namespace OpenSky.Agent.Simulator
                                 RadioHeight = this.PrimaryTracking.RadioHeight,
                                 VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
                                 TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
+                                ConnectedToOnlineNetworkSeconds = (int)onlineForDuration.TotalSeconds,
 
                                 FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
                                 FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
@@ -1374,7 +1397,7 @@ namespace OpenSky.Agent.Simulator
                             }
                         }
                     })
-                { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
+            { Name = "SimConnect.Flight.UploadPositionReport" }.Start();
         }
     }
 }

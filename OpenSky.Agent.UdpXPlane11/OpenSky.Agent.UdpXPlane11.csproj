@@ -41,7 +41,7 @@
       <HintPath>..\packages\JetBrains.Annotations.2023.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="OpenSky.FlightLogXML, Version=0.1.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.6\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
+      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.7\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
     </Reference>
     <Reference Include="ParallelExtensionsExtras, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
