@@ -280,7 +280,7 @@ namespace OpenSky.Agent.Simulator
                     {
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = true;
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = "Unknown";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"Connected: True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}";
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}, Location: <50 km";
                     }
                     else
                     {
@@ -367,6 +367,9 @@ namespace OpenSky.Agent.Simulator
                     this.StopTracking(false);
                     this.lastFlightLogAutoSave = DateTime.MinValue;
                     this.simbriefOfpLoaded = false;
+                    this.OnlineNetworkConnectionDuration = TimeSpan.Zero;
+                    this.OnlineNetworkConnectionStarted = null;
+                    this.VatsimClientConnection = null;
 
                     // Reset ground handling
                     this.GroundHandlingComplete = false;

@@ -7,6 +7,7 @@
 namespace OpenSky.Agent.Simulator
 {
     using System;
+    using System.Device.Location;
     using System.Diagnostics;
     using System.Net;
     using System.Threading;
@@ -105,6 +106,7 @@ namespace OpenSky.Agent.Simulator
                                             this.VatsimClientConnection.LastUpdated = (DateTime)json.pilots[i].last_updated;
                                             this.VatsimClientConnection.Latitude = (double)json.pilots[i].latitude;
                                             this.VatsimClientConnection.Longitude = (double)json.pilots[i].longitude;
+                                            this.VatsimClientConnection.Altitude = (double)json.pilots[i].altitude;
 
                                             this.OnlineNetworkConnectionStarted ??= DateTime.UtcNow;
                                         }
@@ -140,17 +142,16 @@ namespace OpenSky.Agent.Simulator
                         }
 
                         // Update tracking condition
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = $"Connected: {this.VatsimClientConnection != null}, Callsign: {this.VatsimClientConnection?.Callsign ?? "none"}, Flight plan: {this.VatsimClientConnection?.Departure ?? "??"}-{this.VatsimClientConnection?.Arrival ?? "??"}";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet = this.VatsimClientConnection != null &&
-                                                                                                      this.VatsimClientConnection.Callsign.Equals(this.Flight.AtcCallsign, StringComparison.InvariantCultureIgnoreCase) &&
-                                                                                                      this.VatsimClientConnection.Departure.Equals(this.Flight.Origin.Icao, StringComparison.InvariantCultureIgnoreCase) &&
-                                                                                                      this.VatsimClientConnection.Arrival.Equals(this.Flight.Destination.Icao, StringComparison.InvariantCultureIgnoreCase);
+                        var locationDiffKm = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.VatsimClientConnection?.Latitude ?? 0, this.VatsimClientConnection?.Longitude ?? 0, 0.3048 * this.VatsimClientConnection?.Altitude ?? 0)) / 1000;
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = $"{this.VatsimClientConnection != null}, Callsign: {this.VatsimClientConnection?.Callsign ?? "none"}, Flight plan: {this.VatsimClientConnection?.Departure ?? "??"}-{this.VatsimClientConnection?.Arrival ?? "??"}, Location: {locationDiffKm:N1} km";
+                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet = 
+                            this.VatsimClientConnection != null &&
+                            locationDiffKm < 50 &&
+                            this.VatsimClientConnection.Callsign.Equals(this.Flight.AtcCallsign, StringComparison.InvariantCultureIgnoreCase) &&
+                            this.VatsimClientConnection.Departure.Equals(this.Flight.Origin.Icao, StringComparison.InvariantCultureIgnoreCase) &&
+                            this.VatsimClientConnection.Arrival.Equals(this.Flight.Destination.Icao, StringComparison.InvariantCultureIgnoreCase);
 
                         SleepScheduler.SleepFor(TimeSpan.FromSeconds(this.VatsimClientConnection == null ? 15 : 60));
-
-                        // Track how long the connection was established during a flight
-                        // TODO when flight is active and connection is good, record start time ... then when flight ends or connection drops, calculate duration and add to timespan
-                        // TODO init the duration to 0 when starting a new flight and check for connection when tracking start/end
                     }
                     catch (Exception ex)
                     {
