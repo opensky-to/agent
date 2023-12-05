@@ -9356,6 +9356,13 @@ namespace OpenSkyApi
         public bool HasVariants { get; set; }
 
         /// <summary>
+        /// Gets or sets the ICAO type designator.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("icaoTypeDesignator", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(4)]
+        public string IcaoTypeDesignator { get; set; }
+
+        /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -11270,6 +11277,7 @@ namespace OpenSkyApi
         /// Gets or sets the atc call sign for the flight - important for online flying.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("atcCallsign", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(8)]
         public string AtcCallsign { get; set; }
 
         /// <summary>
