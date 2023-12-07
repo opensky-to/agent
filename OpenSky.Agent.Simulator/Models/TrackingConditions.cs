@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TrackingConditions.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -44,6 +44,11 @@ namespace OpenSky.Agent.Simulator.Models
         /// <summary>
         /// Location condition.
         /// </summary>
-        Location = 5
+        Location = 5,
+
+        /// <summary>
+        /// Vatsim option.
+        /// </summary>
+        Vatsim = 6
     }
 }

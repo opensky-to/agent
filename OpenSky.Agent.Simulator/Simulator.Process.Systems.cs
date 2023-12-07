@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Simulator.Process.Systems.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,13 @@ namespace OpenSky.Agent.Simulator
     /// -------------------------------------------------------------------------------------------------
     public partial class Simulator
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last engine running change date/time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastEngineRunningChange = DateTime.MinValue;
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The last overspeed Date/Time.
@@ -130,29 +137,6 @@ namespace OpenSky.Agent.Simulator
                 }
             }
         }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// When did the status of the landing gear last change? PMDG 737 causes constant switches with
-        /// some hardware not in the OFF position.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private DateTime lastGearChange = DateTime.MinValue;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The last gear state, or NULL if are not currently tracking a change - timeout occurred
-        /// while still different.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool? lastGearStatus;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The last engine running change date/time.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private DateTime lastEngineRunningChange = DateTime.MinValue;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -284,11 +268,8 @@ namespace OpenSky.Agent.Simulator
             }
 
             // Was the landing gear lowered/raised?
-            if (((pst.Old.GearHandle != pst.New.GearHandle) || (this.lastGearStatus.HasValue && this.lastGearStatus.Value != pst.New.GearHandle)) && (DateTime.UtcNow - this.lastGearChange).TotalSeconds > 10)
+            if (pst.Old.GearHandle != pst.New.GearHandle)
             {
-                this.lastGearChange = DateTime.UtcNow;
-                this.lastGearStatus = this.lastGearStatus.HasValue ? null : pst.New.GearHandle;
-
                 if (!this.PrimaryTracking.OnGround)
                 {
                     this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.LandingGear, OpenSkyColors.OpenSkyTealLight, pst.New.GearHandle ? "Landing gear lowered" : "Landing gear raised");

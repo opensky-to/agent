@@ -139,6 +139,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The Vatsim user ID.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string vatsimID;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Name of the X-Plane 11 IP address.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -192,6 +199,7 @@ namespace OpenSky.Agent.Views.Models
             this.AircraftPositionUpdateInterval = Settings.Default.AircraftPositionUpdateInterval;
             this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
+            this.VatsimID = UserSessionService.Instance.LinkedAccounts?.VatsimID;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Settings.Default.LandingReportNotification);
             if (!string.IsNullOrEmpty(Settings.Default.SoundPack))
             {
@@ -218,7 +226,7 @@ namespace OpenSky.Agent.Views.Models
             if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
             {
                 var image = new BitmapImage();
-                
+
                 // ReSharper disable once AssignNullToNotNullAttribute
                 using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
                 {
@@ -615,6 +623,28 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets or sets the Vatsim user ID.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string VatsimID
+        {
+            get => this.vatsimID;
+
+            set
+            {
+                if (Equals(this.vatsimID, value))
+                {
+                    return;
+                }
+
+                this.vatsimID = value;
+                this.NotifyPropertyChanged();
+                this.IsDirty = true;
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets or sets the IP address of the X-Plane 11 host.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -854,7 +884,8 @@ namespace OpenSky.Agent.Views.Models
                 var linkedAccounts = new LinkedAccounts
                 {
                     BingMapsKey = this.BingMapsKey,
-                    SimbriefUsername = this.SimBriefUsername
+                    SimbriefUsername = this.SimBriefUsername,
+                    VatsimID = this.VatsimID
                 };
 
                 var result = AgentOpenSkyService.Instance.UpdateLinkedAccountsAsync(linkedAccounts).Result;
@@ -982,7 +1013,7 @@ namespace OpenSky.Agent.Views.Models
                     if (UserSessionService.Instance.AccountOverview?.ProfileImage?.Length > 0)
                     {
                         var image = new BitmapImage();
-                        
+
                         // ReSharper disable once AssignNullToNotNullAttribute
                         using (var mem = new MemoryStream(UserSessionService.Instance.AccountOverview?.ProfileImage))
                         {

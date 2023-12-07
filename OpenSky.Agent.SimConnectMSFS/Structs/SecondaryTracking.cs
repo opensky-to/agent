@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SecondaryTracking.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -329,7 +329,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 new SimVar("BRAKE PARKING INDICATOR", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("SPOILERS ARMED", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("CABIN SEATBELTS ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32),
-                new SimVar("CABIN NO SMOKING ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32),
+                new SimVar("CABIN NO SMOKING ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32)
             };
     }
 }

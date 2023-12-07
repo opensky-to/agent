@@ -1,70 +1,84 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Airport.cs" company="OpenSky">
+// <copyright file="VatsimClientConnection.cs" company="OpenSky">
 // OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-// ReSharper disable once CheckNamespace
-
-namespace OpenSkyApi
+namespace OpenSky.Agent.Simulator.Models
 {
+    using System;
+
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Airport extensions.
+    /// Vatsim client connection model.
     /// </summary>
     /// <remarks>
-    /// sushi.at, 17/01/2022.
+    /// sushi.at, 03/12/2023.
     /// </remarks>
     /// -------------------------------------------------------------------------------------------------
-    public partial class Airport
+    public class VatsimClientConnection
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 3.
+        /// Gets or sets the altitude.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell3Id => ulong.Parse(this.S2Cell3);
+        public double Altitude { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 4.
+        /// Gets or sets the arrival.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell4Id => ulong.Parse(this.S2Cell4);
+        public string Arrival { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 5.
+        /// Gets or sets the call sign.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell5Id => ulong.Parse(this.S2Cell5);
+        public string Callsign { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 6.
+        /// Gets or sets the CID.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell6Id => ulong.Parse(this.S2Cell6);
+        public string CID { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 7.
+        /// Gets or sets the departure.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell7Id => ulong.Parse(this.S2Cell7);
+        public string Departure { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 8.
+        /// Gets or sets the last updated timestamp.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell8Id => ulong.Parse(this.S2Cell8);
+        public DateTime LastUpdated { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// S2 geometry cell ID for level 9.
+        /// Gets or sets the latitude.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ulong S2Cell9Id => ulong.Parse(this.S2Cell9);
+        public double Latitude { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the logon time.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public DateTime LogonTime { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the longitude.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public double Longitude { get; set; }
     }
 }

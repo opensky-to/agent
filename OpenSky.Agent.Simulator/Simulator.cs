@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Simulator.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -144,13 +144,15 @@ namespace OpenSky.Agent.Simulator
                 { (int)Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
                 { (int)Models.TrackingConditions.PlaneModel, new TrackingCondition() },
                 { (int)Models.TrackingConditions.RealismSettings, new TrackingCondition { Expected = "No slew, No unlimited fuel,\r\nCrash detection, SimRate=0 or 1" } },
-                { (int)Models.TrackingConditions.Location, new TrackingCondition() }
+                { (int)Models.TrackingConditions.Location, new TrackingCondition() },
+                { (int)Models.TrackingConditions.Vatsim, new TrackingCondition { Enabled = false } }
             };
 
             // Start our worker threads
             new Thread(this.ProcessPrimaryTracking) { Name = "Simulator.ProcessPrimaryTracking" }.Start();
             new Thread(this.ProcessSecondaryTracking) { Name = "Simulator.ProcessSecondaryTracking" }.Start();
             new Thread(this.ProcessLandingAnalysis) { Name = "Simulator.ProcessLandingAnalysis" }.Start();
+            new Thread(this.MonitorVatsimFlight) { Name = "Simulator.MonitorVatsimFlight" }.Start();
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -385,7 +387,7 @@ namespace OpenSky.Agent.Simulator
         /// </param>
         /// -------------------------------------------------------------------------------------------------
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] [CanBeNull] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName][CanBeNull] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

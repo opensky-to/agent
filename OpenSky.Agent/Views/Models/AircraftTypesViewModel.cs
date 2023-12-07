@@ -9,6 +9,7 @@ namespace OpenSky.Agent.Views.Models
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel.DataAnnotations;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -107,6 +108,13 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private string engineModel;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The ICAO type designator.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private string icaoTypeDesignator;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -617,6 +625,28 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand GetUserRolesCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets the ICAO type designator.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [StringLength(4)]
+        public string IcaoTypeDesignator
+        {
+            get => this.icaoTypeDesignator;
+
+            set
+            {
+                if (Equals(this.icaoTypeDesignator, value))
+                {
+                    return;
+                }
+
+                this.icaoTypeDesignator = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1261,7 +1291,8 @@ namespace OpenSky.Agent.Views.Models
                 EngineModel = this.EngineModel,
                 OverrideFuelType = this.OverrideFuelType,
                 IsHistoric = this.IsHistoric,
-                UsesStrobeForBeacon = this.UsesStrobeForBeacon
+                UsesStrobeForBeacon = this.UsesStrobeForBeacon,
+                IcaoTypeDesignator = this.IcaoTypeDesignator
             };
 
             if (!string.IsNullOrEmpty(this.ManufacturerDeliveryAirportICAOs))
@@ -1352,6 +1383,11 @@ namespace OpenSky.Agent.Views.Models
             this.Comments = null;
             this.OverrideFuelType = FuelType.NotUsed;
             this.EngineModel = null;
+            this.IsHistoric = false;
+            this.RequiresManualFuelling = false;
+            this.RequiresManualLoading = false;
+            this.IcaoTypeDesignator = null;
+            this.UsesStrobeForBeacon = false;
 
             this.aircraftTypeBeingUpdated = null;
         }

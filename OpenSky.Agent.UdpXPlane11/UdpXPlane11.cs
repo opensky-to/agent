@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UdpXPlane11.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -419,9 +419,9 @@ namespace OpenSky.Agent.UdpXPlane11
                             }
 
                             this.connector = new XPlaneConnector(this.simulatorIPAddress, (int)this.simulatorPort);
-                            primaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Primary]);
-                            secondaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Secondary]);
                             aircraftIdentity.RegisterWithConnector(this.connector, this.SampleRates[Requests.AircraftIdentity]);
+                            primaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Primary]);
+                            secondaryTracking.RegisterWithConnector(this.connector, this.SampleRates[Requests.Secondary], aircraftIdentity);
                             fuelTanks.RegisterWithConnector(this.connector, this.SampleRates[Requests.FuelTanks]);
                             payloadStations.RegisterWithConnector(this.connector, this.SampleRates[Requests.PayloadStations]);
                             weightAndBalance.RegisterWithConnector(this.connector, this.SampleRates[Requests.WeightAndBalance]);

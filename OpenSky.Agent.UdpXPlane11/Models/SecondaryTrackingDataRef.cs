@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SecondaryTrackingDataRef.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,16 @@ namespace OpenSky.Agent.UdpXPlane11.Models
     /// -------------------------------------------------------------------------------------------------
     public class SecondaryTrackingDataRef : Simulator.Models.SecondaryTracking
     {
+        private readonly char[] tailNumber = new char[40];
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The aircraft identity - for detecting if we are dealing with the Rotate MD-11 which uses
+        /// custom dataref for beacon.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private AircraftIdentityDataRef aircraftIdentity;
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Number of engines.
@@ -110,9 +120,14 @@ namespace OpenSky.Agent.UdpXPlane11.Models
         /// <param name="sampleRate">
         /// The configured sample rate.
         /// </param>
+        /// <param name="aircraftIdentityRef">
+        /// The aircraft identity - for detecting if we are dealing with the Rotate MD-11 which uses
+        /// custom dataref for beacon.
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public void RegisterWithConnector(XPlaneConnector connector, int sampleRate)
+        public void RegisterWithConnector(XPlaneConnector connector, int sampleRate, AircraftIdentityDataRef aircraftIdentityRef)
         {
+            this.aircraftIdentity = aircraftIdentityRef;
             connector.Subscribe(DataRefs.TimeZuluTimeSec, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentDay, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Cockpit2ClockTimerCurrentMonth, 1000 / sampleRate, this.DataRefUpdated);
@@ -133,6 +148,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
             connector.Subscribe(DataRefs.GraphicsAnimationGroundTrafficTowbarHeadingDeg, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.Cockpit2ElectricalAPURunning, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitElectricalBeaconLightsOn, 1000 / sampleRate, this.DataRefUpdated);
+            connector.Subscribe(new DataRefElement { DataRef = "Rotate/aircraft/controls/beacon_lts" }, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitElectricalNavLightsOn, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitElectricalStrobeLightsOn, 1000 / sampleRate, this.DataRefUpdated);
             connector.Subscribe(DataRefs.CockpitElectricalTaxiLightOn, 1000 / sampleRate, this.DataRefUpdated);
@@ -156,8 +172,6 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 connector.Subscribe(tailNum, 1000 / sampleRate, this.DataRefUpdated);
             }
         }
-
-        private readonly char[] tailNumber = new char[40];
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -183,8 +197,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                     if (int.TryParse(indexString, out var index) && index is >= 0 and < 40)
                     {
                         this.tailNumber[index] = (char)value;
-                        var tailString = new string(this.tailNumber).Replace("\0", string.Empty);
-                        Debug.WriteLine($"Registry: {tailString}");
+                        Debug.WriteLine($"Registry: {new string(this.tailNumber).Replace("\0", string.Empty)}");
                     }
                 }
             }
@@ -266,7 +279,12 @@ namespace OpenSky.Agent.UdpXPlane11.Models
                 this.ApuRunning = (int)value == 1;
             }
 
-            if (element.DataRef == DataRefs.CockpitElectricalBeaconLightsOn.DataRef)
+            if (element.DataRef == DataRefs.CockpitElectricalBeaconLightsOn.DataRef && !"MD11".Equals(this.aircraftIdentity.AtcModel, StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.LightBeacon = (int)value == 1;
+            }
+
+            if (element.DataRef == "Rotate/aircraft/controls_c/beacon_lts")
             {
                 this.LightBeacon = (int)value == 1;
             }

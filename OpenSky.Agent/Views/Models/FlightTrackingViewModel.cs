@@ -984,7 +984,7 @@ namespace OpenSky.Agent.Views.Models
                                 return;
                             }
                         }
-                        else if (this.Simulator.WeightAndBalance.FuelTotalQuantity > (this.Simulator.Flight.FuelGallons ?? 0))
+                        else if (this.Simulator.WeightAndBalance.FuelTotalQuantity > (this.Simulator.Flight.FuelGallons ?? 0) + 1)
                         {
                             var gallons = this.Simulator.WeightAndBalance.FuelTotalQuantity - (this.Simulator.Flight.FuelGallons ?? 0);
                             Debug.WriteLine($"Aircraft has more fuel loaded then planned, charge the pilot/airline for the difference of {gallons} gallons...");

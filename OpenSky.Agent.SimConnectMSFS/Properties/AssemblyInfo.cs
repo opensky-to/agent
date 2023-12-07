@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AssemblyInfo.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,5 +17,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("1f9cbede-669d-4510-bca2-e6ad29d6a498")]
-[assembly: AssemblyVersion("0.5.6")]
-[assembly: AssemblyFileVersion("0.5.6")]
+[assembly: AssemblyVersion("0.5.7")]
+[assembly: AssemblyFileVersion("0.5.7")]

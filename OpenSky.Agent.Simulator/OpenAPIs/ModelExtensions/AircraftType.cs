@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AircraftType.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -89,6 +89,8 @@ namespace OpenSkyApi
             this.EngineModel = copyFrom.EngineModel;
             this.OverrideFuelType = copyFrom.OverrideFuelType;
             this.IsHistoric = copyFrom.IsHistoric;
+            this.UsesStrobeForBeacon = copyFrom.UsesStrobeForBeacon;
+            this.IcaoTypeDesignator = copyFrom.IcaoTypeDesignator;
             this.DeliveryLocations = new List<AircraftManufacturerDeliveryLocation>();
             this.DeliveryLocations.AddRange(copyFrom.DeliveryLocations);
         }
@@ -227,7 +229,7 @@ namespace OpenSkyApi
                         return false;
                     }
 
-                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.MaxGrossWeight - this.MaxGrossWeight) > 0.05 * this.MaxGrossWeight)
+                    if (Math.Abs(OpenSky.Agent.Simulator.Simulator.Instance.WeightAndBalance.MaxGrossWeight - this.MaxGrossWeight) > 0.018 * this.MaxGrossWeight)
                     {
                         return false;
                     }
