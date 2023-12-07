@@ -1383,6 +1383,11 @@ namespace OpenSky.Agent.Views.Models
             this.Comments = null;
             this.OverrideFuelType = FuelType.NotUsed;
             this.EngineModel = null;
+            this.IsHistoric = false;
+            this.RequiresManualFuelling = false;
+            this.RequiresManualLoading = false;
+            this.IcaoTypeDesignator = null;
+            this.UsesStrobeForBeacon = false;
 
             this.aircraftTypeBeingUpdated = null;
         }
