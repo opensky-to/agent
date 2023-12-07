@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Simulator.Process.Lights.cs" company="OpenSky">
-// OpenSky project 2021-2022
+// OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace OpenSky.Agent.Simulator
 {
-    using System;
     using System.Diagnostics;
 
     using OpenSky.Agent.Simulator.Enums;
@@ -31,22 +30,6 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// When did the status of the beacon light last change? Some aircraft seem to toggle this on and
-        /// off with every red flash, omg.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private DateTime lastBeaconChange = DateTime.MinValue;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The last beacon state, or NULL if are not currently tracking a change - timeout occurred
-        /// while still different.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private bool? lastBeaconStatus;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Monitor lights.
         /// </summary>
         /// <remarks>
@@ -59,26 +42,7 @@ namespace OpenSky.Agent.Simulator
         private void MonitorLights(ProcessSecondaryTracking pst)
         {
             // Beacon
-            var wasBeaconChange = false;
             if (pst.Old.LightBeacon != pst.New.LightBeacon)
-            {
-                if ((DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
-                {
-                    this.lastBeaconStatus = pst.New.LightBeacon;
-                    wasBeaconChange = true;
-                }
-
-                this.lastBeaconChange = DateTime.UtcNow;
-            }
-
-            if (this.lastBeaconStatus.HasValue && this.lastBeaconStatus.Value != pst.New.LightBeacon && (DateTime.UtcNow - this.lastBeaconChange).TotalSeconds > 5)
-            {
-                this.lastBeaconChange = DateTime.UtcNow;
-                this.lastBeaconStatus = null;
-                wasBeaconChange = true;
-            }
-
-            if (wasBeaconChange)
             {
                 this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.Beacon, OpenSkyColors.OpenSkyLightYellow, pst.New.LightBeacon ? "Beacon on" : "Beacon off");
 
