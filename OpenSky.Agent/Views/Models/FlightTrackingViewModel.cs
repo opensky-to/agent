@@ -184,6 +184,7 @@ namespace OpenSky.Agent.Views.Models
             this.ToggleOfpCommand = new Command(this.ToggleOfp);
             this.SpeedUpGroundHandlingCommand = new Command(this.SpeedUpGroundHandling);
             this.SkipGroundHandlingCommand = new Command(this.SkipGroundHandling);
+            this.RefreshMetarCommand = new Command(this.RefreshMetar);
 
             // Are we already preparing/resuming/tracking?
             this.SimulatorTrackingStatusChanged(this, this.Simulator.TrackingStatus);
@@ -316,6 +317,13 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Gets the refresh metar command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public Command RefreshMetarCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets the resume flight tips visibility.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -394,14 +402,6 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the startup view model instance.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        [NotNull]
-        public StartupViewModel StartupViewModel  => StartupViewModel.Instance;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets the skip ground handling command.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -469,6 +469,14 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand StartTrackingCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the startup view model instance.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        [NotNull]
+        public StartupViewModel StartupViewModel => StartupViewModel.Instance;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -638,6 +646,19 @@ namespace OpenSky.Agent.Views.Models
                     this.LoadingText = null;
                 }
             }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Refresh metar.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 12/12/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void RefreshMetar()
+        {
+            this.Simulator.RefreshMetar();
         }
 
         /// -------------------------------------------------------------------------------------------------

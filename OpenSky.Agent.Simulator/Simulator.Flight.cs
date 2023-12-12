@@ -219,6 +219,9 @@ namespace OpenSky.Agent.Simulator
                     // Start the ground handling thread for this flight
                     new Thread(this.DoGroundHandling) { Name = "OpenSky.Simulator.GroundHandling" }.Start();
 
+                    // Start a metar refresh
+                    this.RefreshMetar();
+
                     // Add airport markers to map (do this in both new and restore, save file doesn't contain these cause the data would just be redundant)
                     UpdateGUIDelegate addAirports = () =>
                     {
