@@ -119,6 +119,7 @@
     <Compile Include="Simulator.Data.cs" />
     <Compile Include="Simulator.Flight.cs" />
     <Compile Include="Simulator.GroundHandling.cs" />
+    <Compile Include="Simulator.Metar.cs" />
     <Compile Include="Simulator.Process.FlightPhases.cs" />
     <Compile Include="Simulator.Markers.cs" />
     <Compile Include="Simulator.Process.ChangeOverTime.cs" />

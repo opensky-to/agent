@@ -223,9 +223,9 @@
                     &#x27A4; Slew aircraft into position<LineBreak />
                     &#x27A4; Exit slew (press Y) to adjust gear and flaps, enable AP?<LineBreak />
                     &#x27A4; Slew aircraft back into position again<LineBreak />
-                    &#x27A4; "Resume tracking", starts a five second countdown<LineBreak />
+                    &#x27A4; "Resume tracking", starts a five-second countdown<LineBreak />
                     &#x27A4; Fly the aircraft &#x1F643;<LineBreak /><LineBreak />
-                    If resuming on the ground you can also exit slew and resume without the five second countdown.
+                    If resuming on the ground you can also exit slew and resume without the five-second countdown.
                 </TextBlock>
 
                 <UniformGrid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="4" Margin="0, 5, 0, 3" Rows="1">
@@ -550,22 +550,41 @@
         <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0">
                 <GroupBox.Header>
-                    <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                        <Button Style="{StaticResource OpenSkyButtonStyle}" Padding="5,0" FontSize="11" Margin="5,-2,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
+                    </StackPanel>
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <TextBlock FontSize="10">Route</TextBlock>
-                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
                     <TextBlock FontSize="10" Margin="0,10,0,0">Alternate route</TextBlock>
-                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="300" />
-                    <Button Style="{StaticResource OpenSkyButtonStyle}" Margin="0,10,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Grid.Column="0">
+                <GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="15" FontWeight="DemiBold">METAR</TextBlock>
+                        <Button Padding="5,0" FontSize="11" Margin="5,-2,0,0" Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding RefreshMetarCommand}">refresh</Button>
+                    </StackPanel>
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="10">Origin</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.OriginMetar, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
+                    <TextBlock FontSize="10">Destination</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.DestinationMetar, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
+                    <TextBlock FontSize="10">Alternate</TextBlock>
+                    <TextBlock FontFamily="Consolas" Text="{Binding Simulator.AlternateMetar, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Flight events</TextBlock>
                 </GroupBox.Header>
@@ -581,7 +600,7 @@
                     </ListBox.ItemTemplate>
                 </controls:ScrollingListBox>
             </GroupBox>
-            <GroupBox Grid.Row="2" Grid.Column="0">
+            <GroupBox Grid.Row="3" Grid.Column="0">
                 <GroupBox.Header>
                     <TextBlock FontSize="15" FontWeight="DemiBold">Graphs</TextBlock>
                 </GroupBox.Header>
@@ -595,9 +614,9 @@
                             <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
                         </StackPanel.RenderTransform>
                         <CheckBox IsChecked="{Binding ChartAltitudeChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0" MinWidth="0">
-                                <Border CornerRadius="3" Background="#05826c">
-                                    <TextBlock Margin="5,1" Foreground="Black">Altitude</TextBlock>
-                                </Border>
+                            <Border CornerRadius="3" Background="#05826c">
+                                <TextBlock Margin="5,1" Foreground="Black">Altitude</TextBlock>
+                            </Border>
                         </CheckBox>
                         <CheckBox IsChecked="{Binding ChartGroundSpeedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,0,0" MinWidth="0">
                             <Border CornerRadius="3" Background="DarkMagenta">
