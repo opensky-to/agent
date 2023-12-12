@@ -23,10 +23,33 @@ namespace OpenSky.Agent.Simulator
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the landing reports.
+        /// (Immutable) The process landing analysis queue (to monitor values like g-force over a period
+        /// of reports)
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        public ObservableCollection<TouchDown> LandingReports { get; }
+        private readonly LandingAnalysis[] plaQueue = new LandingAnalysis[100];
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The last touchdown even recorded (to group bounces etc., before creating new touchdown event).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private DateTime lastTouchdown = DateTime.MinValue;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The pla queue countdown after initial touchdown (to monitor values like g-force for a short
+        /// period after touchdown)
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int plaQueueCountdown = -1;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The current pla queue index.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private int plaQueueIndex;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -34,6 +57,21 @@ namespace OpenSky.Agent.Simulator
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public event EventHandler<LandingReportNotification> LandingReported;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the zero-based index of the final touch down landing report (in case there are multiple
+        /// like a bounce on takeoff).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public int FinalTouchDownIndex { get; private set; } = -1;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the landing reports.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public ObservableCollection<TouchDown> LandingReports { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -50,15 +88,26 @@ namespace OpenSky.Agent.Simulator
         {
             if (this.TrackingStatus == TrackingStatus.Tracking && !pla.Old.OnGround && pla.New.OnGround)
             {
-                // We have touchdown
+                // We have a touchdown
                 Debug.WriteLine("Adding new landing report");
+
+                // Check for max g-force before touchdown
+                var maxGeforce = Math.Max(pla.Old.Gforce, pla.New.Gforce);
+                for (var i = 0; i < 100; i++)
+                {
+                    if (this.plaQueue[i] != null)
+                    {
+                        maxGeforce = Math.Max(maxGeforce, this.plaQueue[i].Gforce);
+                    }
+                }
+
                 var landingReport = new TouchDown(
                     DateTime.UtcNow,
                     pla.New.Location.Latitude,
                     pla.New.Location.Longitude,
                     (int)pla.New.Location.Altitude,
                     pla.New.LandingRate * -1.0,
-                    Math.Max(pla.Old.Gforce, pla.New.Gforce),
+                    maxGeforce,
                     pla.New.SpeedLong,
                     pla.New.SpeedLat,
                     pla.New.WindLong,
@@ -68,14 +117,47 @@ namespace OpenSky.Agent.Simulator
                     pla.New.AirspeedTrue
                 );
 
+                // Add to the list and start the countdown
                 this.LandingReports.Add(landingReport);
-
-                if (this.LandingReports.Count == 1)
+                if ((DateTime.UtcNow - this.lastTouchdown).TotalSeconds > 30)
                 {
-                    // First landing for this flight
                     this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.Touchdown, OpenSkyColors.OpenSkyTeal, "Touchdown");
-                    this.LandingReported?.Invoke(this, LandingReportNotification.AsSoonAsPossible);
+                    this.FinalTouchDownIndex = this.LandingReports.Count - 1;
+                    this.plaQueueCountdown = 100;
                 }
+
+                this.lastTouchdown = DateTime.UtcNow;
+            }
+
+            this.plaQueue[this.plaQueueIndex++] = pla.New;
+            if (this.plaQueueIndex == 100)
+            {
+                this.plaQueueIndex = 0;
+            }
+
+            if (this.plaQueueCountdown > 0)
+            {
+                this.plaQueueCountdown--;
+            }
+
+            if (this.plaQueueCountdown == 0 && this.FinalTouchDownIndex >= 0)
+            {
+                this.plaQueueCountdown = -1;
+
+                // Check for max g-force after touchdown
+                var maxGeforce = this.LandingReports[this.FinalTouchDownIndex].GForce;
+                for (var i = 0; i < 100; i++)
+                {
+                    if (this.plaQueue[i] != null)
+                    {
+                        maxGeforce = Math.Max(maxGeforce, this.plaQueue[i].Gforce);
+                    }
+                }
+
+                this.LandingReports[this.FinalTouchDownIndex].GForce = maxGeforce;
+
+                // First landing for this flight
+                this.LandingReported?.Invoke(this, LandingReportNotification.AsSoonAsPossible);
             }
         }
     }

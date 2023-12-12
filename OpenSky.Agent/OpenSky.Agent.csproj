@@ -399,7 +399,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="OpenSky.FlightLogXML">
-      <Version>0.1.7</Version>
+      <Version>0.1.8</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
       <Version>23.2.7</Version>

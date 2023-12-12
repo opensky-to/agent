@@ -120,6 +120,7 @@ namespace OpenSky.Agent.Simulator
 
                 log.PositionReports.AddRange(this.AircraftTrailLocations.Cast<AircraftTrailLocation>().Select(loc => loc.Position));
                 log.TouchDowns.AddRange(this.LandingReports);
+                log.FinalTouchDownIndex = this.FinalTouchDownIndex;
                 log.NavLogWaypoints.AddRange(this.simbriefWaypointMarkers.Select(w => w.WayPoint));
 
                 return log.GenerateFlightLog();
@@ -273,6 +274,8 @@ namespace OpenSky.Agent.Simulator
             {
                 this.LandingReports.Add(touchdown);
             }
+
+            this.FinalTouchDownIndex = log.FinalTouchDownIndex;
 
             // Restore simbrief waypoint markers
             UpdateGUIDelegate restoreSimbrief = () =>

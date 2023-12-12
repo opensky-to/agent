@@ -66,9 +66,12 @@ namespace OpenSky.Agent.Views.Models
             this.FlightNumberHeader = $"Flight #{this.Simulator.Flight?.FullFlightNumber}\r\nLanding Report";
 
             // Fetch the initial already existing landing report(s)
-            foreach (var item in this.Simulator.LandingReports)
+            if (this.Simulator.FinalTouchDownIndex > 0)
             {
-                this.landingReports.Add(item);
+                for (var i = this.Simulator.FinalTouchDownIndex; i < this.Simulator.LandingReports.Count; i++)
+                {
+                    this.landingReports.Add(this.Simulator.LandingReports[i]);
+                }
             }
 
             // Subscribe to changes
@@ -144,7 +147,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the head wind (only from first touchdown).
+        /// Gets the head-wind (only from first touchdown).
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public string HeadWind => this.landingReports.Count > 0 ? this.landingReports[0].HeadWind.ToString("Tail, 0.00;Head, 0.00;None, 0") : "0";
@@ -198,79 +201,105 @@ namespace OpenSky.Agent.Views.Models
                 // E  Dangerous <-5 or >5
 
                 var landingRateAbs = Math.Abs(this.MaxLandingRate);
-                var grade = "A+";
-                var desc = "Butter landing";
+                var geforceAbs = Math.Abs(this.MaxGForce);
+                var grade = "?";
+                var desc = "Unknown";
 
-                if (landingRateAbs > 1000)
+                if (landingRateAbs > 1000 || geforceAbs > 3)
                 {
                     grade = "F";
                     desc = "Crash landing";
                 }
 
-                if (grade == "A+" && (this.MaxBankAngle is < -5.0 or > 5.0))
+                if (grade == "?" && (this.MaxBankAngle is < -5.0 or > 5.0))
                 {
                     grade = "E";
                     desc = "Dangerous bank angle";
                 }
 
-                if (grade == "A+" && (this.MaxSideSlipAngle is < -15.0 or > 15.0))
+                if (grade == "?" && (this.MaxSideSlipAngle is < -15.0 or > 15.0))
                 {
                     grade = "E";
                     desc = "Dangerous sideslip angle";
                 }
 
-                if (grade == "A+" && landingRateAbs is > 600 and <= 1000)
+                if (grade == "?" && (landingRateAbs is > 840 and <= 1000 || geforceAbs > 2.86))
                 {
-                    grade = "D";
-                    desc = "Rough landing";
+                    grade = "E";
+                    desc = "Severe hard landing";
                 }
 
-                if (grade == "A+" && this.Bounces > 2)
+                if (grade == "A+" && (landingRateAbs is > 600 and <= 840 || geforceAbs is > 2.6 and <= 2.86))
+                {
+                    grade = "D";
+                    desc = "Hard landing";
+                }
+
+                if (grade == "?" && this.Bounces > 2)
                 {
                     grade = "D";
                     desc = "Porpoising landing";
                 }
 
-                if (grade == "A+" && (this.MaxGForce is < -2.1 or > 2.1))
+                if (grade == "?" && geforceAbs is > 2.1 and <= 2.6)
                 {
                     grade = "C";
-                    desc = "Hard landing";
+                    desc = "Rough landing";
                 }
 
-                if (grade == "A+" && landingRateAbs is > 240 and <= 600)
-                {
-                    grade = "C";
-                    desc = "Hard landing";
-                }
-
-                if (grade == "A+" && this.Bounces > 1)
+                if (grade == "?" && this.Bounces > 1)
                 {
                     grade = "C";
                     desc = "Bouncy landing";
                 }
 
-                if (grade == "A+" && landingRateAbs is > 180 and <= 240)
+                if (grade == "?" && geforceAbs is > 1.5 and <= 2.1)
                 {
-                    grade = "B";
-                    desc = "OK landing";
+                    grade = "B-";
+                    desc = "Uncomfortable landing";
                 }
 
-                if (grade == "A+" && landingRateAbs is > 60 and <= 180)
+
+                if (grade == "?" && geforceAbs is > 1.25 and <= 1.5)
+                {
+                    grade = "B";
+                    desc = "Good landing";
+                }
+
+                if (grade == "?" && geforceAbs is >= 0.75 and <= 1.25)
                 {
                     grade = "A";
-                    desc = "Good landing";
+                    desc = "Great landing";
 
-                    if (landingRateAbs <= 130 && this.Simulator.AircraftIdentity.EngineType == EngineType.Jet)
+                    if (this.Simulator.AircraftIdentity.EngineType == EngineType.Jet)
                     {
-                        grade = "A+";
-                        desc = "Perfect landing";
+
+                        if (landingRateAbs is <= 160 and >= 80)
+                        {
+                            grade = "A+";
+                            desc = "Perfect landing";
+                        }
+
+                        if (landingRateAbs < 50)
+                        {
+                            grade = "A-";
+                            desc = "Lading too soft";
+                        }
+                    }
+                    else
+                    {
+                        if (landingRateAbs < 80)
+                        {
+                            grade = "A+";
+                            desc = "Butter landing";
+                        }
                     }
                 }
 
-                if (grade == "A+" && this.Simulator.AircraftIdentity.EngineType == EngineType.Jet)
+                if (grade == "?" && geforceAbs < 0.75)
                 {
-                    grade = "A-";
-                    desc = "Lading too soft";
+                    grade = "B-";
+                    desc = "Negative-G landing";
                 }
 
                 this.LandingGradeDescription = desc;
@@ -342,7 +371,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the maximum side slip angle.
+        /// Gets the maximum side-slip angle.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public double MaxSideSlipAngle
@@ -362,7 +391,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the maximum side slip angle info text.
+        /// Gets the maximum side-slip angle info text.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public string MaxSideSlipAngleInfo => this.MaxSideSlipAngle.ToString("Left, 0.00;Right, 0.00;None, 0");
