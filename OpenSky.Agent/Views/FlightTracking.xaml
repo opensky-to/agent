@@ -556,14 +556,16 @@
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0">
                 <GroupBox.Header>
-                    <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
+                        <Button Style="{StaticResource OpenSkyButtonStyle}" Padding="5,0" FontSize="11" Margin="5,-2,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
+                    </StackPanel>
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <TextBlock FontSize="10">Route</TextBlock>
                     <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.Route, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
                     <TextBlock FontSize="10" Margin="0,10,0,0">Alternate route</TextBlock>
                     <TextBlock FontFamily="Consolas" Text="{Binding Simulator.Flight.AlternateRoute, FallbackValue=None}" TextWrapping="Wrap" MaxWidth="450" HorizontalAlignment="Left" />
-                    <Button Style="{StaticResource OpenSkyButtonStyle}" Margin="0,10,0,0" Content="{Binding ShowHideOFPButtonText}" Command="{Binding ToggleOfpCommand}" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Grid.Column="0">
