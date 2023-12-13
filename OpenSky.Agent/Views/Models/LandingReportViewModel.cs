@@ -66,7 +66,7 @@ namespace OpenSky.Agent.Views.Models
             this.FlightNumberHeader = $"Flight #{this.Simulator.Flight?.FullFlightNumber}\r\nLanding Report";
 
             // Fetch the initial already existing landing report(s)
-            if (this.Simulator.FinalTouchDownIndex > 0)
+            if (this.Simulator.FinalTouchDownIndex >= 0)
             {
                 for (var i = this.Simulator.FinalTouchDownIndex; i < this.Simulator.LandingReports.Count; i++)
                 {

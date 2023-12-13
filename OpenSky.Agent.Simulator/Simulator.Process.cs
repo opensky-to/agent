@@ -379,7 +379,7 @@ namespace OpenSky.Agent.Simulator
                             }
 
                             // Are we close to landing?
-                            this.SampleRates[Requests.LandingAnalysis] = this.WasAirborne && ppt.New.RadioHeight < 500 ? 25 : 500;
+                            this.SampleRates[Requests.LandingAnalysis] = this.WasAirborne && ppt.New.RadioHeight < 200 ? 25 : 500;
                             this.OnPropertyChanged(nameof(this.SampleRates));
 
                             // Was the sim paused/un-paused?
