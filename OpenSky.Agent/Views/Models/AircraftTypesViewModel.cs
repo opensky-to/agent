@@ -608,7 +608,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets a list of of the existing aircraft types.
+        /// Gets a list of the existing aircraft types.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public ObservableCollection<AircraftType> ExistingAircraftTypes { get; }
@@ -1030,7 +1030,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets or sets the the selected aircraft type.
+        /// Gets or sets the selected aircraft type.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AircraftType SelectedAircraftType
@@ -1214,7 +1214,7 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Adds the current plane identity to the CSV.
+        /// Adds the current aircraft type.
         /// </summary>
         /// <remarks>
         /// sushi.at, 28/03/2021.
