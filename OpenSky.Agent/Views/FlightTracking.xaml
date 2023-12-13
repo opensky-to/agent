@@ -256,6 +256,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="1" Grid.Column="0">Tracking duration</TextBlock>
                 <TextBlock Grid.Row="2" Grid.Column="0">Fuel remaining</TextBlock>
@@ -281,9 +282,10 @@
                     <Button Margin="0,0,3,0" Padding="3" Background="{StaticResource OpenSkyTealBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding ToggleFlightPauseCommand}" Content="{Binding Simulator.IsPaused, Converter={StaticResource IsPausedButtonConverter}}"></Button>
                     <Button Margin="3,0,0,0" Padding="3" Background="{StaticResource OpenSkyRedBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding StopTrackingCommand}">Stop Tracking</Button>
                 </UniformGrid>
-                <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Margin="0,0,0,10">[*] Time warp time saved and pause times only update when the sim rate is changed or the sim is resumed.</TextBlock>
-                <Rectangle Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="3" RadiusY="3" Margin="0,5" />
-                <TextBlock Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Foreground="Black" Margin="10,10">Note: You can close this window and OpenSky will monitor your flight in the background...</TextBlock>
+                <Button Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,3,0,5" Background="{StaticResource OpenSkyTealBrush}" HorizontalAlignment="Stretch" Foreground="White" FontSize="15" FontWeight="SemiBold" Command="{Binding CompleteFlightCommand}" Visibility="{Binding Simulator.CanFinishTracking, Converter={StaticResource BooleanVisibilityConverter}}">Complete Flight</Button>
+                <TextBlock Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" FontSize="9" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Margin="0,0,0,10">[*] Time warp time saved and pause times only update when the sim rate is changed or the sim is resumed.</TextBlock>
+                <Rectangle Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Fill="{StaticResource OpenSkyTealLightBrush}" RadiusX="3" RadiusY="3" Margin="0,5" />
+                <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Foreground="Black" Margin="10,10">Note: You can close this window and OpenSky will monitor your flight in the background...</TextBlock>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="3" Grid.Column="0" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesVisibility}">

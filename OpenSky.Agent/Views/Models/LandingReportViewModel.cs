@@ -212,6 +212,12 @@ namespace OpenSky.Agent.Views.Models
                 // ----------------------------------------------------
                 // E  Dangerous <-5 or >5
 
+                if (this.landingReports.Count == 0)
+                {
+                    this.LandingGradeDescription = "Unknown";
+                    return "?";
+                }
+
                 var landingRateAbs = Math.Abs(this.MaxLandingRate);
                 var crossWindAbs = Math.Abs(this.landingReports[0].CrossWind);
                 var grade = "?";
