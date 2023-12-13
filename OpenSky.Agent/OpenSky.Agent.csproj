@@ -167,6 +167,9 @@
     <Compile Include="Tools\VisibilityAnimation.cs" />
     <Compile Include="Tools\WindowExtensions.cs" />
     <Compile Include="UserSessionService.cs" />
+    <Compile Include="Views\AddAircraft.xaml.cs">
+      <DependentUpon>AddAircraft.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\FlightTracking.xaml.cs">
       <DependentUpon>FlightTracking.xaml</DependentUpon>
     </Compile>
@@ -176,6 +179,7 @@
     <Compile Include="Views\LoginNotification.xaml.cs">
       <DependentUpon>LoginNotification.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Models\AddAircraftViewModel.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.CustomModules.cs" />
     <Compile Include="Views\Models\FlightTrackingViewModel.FuelTanks.cs" />
@@ -234,6 +238,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="VectorGraphics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AddAircraft.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
