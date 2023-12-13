@@ -27,7 +27,7 @@ namespace OpenSky.Agent.Simulator
         /// of reports)
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private readonly LandingAnalysis[] plaQueue = new LandingAnalysis[100];
+        private LandingAnalysis[] plaQueue = new LandingAnalysis[100];
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

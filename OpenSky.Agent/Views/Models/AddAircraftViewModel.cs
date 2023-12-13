@@ -13,9 +13,9 @@ namespace OpenSky.Agent.Views.Models
     using System.Threading;
     using System.Windows;
 
-    using OpenSky.Agent.Controls;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.Agent.Tools;
 

@@ -22,6 +22,7 @@
             xmlns:controls="clr-namespace:OpenSky.Agent.Controls"
             xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
             xmlns:converters="clr-namespace:OpenSky.Agent.Converters"
+            xmlns:simTools="clr-namespace:OpenSky.Agent.Simulator.Tools;assembly=OpenSky.Agent.Simulator"
             xmlns:tools="clr-namespace:OpenSky.Agent.Tools"
             mc:Ignorable="d" d:DesignWidth="2000" Loaded="AircraftTypesOnLoaded"
             Title="Aircraft Types" Height="800" Width="1400" HorizontalScrollBar="False" VerticalScrollBar="False" LoadingText="{Binding LoadingText}">
@@ -83,7 +84,7 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <FrameworkElement Grid.Column="0" x:Name="ProxyElement" Visibility="Collapsed" />
-        <GroupBox Grid.Column="0" Visibility="{Binding AircraftTypeDetailsVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromLeft">
+        <GroupBox Grid.Column="0" Visibility="{Binding AircraftTypeDetailsVisibility}" simTools:VisibilityAnimation.AnimationType="SlideFromLeft">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Aircraft Type Details</TextBlock>
@@ -383,7 +384,7 @@
                 </DataGrid>
             </DockPanel>
         </GroupBox>
-        <GroupBox Grid.Column="2" Width="450" Visibility="{Binding EditAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
+        <GroupBox Grid.Column="2" Width="450" Visibility="{Binding EditAircraftVisibility}" simTools:VisibilityAnimation.AnimationType="SlideFromRight">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Edit aircraft type</TextBlock>
@@ -529,7 +530,7 @@
                 </Grid>
             </ScrollViewer>
         </GroupBox>
-        <GroupBox Grid.Column="3" Width="450" Visibility="{Binding AddAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
+        <GroupBox Grid.Column="3" Width="450" Visibility="{Binding AddAircraftVisibility}" simTools:VisibilityAnimation.AnimationType="SlideFromRight">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Add aircraft type</TextBlock>
@@ -672,7 +673,7 @@
                 </Grid>
             </ScrollViewer>
         </GroupBox>
-        <GroupBox Grid.Column="4" Visibility="{Binding UpgradeAircraftVisibility}" tools:VisibilityAnimation.AnimationType="SlideFromRight">
+        <GroupBox Grid.Column="4" Visibility="{Binding UpgradeAircraftVisibility}" simTools:VisibilityAnimation.AnimationType="SlideFromRight">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Upgrade aircraft types</TextBlock>

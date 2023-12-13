@@ -19,7 +19,8 @@ namespace OpenSky.Agent.Controls
     using System.Windows.Interop;
     using System.Windows.Shapes;
 
-    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Tools;
 
     using Button = System.Windows.Controls.Button;

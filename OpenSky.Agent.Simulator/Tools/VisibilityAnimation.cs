@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.Agent.Tools
+namespace OpenSky.Agent.Simulator.Tools
 {
     using System;
     using System.Collections.Generic;

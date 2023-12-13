@@ -11,9 +11,9 @@ namespace OpenSky.Agent.Views.Models
     using System.Collections.ObjectModel;
     using System.Diagnostics;
 
-    using OpenSky.Agent.Controls;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Enums;
 
     /// -------------------------------------------------------------------------------------------------

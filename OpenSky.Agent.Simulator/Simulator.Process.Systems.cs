@@ -7,17 +7,14 @@
 namespace OpenSky.Agent.Simulator
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Media;
     using System.Reflection;
-    using System.Windows;
 
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
-    using OpenSky.Agent.Simulator.Tools;
     using OpenSky.FlightLogXML;
-
-    using TrackingEventMarker = OpenSky.Agent.Simulator.Models.TrackingEventMarker;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
@@ -198,43 +195,13 @@ namespace OpenSky.Agent.Simulator
                         $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
                 }
 
-                // Was the engine turned off on the ground, not moving, while tracking? -> End tracking session, save reports and report to API
-                if (!pst.New.EngineRunning && this.PrimaryTracking.OnGround && this.PrimaryTracking.GroundSpeed < 1 && this.TrackingStatus == TrackingStatus.Tracking)
+                // Was the engine turned off on the ground, not moving, while tracking? -> Report that we can now finish up tracking
+                if (!pst.New.EngineRunning && this.PrimaryTracking.OnGround && this.PrimaryTracking.GroundSpeed < 1 && this.TrackingStatus == TrackingStatus.Tracking && this.WasAirborne)
                 {
-                    // todo expand this to battery off and proper shutdown/secure flow for extra xp (enable/disable in the settings)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(this.CanFinishTracking)));
 
-                    if (this.WasAirborne)
-                    {
-                        Debug.WriteLine("Engine was turned off, wrapping up flight");
-
-                        // Did the user shut the engines off on the runway or was there some taxi to parking?
-                        if (this.taxiInStarted)
-                        {
-                            if (!this.taxiInTurned)
-                            {
-                                this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.EngineOffRunway, OpenSkyColors.OpenSkyWarningOrange, "Engine turned off on the runway?");
-                            }
-
-                            this.taxiInStarted = false;
-                        }
-
-                        // Add one last position report
-                        UpdateGUIDelegate addPositionReport = () =>
-                        {
-                            this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, this.PrimaryTracking, pst.New, this.WeightAndBalance.FuelTotalQuantity));
-                            this.TrackingEventMarkerAdded?.Invoke(this, new TrackingEventMarker(this.PrimaryTracking, pst.New, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report"));
-                        };
-                        Application.Current.Dispatcher.Invoke(addPositionReport);
-
-                        this.AddTrackingEvent(this.PrimaryTracking, pst.New, FlightTrackingEventType.TrackingStopped, OpenSkyColors.OpenSkyTealLight, "Flight tracking stopped");
-
-                        // Show landing report notification now?
-                        this.LandingReported?.Invoke(this, LandingReportNotification.AfterTurningEnginesOff);
-
-                        // Actually finish up the tracking session now
-                        SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightCompleteSubmitting);
-                        this.FinishUpFlightTracking();
-                    }
+                    // Show landing report notification now?
+                    this.LandingReported?.Invoke(this, LandingReportNotification.AfterTurningEnginesOff);
                 }
             }
 

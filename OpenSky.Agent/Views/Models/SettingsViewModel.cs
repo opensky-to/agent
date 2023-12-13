@@ -20,12 +20,12 @@ namespace OpenSky.Agent.Views.Models
 
     using Microsoft.Win32;
 
-    using OpenSky.Agent.Controls;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Properties;
     using OpenSky.Agent.SimConnectMSFS;
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
     using OpenSky.Agent.Tools;
@@ -839,6 +839,7 @@ namespace OpenSky.Agent.Views.Models
 
                 if (simulatorWasChanged && Simulator.Instance != null)
                 {
+                    StartupViewModel.Instance.SimulatorChanged();
                     Simulator.Instance.LandingReported += (_, landingReportNotification) =>
                     {
                         if (landingReportNotification.Equals(LandingReportNotification.Parse(Settings.Default.LandingReportNotification)))
