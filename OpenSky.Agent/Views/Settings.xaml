@@ -154,7 +154,7 @@
             </GroupBox>
             <GroupBox Grid.Column="1">
                 <GroupBox.Header>
-                    <RadioButton GroupName="SimulatorInterface" FontSize="15" FontWeight="DemiBold" VerticalAlignment="Center" IsChecked="{Binding UdpXplaneChecked}">X-Plane 11 (UDP)</RadioButton>
+                    <RadioButton GroupName="SimulatorInterface" FontSize="15" FontWeight="DemiBold" VerticalAlignment="Center" IsChecked="{Binding UdpXplaneChecked}">X-Plane 11+ (UDP)</RadioButton>
                 </GroupBox.Header>
                 <Grid Margin="5" IsEnabled="{Binding UdpXplaneChecked}">
                     <Grid.ColumnDefinitions>

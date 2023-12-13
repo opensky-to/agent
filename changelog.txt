@@ -3,6 +3,13 @@ OpenSky Flight Tracking Agent Changelog
 ======================================================================================
 
 --------------------------------------------------------------------------------------
+Version 0.5.9 (ALPHA5)
+--------------------------------------------------------------------------------------
+- Fixed headwind/tailwind for Xplane
+- Added live METAR to tracking window
+- Added new simpler "Add Aircraft" window for users
+
+--------------------------------------------------------------------------------------
 Version 0.5.8 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Now highlighting differences between two selected aircraft types

@@ -197,7 +197,7 @@ namespace OpenSky.Agent.UdpXPlane11.Models
 
             var windDelta = Math.Abs(this.heading - this.windDegrees);
             this.WindLat = Math.Sin((Math.PI / 180) * windDelta) * this.windSpeed;
-            this.WindLong = Math.Cos((Math.PI / 180) * windDelta) * this.windSpeed;
+            this.WindLong = Math.Cos((Math.PI / 180) * windDelta) * this.windSpeed * -1;
         }
     }
 }
