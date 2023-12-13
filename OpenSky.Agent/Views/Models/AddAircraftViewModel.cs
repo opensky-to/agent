@@ -274,27 +274,32 @@ namespace OpenSky.Agent.Views.Models
                 }
             }
 
-            var abortFlow = false;
             if (matchedType != null)
             {
-                var messageBox = new OpenSkyMessageBox(
-                    "Add aircraft type",
-                    $"The aircraft currently loaded in the sim seems to be a match for the existing type: {matchedType}\r\n\r\nAre you sure you want to add another type?",
-                    MessageBoxButton.YesNo,
-                    ExtendedMessageBoxImage.Question);
-                messageBox.Closed += (_, _) =>
-                {
-                    if (messageBox.Result != ExtendedMessageBoxResult.Yes)
+                ExtendedMessageBoxResult? answer = null;
+                this.AddAircraftTypeCommand.ReportProgress(
+                    () =>
                     {
-                        abortFlow = true;
-                    }
-                };
-                this.ViewReference.ShowMessageBox(messageBox);
-            }
+                        var messageBox = new OpenSkyMessageBox(
+                            "Add aircraft type",
+                            $"The aircraft currently loaded in the sim seems to be a match for the existing type: {matchedType}\r\n\r\nAre you sure you want to add another type?",
+                            MessageBoxButton.YesNo,
+                            ExtendedMessageBoxImage.Question);
+                        messageBox.Closed += (_, _) =>
+                        {
+                            answer = messageBox.Result;
+                        };
+                        this.ViewReference.ShowMessageBox(messageBox);
+                    });
+                while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                {
+                    Thread.Sleep(500);
+                }
 
-            if (abortFlow)
-            {
-                return;
+                if (answer != ExtendedMessageBoxResult.Yes)
+                {
+                    return;
+                }
             }
 
             if (string.IsNullOrEmpty(this.Name) || this.Name.Length < 5)
@@ -339,8 +344,7 @@ namespace OpenSky.Agent.Views.Models
                         {
                             var messageBox = new OpenSkyMessageBox("New aircraft", result.Message, MessageBoxButton.OK, ExtendedMessageBoxImage.Check, 10);
                             this.ViewReference.ShowMessageBox(messageBox);
-                            this.RefreshAircraftTypesCommand.DoExecute(null);
-                            this.CloseWindow?.Invoke(this, null);
+                            messageBox.Closed += (_, _) => { this.CloseWindow?.Invoke(this, null); };
                         });
                 }
                 else
@@ -442,6 +446,8 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 this.ExistingAircraftTypes.Add(type);
                             }
+
+                            this.IdentifyAircraftCommand.DoExecute(null);
                         });
                 }
                 else

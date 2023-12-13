@@ -35,8 +35,6 @@ namespace OpenSky.Agent.Views.Models
     using OpenSkyApi;
 
     using Simulator = OpenSky.Agent.Simulator.Simulator;
-#if DEBUG
-#endif
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -217,26 +215,18 @@ namespace OpenSky.Agent.Views.Models
                     }
                 });
 
-            // Build main menu and subscribe to user logged in/out events
-            this.UpdateMainMenu();
-            UserSessionService.Instance.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn))
-                {
-                    UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
-                    Application.Current.Dispatcher.BeginInvoke(updateMenu);
-                }
-            };
-
             // Check for new flight from API
             new Thread(
                     () =>
                     {
                         if (UserSessionService.Instance.IsUserLoggedIn)
                         {
+                            _ = UserSessionService.Instance.UpdateUserRoles().Result;
                             _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
                             _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
                             Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                            UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
+                            Application.Current.Dispatcher.BeginInvoke(updateMenu);
                         }
                         else
                         {
@@ -249,9 +239,12 @@ namespace OpenSky.Agent.Views.Models
                             {
                                 if (UserSessionService.Instance.IsUserLoggedIn)
                                 {
+                                    _ = UserSessionService.Instance.UpdateUserRoles().Result;
                                     _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
                                     _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
                                     Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                                    UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
+                                    Application.Current.Dispatcher.BeginInvoke(updateMenu);
                                 }
                                 else
                                 {
