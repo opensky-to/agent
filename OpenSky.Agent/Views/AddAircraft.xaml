@@ -1,0 +1,69 @@
+﻿<!-- 
+====================================================================================================================
+<copyright file="AddAircraft.xaml" company="OpenSky">
+  OpenSky project 2021-2023
+</copyright>
+<summary>
+  Add aircraft window
+</summary>
+====================================================================================================================
+-->
+
+<controls:OpenSkyWindow x:Class="OpenSky.Agent.Views.AddAircraft"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:controls="clr-namespace:OpenSky.Agent.Controls"
+                        xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
+                        xmlns:ui="http://schemas.modernwpf.com/2019"
+                        mc:Ignorable="d" d:DesignWidth="600" Loaded="AddAircraftLoaded"
+                        Title="Add Aircraft" Height="500" Width="600" HorizontalScrollBar="False" VerticalScrollBar="False" LoadingText="{Binding LoadingText}">
+    <Window.DataContext>
+        <models:AddAircraftViewModel CloseWindow="ViewModelCloseWindow" />
+    </Window.DataContext>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0">
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Aircraft identification</TextBlock>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical" Margin="10">
+                    <TextBlock FontSize="16">Aircraft currently loaded in the sim identified as:</TextBlock>
+                    <TextBlock FontSize="22" Text="{Binding IdentifiedAircraftInfo}" />
+                </StackPanel>
+                <Button Grid.Column="1" Margin="5,0,10,0" Command="{Binding IdentifyAircraftCommand}" Style="{StaticResource OpenSkyButtonStyle}">Refresh</Button>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1">
+            <GroupBox.Header>
+                <TextBlock FontSize="15" FontWeight="DemiBold">Add new aircraft</TextBlock>
+            </GroupBox.Header>
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0">Name</TextBlock>
+                <TextBox Grid.Row="1" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.PlaceholderText="Name of the aircraft and any type identifiers" ui:ControlHelper.PlaceholderForeground="#666" />
+                <TextBlock Grid.Row="2" Margin="0,10,0,0">Comments</TextBlock>
+                <TextBox Grid.Row="3" AcceptsReturn="True" Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ui:ControlHelper.PlaceholderText="Mod name and version and anything else you deem important for the moderation team." ui:ControlHelper.PlaceholderForeground="#666" />
+                <StackPanel Grid.Row="4" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource OpenSkyButtonStyle}" Command="{Binding AddAircraftTypeCommand}">Add aircraft</Button>
+                    <Button Margin="5,0,0,0" Style="{StaticResource OpenSkyRedButtonStyle}" Command="{Binding CancelCommand}">Cancel</Button>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</controls:OpenSkyWindow>

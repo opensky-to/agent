@@ -16,7 +16,6 @@
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:tb="http://www.hardcodet.net/taskbar"
             mc:Ignorable="d"
-            xmlns:debug="debug-mode"
             xmlns:models="clr-namespace:OpenSky.Agent.Views.Models"
             Title="Startup" Height="400" Width="600" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen"
             AllowsTransparency="True" Background="#171a1d" Visibility="Visible">
@@ -60,14 +59,11 @@
             </tb:TaskbarIcon.TrayToolTip>
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu Name="NotificationContextMenu" MinWidth="200">
-                    <MenuItem Header="Flight tracking" Command="{Binding FlightTrackingCommand}" />
-                    <mc:AlternateContent>
-                        <mc:Choice Requires="debug">
-                            <MenuItem Header="Tracking debug" Command="{Binding TrackingDebugCommand}" />
-                            <MenuItem Header="Sound pack tester" Command="{Binding SoundPackTesterCommand}" />
-                        </mc:Choice>
-                    </mc:AlternateContent>
-                    <MenuItem Header="Aircraft types" Command="{Binding AircraftTypesCommand}" />
+                    <MenuItem Header="Flight tracking" Command="{Binding FlightTrackingCommand}" Visibility="{Binding UserLoggedInCommandVisibility}" />
+                    <MenuItem Header="Add aircraft" Command="{Binding AddAircraftCommand}" Visibility="{Binding UserLoggedInCommandVisibility}" />
+                    <MenuItem Header="Tracking debug" Command="{Binding TrackingDebugCommand}" Visibility="{Binding ModCommandVisibility}" />
+                    <MenuItem Header="Sound pack tester" Command="{Binding SoundPackTesterCommand}" Visibility="{Binding ModCommandVisibility}" />
+                    <MenuItem Header="Aircraft types" Command="{Binding AircraftTypesCommand}" Visibility="{Binding ModCommandVisibility}" />
                     <MenuItem Header="Settings" Command="{Binding SettingsCommand}" />
                     <MenuItem Header="Quit" Command="{Binding QuitCommand}" />
                 </ContextMenu>
