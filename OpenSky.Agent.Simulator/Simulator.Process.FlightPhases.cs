@@ -349,7 +349,7 @@ namespace OpenSky.Agent.Simulator
             // Landing
             if (this.WasAirborne && this.PrimaryTracking.RadioHeight <= 500 && this.PrimaryTracking.GroundSpeed >= 40 && this.SecondaryTracking.EngineRunning)
             {
-                // Landing is allowed to override descent in case of return to origin airport or I guess landing anywhere but the destination/alternate
+                // Landing is allowed to override descent in case of return to origin airport,  or I guess landing anywhere but the destination/alternate
                 if (unknownFlightPhase || this.FlightPhase == FlightPhase.Descent)
                 {
                     this.FlightPhase = FlightPhase.Landing;
@@ -393,7 +393,7 @@ namespace OpenSky.Agent.Simulator
                 if (unknownFlightPhase)
                 {
                     this.FlightPhase = FlightPhase.PostFlight;
-                    this.NextFlightStep = "All done, saving report and submitting to OpenSky...";
+                    this.NextFlightStep = "All done, secure the aircraft and hit \"Complete Flight\" when ready...";
                     newNextStepFlashing = true;
                     unknownFlightPhase = false;
                 }

@@ -23,21 +23,21 @@ namespace OpenSky.Agent.Simulator
         /// The alternate metar.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string alternateMetar = "???";
+        private string alternateMetar = "???\n";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Destination metar.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string destinationMetar = "???";
+        private string destinationMetar = "???\n";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The origin metar.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private string originMetar = "???";
+        private string originMetar = "???\n";
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -122,10 +122,14 @@ namespace OpenSky.Agent.Simulator
                             {
                                 var url = $"https://aviationweather.gov/api/data/metar?ids={this.Flight.Origin.Icao}";
                                 this.OriginMetar = client.DownloadString(url);
+                                if (string.IsNullOrEmpty(this.OriginMetar))
+                                {
+                                    this.OriginMetar = "Unavailable\n";
+                                }
                             }
                             else
                             {
-                                this.OriginMetar = "???";
+                                this.OriginMetar = "???\n";
                             }
                         }
                         catch (Exception ex)
@@ -140,10 +144,14 @@ namespace OpenSky.Agent.Simulator
                             {
                                 var url = $"https://aviationweather.gov/api/data/metar?ids={this.Flight.Destination.Icao}";
                                 this.DestinationMetar = client.DownloadString(url);
+                                if (string.IsNullOrEmpty(this.DestinationMetar))
+                                {
+                                    this.DestinationMetar = "Unavailable\n";
+                                }
                             }
                             else
                             {
-                                this.DestinationMetar = "???";
+                                this.DestinationMetar = "???\n";
                             }
                         }
                         catch (Exception ex)
@@ -158,10 +166,14 @@ namespace OpenSky.Agent.Simulator
                             {
                                 var url = $"https://aviationweather.gov/api/data/metar?ids={this.Flight.Alternate.Icao}";
                                 this.AlternateMetar = client.DownloadString(url);
+                                if (string.IsNullOrEmpty(this.AlternateMetar))
+                                {
+                                    this.AlternateMetar = "Unavailable\n";
+                                }
                             }
                             else
                             {
-                                this.AlternateMetar = "???";
+                                this.AlternateMetar = "???\n";
                             }
                         }
                         catch (Exception ex)

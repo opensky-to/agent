@@ -18,10 +18,10 @@ namespace OpenSky.Agent.Views.Models
 
     using JetBrains.Annotations;
 
-    using OpenSky.Agent.Controls;
     using OpenSky.Agent.Controls.CustomModules;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
@@ -185,6 +185,7 @@ namespace OpenSky.Agent.Views.Models
             this.SpeedUpGroundHandlingCommand = new Command(this.SpeedUpGroundHandling);
             this.SkipGroundHandlingCommand = new Command(this.SkipGroundHandling);
             this.RefreshMetarCommand = new Command(this.RefreshMetar);
+            this.CompleteFlightCommand = new AsynchronousCommand(this.CompleteFlight);
 
             // Are we already preparing/resuming/tracking?
             this.SimulatorTrackingStatusChanged(this, this.Simulator.TrackingStatus);
@@ -208,6 +209,13 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public AsynchronousCommand AbortFlightCommand { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the complete flight command.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public AsynchronousCommand CompleteFlightCommand { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -650,6 +658,22 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Complete the flight and submit it to the OpenSky server.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 13/12/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CompleteFlight()
+        {
+            if (this.Simulator.CanFinishTracking)
+            {
+                this.Simulator.FinishUpFlightTracking();
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Refresh metar.
         /// </summary>
         /// <remarks>
@@ -978,7 +1002,7 @@ namespace OpenSky.Agent.Views.Models
                     // Check fuel
                     if (this.Simulator.Flight != null)
                     {
-                        if (this.Simulator.WeightAndBalance.FuelTotalQuantity < (this.Simulator.Flight.FuelGallons ?? 0))
+                        if (this.Simulator.WeightAndBalance.FuelTotalQuantity < (this.Simulator.Flight.FuelGallons ?? 0) && ((this.Simulator.Flight.FuelGallons ?? 0) - this.Simulator.WeightAndBalance.FuelTotalQuantity) > 0.2)
                         {
                             Debug.WriteLine("Fuel below flight plan, double checking with user...");
                             ExtendedMessageBoxResult? answer = null;

@@ -8,6 +8,7 @@ Version 0.5.9 (ALPHA5)
 - Fixed headwind/tailwind for Xplane
 - Added live METAR to tracking window
 - Added new simpler "Add Aircraft" window for users
+- Landing Analysis 2.0
 
 --------------------------------------------------------------------------------------
 Version 0.5.8 (ALPHA5)

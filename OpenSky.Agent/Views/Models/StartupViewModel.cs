@@ -25,10 +25,10 @@ namespace OpenSky.Agent.Views.Models
 
     using JetBrains.Annotations;
 
-    using OpenSky.Agent.Controls;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Tools;
 
@@ -161,6 +161,7 @@ namespace OpenSky.Agent.Views.Models
                 Instance = this;
                 Simulator.Instance.PropertyChanged += this.SimConnectPropertyChanged;
                 Simulator.Instance.FlightChanged += this.SimConnectFlightChanged;
+                Simulator.Instance.MessageBoxCreated += this.SimMessageBoxCreated;
                 this.notificationIcon = this.greyIcon;
 
                 if (!UserSessionService.Instance.IsUserLoggedIn)
@@ -332,6 +333,21 @@ namespace OpenSky.Agent.Views.Models
                         }
                     })
                 { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Simulator interface was changed in the settings.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 13/12/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        public void SimulatorChanged()
+        {
+            Simulator.Instance.PropertyChanged += this.SimConnectPropertyChanged;
+            Simulator.Instance.FlightChanged += this.SimConnectFlightChanged;
+            Simulator.Instance.MessageBoxCreated += this.SimMessageBoxCreated;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -903,6 +919,26 @@ namespace OpenSky.Agent.Views.Models
         {
             Debug.WriteLine("Opening flight tracking view");
             FlightTracking.Open();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The simulator interface created a message box and asked as to show it to the user.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 13/12/2023.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="openSkyMessageBox">
+        /// The OpenSky message box.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void SimMessageBoxCreated(object sender, OpenSkyMessageBox openSkyMessageBox)
+        {
+            FlightTracking.Open();
+            FlightTracking.Instance.ShowMessageBox(openSkyMessageBox);
         }
 
         /// -------------------------------------------------------------------------------------------------

@@ -109,15 +109,6 @@
     <Compile Include="Controls\FuelTankControl.xaml.cs">
       <DependentUpon>FuelTankControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Models\ErrorDetails.cs" />
-    <Compile Include="Controls\Models\ExtendedMessageBoxImage.cs" />
-    <Compile Include="Controls\Models\ExtendedMessageBoxResult.cs" />
-    <Compile Include="Controls\OpenSkyMessageBox.xaml.cs">
-      <DependentUpon>OpenSkyMessageBox.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\OpenSkyNotification.xaml.cs">
-      <DependentUpon>OpenSkyNotification.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\OpenSkyWindow.cs" />
     <Compile Include="Controls\PayloadStationControl.xaml.cs">
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
@@ -164,7 +155,6 @@
     <Compile Include="Tools\ExceptionExtensions.cs" />
     <Compile Include="Tools\MultiSelectExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
-    <Compile Include="Tools\VisibilityAnimation.cs" />
     <Compile Include="Tools\WindowExtensions.cs" />
     <Compile Include="UserSessionService.cs" />
     <Compile Include="Views\AddAircraft.xaml.cs">
@@ -218,14 +208,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\FuelTankControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\OpenSkyMessageBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\OpenSkyNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -407,7 +389,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="OpenSky.FlightLogXML">
-      <Version>0.1.7</Version>
+      <Version>0.1.8</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
       <Version>23.2.7</Version>

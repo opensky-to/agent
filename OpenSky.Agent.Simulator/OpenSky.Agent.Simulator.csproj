@@ -48,14 +48,17 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OpenSky.FlightLogXML, Version=0.1.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.7\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
+    <Reference Include="OpenSky.FlightLogXML, Version=0.1.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenSky.FlightLogXML.0.1.8\lib\net48\OpenSky.FlightLogXML.dll</HintPath>
     </Reference>
     <Reference Include="ParallelExtensionsExtras, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Syncfusion.SfProgressBar.WPF, Version=23.2460.7.0, Culture=neutral, PublicKeyToken=3d67ed1f87d44c89, processorArchitecture=MSIL">
+      <HintPath>..\packages\Syncfusion.SfProgressBar.WPF.23.2.7\lib\net46\Syncfusion.SfProgressBar.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Device" />
@@ -79,6 +82,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Models\ErrorDetails.cs" />
+    <Compile Include="Controls\Models\ExtendedMessageBoxImage.cs" />
+    <Compile Include="Controls\Models\ExtendedMessageBoxResult.cs" />
+    <Compile Include="Controls\OpenSkyMessageBox.xaml.cs">
+      <DependentUpon>OpenSkyMessageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OpenSkyNotification.xaml.cs">
+      <DependentUpon>OpenSkyNotification.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Enums\FuelTank.cs" />
     <Compile Include="Enums\Pushback.cs" />
     <Compile Include="Enums\Requests.cs" />
@@ -137,6 +149,7 @@
     <Compile Include="Tools\StringEnumExtension.cs" />
     <Compile Include="Tools\StringValueAttribute.cs" />
     <Compile Include="Tools\UpdateGUIDelegate.cs" />
+    <Compile Include="Tools\VisibilityAnimation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenAPIs\swagger.json">
@@ -149,6 +162,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\OpenSkyMessageBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\OpenSkyNotification.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="OpenSkyColors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -161,5 +182,6 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.NetAnalyzers.8.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.NetAnalyzers.8.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.NetAnalyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

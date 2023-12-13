@@ -12,10 +12,10 @@ namespace OpenSky.Agent.Views.Models
     using System.Linq;
     using System.Speech.Synthesis;
 
-    using OpenSky.Agent.Controls;
-    using OpenSky.Agent.Controls.Models;
     using OpenSky.Agent.MVVM;
     using OpenSky.Agent.Simulator;
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

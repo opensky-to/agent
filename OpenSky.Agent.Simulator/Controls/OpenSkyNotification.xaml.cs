@@ -1,27 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OpenSkyMessageBox.xaml.cs" company="OpenSky">
+// <copyright file="OpenSkyNotification.xaml.cs" company="OpenSky">
 // OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenSky.Agent.Controls
+namespace OpenSky.Agent.Simulator.Controls
 {
     using System;
-    using System.Media;
     using System.Threading;
     using System.Windows;
-    using System.Windows.Input;
     using System.Windows.Media;
 
-    using OpenSky.Agent.Controls.Models;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Tools;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// OpenSky message box control.
+    /// OpenSky notification control.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class OpenSkyMessageBox
+    public partial class OpenSkyNotification 
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -32,6 +30,13 @@ namespace OpenSky.Agent.Controls
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// The error details (that can be passed on to a OpenSkyMessageBox).
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly ErrorDetails errorDetails;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// The automatic close timeout.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -39,19 +44,19 @@ namespace OpenSky.Agent.Controls
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenSkyMessageBox"/> class.
+        /// Initializes a new instance of the <see cref="OpenSkyNotification"/> class.
         /// </summary>
         /// <remarks>
         /// sushi.at, 12/01/2022.
         /// </remarks>
-        /// <param name="exception">
-        /// The exception.
-        /// </param>
         /// <param name="title">
         /// The title.
         /// </param>
         /// <param name="message">
         /// The message.
+        /// </param>
+        /// <param name="errorDetails">
+        /// The error details (that can be passed on to a OpenSkyMessageBox).
         /// </param>
         /// <param name="image">
         /// (Optional) The image.
@@ -61,12 +66,11 @@ namespace OpenSky.Agent.Controls
         /// The automatic close timeout.
         /// </param>
         /// <param name="autoCloseResult">
-        /// (Optional)
-        /// The automatic close result.
+        /// (Optional) The automatic close result.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public OpenSkyMessageBox(
-            Exception exception,
+        public OpenSkyNotification(
+            ErrorDetails errorDetails,
             string title,
             string message,
             ExtendedMessageBoxImage image = ExtendedMessageBoxImage.Error,
@@ -77,16 +81,18 @@ namespace OpenSky.Agent.Controls
 
             this.Title.Text = title;
             this.Message.Text = message;
-            if (exception != null)
-            {
-                this.ExceptionText.Text = exception.ToString();
-                this.ExceptionText.Visibility = Visibility.Visible;
-            }
+            this.errorDetails = errorDetails;
 
             this.NotificationBackground = new SolidColorBrush(Color.FromRgb(180, 0, 0));
 
+            this.ButtonPanel.Visibility = Visibility.Visible;
             this.OkButton.Visibility = Visibility.Visible;
             this.OkButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
+            if (errorDetails != null)
+            {
+                this.DetailsButton.Visibility = Visibility.Visible;
+                this.DetailsButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
+            }
 
             switch (image)
             {
@@ -129,16 +135,35 @@ namespace OpenSky.Agent.Controls
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenSkyMessageBox"/> class.
+        /// Initializes a new instance of the <see cref="OpenSkyNotification"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 12/01/2022.
+        /// sushi.at, 10/01/2022.
         /// </remarks>
+        /// <param name="title">
+        /// The title.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <param name="buttons">
+        /// (Optional) The buttons.
+        /// </param>
+        /// <param name="image">
+        /// (Optional) The image.
+        /// </param>
+        /// <param name="autoCloseTimeout">
+        /// (Optional)
+        /// The automatic close timeout.
+        /// </param>
+        /// <param name="autoCloseResult">
+        /// (Optional) The automatic close result.
+        /// </param>
         /// -------------------------------------------------------------------------------------------------
-        public OpenSkyMessageBox(
+        public OpenSkyNotification(
             string title,
             string message,
-            MessageBoxButton buttons = MessageBoxButton.OK,
+            MessageBoxButton? buttons = null,
             ExtendedMessageBoxImage image = ExtendedMessageBoxImage.None,
             int autoCloseTimeout = 0,
             ExtendedMessageBoxResult autoCloseResult = ExtendedMessageBoxResult.None)
@@ -148,26 +173,30 @@ namespace OpenSky.Agent.Controls
             this.Title.Text = title;
             this.Message.Text = message;
 
-            switch (buttons)
+            if (buttons.HasValue)
             {
-                case MessageBoxButton.OK:
-                    this.OkButton.Visibility = Visibility.Visible;
-                    break;
-                case MessageBoxButton.OKCancel:
-                    this.OkButton.Visibility = Visibility.Visible;
-                    this.CancelButton.Visibility = Visibility.Visible;
-                    break;
-                case MessageBoxButton.YesNo:
-                    this.YesButton.Visibility = Visibility.Visible;
-                    this.NoButton.Visibility = Visibility.Visible;
-                    break;
-                case MessageBoxButton.YesNoCancel:
-                    this.YesButton.Visibility = Visibility.Visible;
-                    this.NoButton.Visibility = Visibility.Visible;
-                    this.CancelButton.Visibility = Visibility.Visible;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(buttons), buttons, null);
+                this.ButtonPanel.Visibility = Visibility.Visible;
+                switch (buttons.Value)
+                {
+                    case MessageBoxButton.OK:
+                        this.OkButton.Visibility = Visibility.Visible;
+                        break;
+                    case MessageBoxButton.OKCancel:
+                        this.OkButton.Visibility = Visibility.Visible;
+                        this.CancelButton.Visibility = Visibility.Visible;
+                        break;
+                    case MessageBoxButton.YesNo:
+                        this.YesButton.Visibility = Visibility.Visible;
+                        this.NoButton.Visibility = Visibility.Visible;
+                        break;
+                    case MessageBoxButton.YesNoCancel:
+                        this.YesButton.Visibility = Visibility.Visible;
+                        this.NoButton.Visibility = Visibility.Visible;
+                        this.CancelButton.Visibility = Visibility.Visible;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(buttons), buttons.Value, null);
+                }
             }
 
             switch (image)
@@ -249,6 +278,7 @@ namespace OpenSky.Agent.Controls
             this.CancelButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
             this.YesButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
             this.NoButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
+            this.DetailsButton.Style = this.FindResource("OpenSkyRedButtonStyle") as Style;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -267,25 +297,7 @@ namespace OpenSky.Agent.Controls
             this.CancelButton.Style = this.FindResource("OpenSkyOrangeButtonStyle") as Style;
             this.YesButton.Style = this.FindResource("OpenSkyOrangeButtonStyle") as Style;
             this.NoButton.Style = this.FindResource("OpenSkyOrangeButtonStyle") as Style;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Black cover on mouse left button down.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 12/01/2022.
-        /// </remarks>
-        /// <param name="sender">
-        /// Source of the event.
-        /// </param>
-        /// <param name="e">
-        /// Mouse button event information.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void BlackCoverOnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            SystemSounds.Asterisk.Play();
+            this.DetailsButton.Style = this.FindResource("OpenSkyOrangeButtonStyle") as Style;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -307,6 +319,27 @@ namespace OpenSky.Agent.Controls
             this.Result = ExtendedMessageBoxResult.Cancel;
             this.Visibility = Visibility.Collapsed;
             this.Closed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Details button click.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 12/01/2022.
+        /// </remarks>
+        /// <param name="sender">
+        /// Source of the event.
+        /// </param>
+        /// <param name="e">
+        /// Routed event information.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        private void DetailsButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            this.Result = ExtendedMessageBoxResult.Details;
+            this.Visibility = Visibility.Collapsed;
+            this.Closed?.Invoke(this, new ErrorDetailsEventArgs { ErrorDetails = this.errorDetails });
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -353,10 +386,10 @@ namespace OpenSky.Agent.Controls
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// OpenSky message box on loaded.
+        /// OpenSky notification loaded.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 12/01/2022.
+        /// sushi.at, 11/01/2022.
         /// </remarks>
         /// <param name="sender">
         /// Source of the event.
@@ -365,7 +398,7 @@ namespace OpenSky.Agent.Controls
         /// Routed event information.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void OpenSkyMessageBoxOnLoaded(object sender, RoutedEventArgs e)
+        private void OpenSkyNotificationOnLoaded(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Visible;
 
@@ -407,7 +440,7 @@ namespace OpenSky.Agent.Controls
                             };
                             this.Dispatcher.BeginInvoke(hideNotification);
                         })
-                { Name = "OpenSkyMessageBox.AutoCloseTimeout" }.Start();
+                { Name = "OpenSkyNotification.AutoCloseTimeout" }.Start();
             }
         }
 
@@ -430,6 +463,25 @@ namespace OpenSky.Agent.Controls
             this.Result = ExtendedMessageBoxResult.Yes;
             this.Visibility = Visibility.Collapsed;
             this.Closed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Additional information for error details events.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 12/01/2022.
+        /// </remarks>
+        /// <seealso cref="T:System.EventArgs"/>
+        /// -------------------------------------------------------------------------------------------------
+        public class ErrorDetailsEventArgs : EventArgs
+        {
+            /// -------------------------------------------------------------------------------------------------
+            /// <summary>
+            /// Gets or sets the error details.
+            /// </summary>
+            /// -------------------------------------------------------------------------------------------------
+            public ErrorDetails ErrorDetails { get; set; }
         }
     }
 }

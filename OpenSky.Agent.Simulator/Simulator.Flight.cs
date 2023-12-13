@@ -7,6 +7,7 @@
 namespace OpenSky.Agent.Simulator
 {
     using System;
+    using System.ComponentModel;
     using System.Device.Location;
     using System.Diagnostics;
     using System.IO;
@@ -21,6 +22,8 @@ namespace OpenSky.Agent.Simulator
 
     using Microsoft.Maps.MapControl.WPF;
 
+    using OpenSky.Agent.Simulator.Controls;
+    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Enums;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
@@ -161,6 +164,13 @@ namespace OpenSky.Agent.Simulator
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        /// Occurs when a messageBox was created and should be displayed to the user.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public event EventHandler<OpenSkyMessageBox> MessageBoxCreated;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         /// Gets a value indicating whether we can start tracking the current flight or not.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -185,6 +195,14 @@ namespace OpenSky.Agent.Simulator
                 return allConditionsMet;
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets a value indicating whether we can finish tracking the current flight or not - this is
+        /// not aborting, this is wrapping up and submitting pirep finish.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool CanFinishTracking => this.WasAirborne && !this.SecondaryTracking.EngineRunning && this.PrimaryTracking.OnGround && this.PrimaryTracking.GroundSpeed < 1 && this.TrackingStatus == TrackingStatus.Tracking;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -521,7 +539,7 @@ namespace OpenSky.Agent.Simulator
                         // Check if we just resumed a save that failed to upload
                         if (this.FlightPhase == FlightPhase.PostFlight)
                         {
-                            this.FinishUpFlightTracking();
+                            this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(this.CanFinishTracking)));
                         }
                     }
 
@@ -578,6 +596,11 @@ namespace OpenSky.Agent.Simulator
                 this.lastFlightLogAutoSave = DateTime.MinValue;
                 this.lastPositionReportUpload = DateTime.MinValue;
                 this.lastAutoSaveUpload = DateTime.MinValue;
+                this.FinalTouchDownIndex = -1;
+                this.plaQueueIndex = 0;
+                this.plaQueueCountdown = -1;
+                this.wasCrash = false;
+                this.plaQueue = new LandingAnalysis[100];
 
                 this.DeleteSaveFile();
                 if (this.Flight != null)
@@ -812,6 +835,7 @@ namespace OpenSky.Agent.Simulator
             }
         }
 
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Finishes up the flight tracking.
@@ -820,123 +844,220 @@ namespace OpenSky.Agent.Simulator
         /// sushi.at, 22/03/2021.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private void FinishUpFlightTracking()
+        public void FinishUpFlightTracking()
         {
             Debug.WriteLine("SimConnect finishing up flight tracking started");
+
+            if (!this.wasCrash)
+            {
+                if (!this.CanFinishTracking)
+                {
+                    Debug.WriteLine("Can't actually finish tracking right now...");
+                    return;
+                }
+
+                // Did the user shut the engines off on the runway or was there some taxi to parking?
+                if (this.taxiInStarted)
+                {
+                    if (!this.taxiInTurned)
+                    {
+                        this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.EngineOffRunway, OpenSkyColors.OpenSkyWarningOrange, "Engine turned off on the runway?");
+                    }
+
+                    this.taxiInStarted = false;
+                }
+
+                // Add one last position report
+                UpdateGUIDelegate addPositionReport = () =>
+                {
+                    this.AircraftTrailLocations.Add(new AircraftTrailLocation(DateTime.UtcNow, this.PrimaryTracking, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity));
+                    this.TrackingEventMarkerAdded?.Invoke(this, new TrackingEventMarker(this.PrimaryTracking, this.SecondaryTracking, this.WeightAndBalance.FuelTotalQuantity, 8, OpenSkyColors.OpenSkyTeal, "Position report"));
+                };
+                Application.Current.Dispatcher.Invoke(addPositionReport);
+
+                this.AddTrackingEvent(this.PrimaryTracking, this.SecondaryTracking, FlightTrackingEventType.TrackingStopped, OpenSkyColors.OpenSkyTealLight, "Flight tracking stopped");
+
+                // Play flight complete audio
+                SpeechSoundPacks.Instance.PlaySpeechEvent(SpeechEvent.FlightCompleteSubmitting);
+            }
 
             var callStopFlight = false;
             if (this.Flight != null)
             {
-                try
-                {
-                    Debug.WriteLine("Creating final position report...");
-                    var onlineForDuration = this.OnlineNetworkConnectionDuration;
-                    if (this.OnlineNetworkConnectionStarted.HasValue)
-                    {
-                        onlineForDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
-                    }
-
-                    var positionReport = new PositionReport
-                    {
-                        Id = this.Flight.Id,
-                        AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
-                        Altitude = this.PrimaryTracking.Altitude,
-                        BankAngle = this.PrimaryTracking.BankAngle,
-                        FlightPhase = this.PrimaryTracking.Crash ? FlightPhase.Crashed : this.FlightPhase,
-                        GroundSpeed = this.PrimaryTracking.GroundSpeed,
-                        Heading = this.PrimaryTracking.Heading,
-                        Latitude = this.PrimaryTracking.Latitude,
-                        Longitude = this.PrimaryTracking.Longitude,
-                        OnGround = this.PrimaryTracking.OnGround,
-                        PitchAngle = this.PrimaryTracking.PitchAngle,
-                        RadioHeight = this.PrimaryTracking.RadioHeight,
-                        VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
-                        TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
-                        ConnectedToOnlineNetworkSeconds = (int)onlineForDuration.TotalSeconds,
-
-                        FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
-                        FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
-                        FuelTankCenter3Quantity = this.FuelTanks.FuelTankCenter3Quantity,
-                        FuelTankLeftMainQuantity = this.FuelTanks.FuelTankLeftMainQuantity,
-                        FuelTankLeftAuxQuantity = this.FuelTanks.FuelTankLeftAuxQuantity,
-                        FuelTankLeftTipQuantity = this.FuelTanks.FuelTankLeftTipQuantity,
-                        FuelTankRightMainQuantity = this.FuelTanks.FuelTankRightMainQuantity,
-                        FuelTankRightAuxQuantity = this.FuelTanks.FuelTankRightAuxQuantity,
-                        FuelTankRightTipQuantity = this.FuelTanks.FuelTankRightTipQuantity,
-                        FuelTankExternal1Quantity = this.FuelTanks.FuelTankExternal1Quantity,
-                        FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
-                    };
-
-                    this.RefreshModelNow(Requests.FuelTanks);
-                    this.RefreshModelNow(Requests.PayloadStations);
-                    Thread.Sleep(500);
-
-                    var saveFile = this.GenerateSaveFile();
-                    if (saveFile != null)
-                    {
-                        var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
-                        xmlStream.Seek(0, SeekOrigin.Begin);
-                        var targetMemoryStream = new MemoryStream();
-                        byte[] zippedBytes;
-                        using (var gzip = new GZipStream(targetMemoryStream, CompressionMode.Compress))
-                        {
-                            xmlStream.CopyTo(gzip);
-                            gzip.Close();
-                            zippedBytes = targetMemoryStream.ToArray();
-                        }
-
-                        var base64String = Convert.ToBase64String(zippedBytes);
-
-                        Debug.WriteLine("Submitting final report to OpenSky server...");
-                        var finalReport = new FinalReport
-                        {
-                            FinalPositionReport = positionReport,
-                            FlightLog = base64String
-                        };
-
-                        var result = this.openSkyServiceInstance.CompleteFlightAsync(finalReport).Result;
-                        if (result.IsError)
-                        {
-                            Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
-
-                            // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Submitting final report to OpenSky server successfully!");
-                            callStopFlight = true;
-                        }
-                    }
-                }
-                catch (AbandonedMutexException)
-                {
-                    // Ignore
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Error submitting final flight report: " + ex);
-
-                    // todo how to handle this? save to a special file or only offer retry? Or does the user have to resume from the last save?
-                }
-                finally
+                var successfullOrAbortedOuter = false;
+                while (!successfullOrAbortedOuter)
                 {
                     try
                     {
-                        this.flightSaveMutex.ReleaseMutex();
+                        Debug.WriteLine("Creating final position report...");
+                        var onlineForDuration = this.OnlineNetworkConnectionDuration;
+                        if (this.OnlineNetworkConnectionStarted.HasValue)
+                        {
+                            onlineForDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                        }
+
+                        var positionReport = new PositionReport
+                        {
+                            Id = this.Flight.Id,
+                            AirspeedTrue = this.PrimaryTracking.AirspeedTrue,
+                            Altitude = this.PrimaryTracking.Altitude,
+                            BankAngle = this.PrimaryTracking.BankAngle,
+                            FlightPhase = this.PrimaryTracking.Crash ? FlightPhase.Crashed : this.FlightPhase,
+                            GroundSpeed = this.PrimaryTracking.GroundSpeed,
+                            Heading = this.PrimaryTracking.Heading,
+                            Latitude = this.PrimaryTracking.Latitude,
+                            Longitude = this.PrimaryTracking.Longitude,
+                            OnGround = this.PrimaryTracking.OnGround,
+                            PitchAngle = this.PrimaryTracking.PitchAngle,
+                            RadioHeight = this.PrimaryTracking.RadioHeight,
+                            VerticalSpeedSeconds = this.PrimaryTracking.VerticalSpeedSeconds,
+                            TimeWarpTimeSavedSeconds = (int)this.timeSavedBecauseOfSimRate.TotalSeconds,
+                            ConnectedToOnlineNetworkSeconds = (int)onlineForDuration.TotalSeconds,
+
+                            FuelTankCenterQuantity = this.FuelTanks.FuelTankCenterQuantity,
+                            FuelTankCenter2Quantity = this.FuelTanks.FuelTankCenter2Quantity,
+                            FuelTankCenter3Quantity = this.FuelTanks.FuelTankCenter3Quantity,
+                            FuelTankLeftMainQuantity = this.FuelTanks.FuelTankLeftMainQuantity,
+                            FuelTankLeftAuxQuantity = this.FuelTanks.FuelTankLeftAuxQuantity,
+                            FuelTankLeftTipQuantity = this.FuelTanks.FuelTankLeftTipQuantity,
+                            FuelTankRightMainQuantity = this.FuelTanks.FuelTankRightMainQuantity,
+                            FuelTankRightAuxQuantity = this.FuelTanks.FuelTankRightAuxQuantity,
+                            FuelTankRightTipQuantity = this.FuelTanks.FuelTankRightTipQuantity,
+                            FuelTankExternal1Quantity = this.FuelTanks.FuelTankExternal1Quantity,
+                            FuelTankExternal2Quantity = this.FuelTanks.FuelTankExternal2Quantity
+                        };
+
+                        this.RefreshModelNow(Requests.FuelTanks);
+                        this.RefreshModelNow(Requests.PayloadStations);
+                        Thread.Sleep(500);
+
+                        var saveFile = this.GenerateSaveFile();
+                        if (saveFile != null)
+                        {
+                            var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes($"{saveFile}"));
+                            xmlStream.Seek(0, SeekOrigin.Begin);
+                            var targetMemoryStream = new MemoryStream();
+                            byte[] zippedBytes;
+                            using (var gzip = new GZipStream(targetMemoryStream, CompressionMode.Compress))
+                            {
+                                xmlStream.CopyTo(gzip);
+                                gzip.Close();
+                                zippedBytes = targetMemoryStream.ToArray();
+                            }
+
+                            var base64String = Convert.ToBase64String(zippedBytes);
+
+                            Debug.WriteLine("Submitting final report to OpenSky server...");
+                            var finalReport = new FinalReport
+                            {
+                                FinalPositionReport = positionReport,
+                                FlightLog = base64String
+                            };
+
+                            var successfullOrAbortedInner = false;
+                            while (!successfullOrAbortedInner)
+                            {
+                                var result = this.openSkyServiceInstance.CompleteFlightAsync(finalReport).Result;
+                                if (result.IsError)
+                                {
+                                    Debug.WriteLine("Error submitting final flight report: " + result.Message + "\r\n" + result.ErrorDetails);
+
+                                    ExtendedMessageBoxResult? answer = null;
+                                    UpdateGUIDelegate reportError = () =>
+                                    {
+                                        var messageBox = new OpenSkyMessageBox(
+                                            "Error submitting completed flight",
+                                            $"Received error from OpenSky server, do you want to retry submitting?\r\n\r\nDetails: {result.Message}",
+                                            MessageBoxButton.YesNo,
+                                            ExtendedMessageBoxImage.Warning);
+                                        messageBox.SetErrorColorStyle();
+                                        messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                        this.MessageBoxCreated?.Invoke(this, messageBox);
+                                    };
+                                    Application.Current.Dispatcher.BeginInvoke(reportError);
+                                    while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                                    {
+                                        Thread.Sleep(500);
+                                    }
+
+                                    if (answer == ExtendedMessageBoxResult.No)
+                                    {
+                                        successfullOrAbortedInner = true;
+                                    }
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Submitting final report to OpenSky server successfully!");
+                                    callStopFlight = true;
+                                    successfullOrAbortedInner = true;
+                                    successfullOrAbortedOuter = true;
+                                }
+                            }
+                        }
                     }
-                    catch
+                    catch (AbandonedMutexException)
                     {
                         // Ignore
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error submitting final flight report: " + ex);
+
+                        ExtendedMessageBoxResult? answer = null;
+                        UpdateGUIDelegate reportError = () =>
+                        {
+                            var messageBox = new OpenSkyMessageBox(
+                                "Error submitting completed flight",
+                                $"Encountered error, do you want to retry submitting?\r\n\r\nDetails: {ex.Message}",
+                                MessageBoxButton.YesNo,
+                                ExtendedMessageBoxImage.Error);
+                            messageBox.SetErrorColorStyle();
+                            messageBox.ExceptionText.Text = ex.ToString();
+                            messageBox.ExceptionText.Visibility = Visibility.Visible;
+                            messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                            this.MessageBoxCreated?.Invoke(this, messageBox);
+                        };
+                        Application.Current.Dispatcher.BeginInvoke(reportError);
+                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        if (answer == ExtendedMessageBoxResult.No)
+                        {
+                            successfullOrAbortedOuter = true;
+                        }
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            this.flightSaveMutex.ReleaseMutex();
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+
                     }
                 }
             }
             else
             {
-                Debug.WriteLine("CRITICAL: Unable to finish up flight tracking and submitting final log because SimConnect.Flight is NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                UpdateGUIDelegate badNews = () =>
+                {
+                    var messageBox = new OpenSkyMessageBox(
+                        "Critical error",
+                        "CRITICAL: Unable to finish up flight tracking and submitting final log because SimConnect.Flight is NULL!\r\n\r\nPlease report this as a bug report with as much detail as possible on the OpenSky discord.\r\n\r\nYou can try to resume the flight from the last auto-save.",
+                        MessageBoxButton.OK,
+                        ExtendedMessageBoxImage.Hand);
+                    this.MessageBoxCreated?.Invoke(this, messageBox);
+                };
+                Application.Current.Dispatcher.BeginInvoke(badNews);
+
                 callStopFlight = true;
             }
 
-            // todo only call this if the saving/etc. worked, ask user for retry etc.
             if (callStopFlight)
             {
                 this.DeleteSaveFile();
@@ -1196,6 +1317,8 @@ namespace OpenSky.Agent.Simulator
 
                 if (this.PrimaryTracking.Crash)
                 {
+                    this.wasCrash = true;
+
                     // Plane crashed
                     this.AddTrackingEvent(ppt.New, this.SecondaryTracking, FlightTrackingEventType.Crashed, OpenSkyColors.OpenSkyRed, "Aircraft crashed");
 
@@ -1210,7 +1333,7 @@ namespace OpenSky.Agent.Simulator
                     this.SaveFlight();
                 }
 
-                // Do a position report?
+                // Report position?
                 if ((DateTime.UtcNow - this.lastPositionReportUpload).TotalSeconds > 30)
                 {
                     this.UploadPositionReport();
@@ -1223,6 +1346,13 @@ namespace OpenSky.Agent.Simulator
                 }
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Did a crash end the flight?.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private bool wasCrash;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
