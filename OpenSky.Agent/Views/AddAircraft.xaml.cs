@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AircraftTypes.xaml.cs" company="OpenSky">
+// <copyright file="AddAircraft.xaml.cs" company="OpenSky">
 // OpenSky project 2021-2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,26 +8,24 @@ namespace OpenSky.Agent.Views
 {
     using System.Windows;
 
-    using DataGridExtensions;
-
     using OpenSky.Agent.Views.Models;
 
     /// -------------------------------------------------------------------------------------------------
     /// <content>
-    /// Aircraft types management window.
+    /// Simple add aircraft window for users.
     /// </content>
     /// -------------------------------------------------------------------------------------------------
-    public partial class AircraftTypes
+    public partial class AddAircraft
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Initializes a new instance of the <see cref="AircraftTypes"/> class.
+        /// Initializes a new instance of the <see cref="AddAircraft"/> class.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 28/03/2021.
+        /// sushi.at, 12/12/2023.
         /// </remarks>
         /// -------------------------------------------------------------------------------------------------
-        private AircraftTypes()
+        private AddAircraft()
         {
             this.InitializeComponent();
         }
@@ -37,11 +35,11 @@ namespace OpenSky.Agent.Views
         /// The single instance of this view.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
-        private static AircraftTypes Instance { get; set; }
+        private static AddAircraft Instance { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Open the aircraft type management view or bring the existing instance into view.
+        /// Open the add aircraft view or bring the existing instance into view.
         /// </summary>
         /// <remarks>
         /// sushi.at, 23/03/2021.
@@ -57,7 +55,7 @@ namespace OpenSky.Agent.Views
                     return;
                 }
 
-                Instance = new AircraftTypes();
+                Instance = new AddAircraft();
                 Instance.Closed += (_, _) => Instance = null;
                 Instance.Show();
             }
@@ -70,10 +68,10 @@ namespace OpenSky.Agent.Views
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Aircraft types on loaded.
+        /// Add aircraft on loaded.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 14/01/2022.
+        /// sushi.at, 12/12/2023.
         /// </remarks>
         /// <param name="sender">
         /// Source of the event.
@@ -82,9 +80,9 @@ namespace OpenSky.Agent.Views
         /// Routed event information.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void AircraftTypesOnLoaded(object sender, RoutedEventArgs e)
+        private void AddAircraftLoaded(object sender, RoutedEventArgs e)
         {
-            if (this.DataContext is AircraftTypesViewModel viewModel)
+            if (this.DataContext is AddAircraftViewModel viewModel)
             {
                 viewModel.ViewReference = this;
             }
@@ -92,21 +90,21 @@ namespace OpenSky.Agent.Views
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Clears all filters on click.
+        /// View model fired close window event.
         /// </summary>
         /// <remarks>
-        /// sushi.at, 04/06/2021.
+        /// sushi.at, 13/12/2023.
         /// </remarks>
         /// <param name="sender">
         /// Source of the event.
         /// </param>
         /// <param name="e">
-        /// Routed event information.
+        /// An object to process.
         /// </param>
         /// -------------------------------------------------------------------------------------------------
-        private void ClearAllFiltersOnClick(object sender, RoutedEventArgs e)
+        private void ViewModelCloseWindow(object sender, object e)
         {
-            this.AircraftTypesGrid.GetFilter().Clear();
+            this.Close();
         }
     }
 }
