@@ -230,6 +230,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.flight = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
                 this.FlightChanged?.Invoke(this, value);
 
                 if (value != null)
@@ -444,6 +445,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.trackingStatus = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
                 this.TrackingStatusChanged?.Invoke(this, value);
 
                 // Reduce the loading and fuel sample rates while preparing to make it easier for the user to adjust them for manual aircraft

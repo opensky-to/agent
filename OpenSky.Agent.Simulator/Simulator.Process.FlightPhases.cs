@@ -156,6 +156,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.wasAirborne = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
             }
         }
 

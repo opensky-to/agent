@@ -7,7 +7,6 @@
 namespace OpenSky.Agent.Simulator
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Media;
     using System.Reflection;
@@ -151,6 +150,8 @@ namespace OpenSky.Agent.Simulator
             // Was the engine turned off/on?
             if (pst.Old.EngineRunning != pst.New.EngineRunning)
             {
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
+
                 if ((DateTime.UtcNow - this.lastEngineRunningChange).TotalSeconds > 5)
                 {
                     this.lastEngineRunningChange = DateTime.UtcNow;
@@ -198,8 +199,6 @@ namespace OpenSky.Agent.Simulator
                 // Was the engine turned off on the ground, not moving, while tracking? -> Report that we can now finish up tracking
                 if (!pst.New.EngineRunning && this.PrimaryTracking.OnGround && this.PrimaryTracking.GroundSpeed < 1 && this.TrackingStatus == TrackingStatus.Tracking && this.WasAirborne)
                 {
-                    this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(this.CanFinishTracking)));
-
                     // Show landing report notification now?
                     this.LandingReported?.Invoke(this, LandingReportNotification.AfterTurningEnginesOff);
                 }
