@@ -7,6 +7,8 @@ Version 0.5.10 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Added support for GSX pushback
 - Fixed "Complete Flight" button shown when it shouldn't
+- Improved vatsim flight tracking, now supports VFR flights without flight plan
+- Improved handling of tracking start questions, code cleaned, 15 sec timeout added
 
 --------------------------------------------------------------------------------------
 Version 0.5.9 (ALPHA5)

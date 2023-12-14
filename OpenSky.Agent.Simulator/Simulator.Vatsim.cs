@@ -117,9 +117,6 @@ namespace OpenSky.Agent.Simulator
                                                 this.VatsimClientConnection.Departure = string.Empty;
                                                 this.VatsimClientConnection.Arrival = string.Empty;
                                             }
-
-
-                                            this.OnlineNetworkConnectionStarted ??= DateTime.UtcNow;
                                         }
                                     }
                                 }
@@ -154,13 +151,40 @@ namespace OpenSky.Agent.Simulator
 
                         // Update tracking condition
                         var locationDiffKm = this.PrimaryTracking.GeoCoordinate.GetDistanceTo(new GeoCoordinate(this.VatsimClientConnection?.Latitude ?? 0, this.VatsimClientConnection?.Longitude ?? 0, 0.3048 * this.VatsimClientConnection?.Altitude ?? 0)) / 1000;
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = $"{this.VatsimClientConnection != null}, Callsign: {this.VatsimClientConnection?.Callsign ?? "none"}, Flight plan: {this.VatsimClientConnection?.Departure ?? "??"}-{this.VatsimClientConnection?.Arrival ?? "??"}, Location: {locationDiffKm:N1} km";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet =
-                            this.VatsimClientConnection != null &&
-                            locationDiffKm < 50 &&
-                            this.VatsimClientConnection.Callsign.Equals(this.Flight.AtcCallsign, StringComparison.InvariantCultureIgnoreCase) &&
-                            this.VatsimClientConnection.Departure.Equals(this.Flight.Origin.Icao, StringComparison.InvariantCultureIgnoreCase) &&
-                            this.VatsimClientConnection.Arrival.Equals(this.Flight.Destination.Icao, StringComparison.InvariantCultureIgnoreCase);
+
+                        if (this.Flight.FlightRule != FlightRule.VFR)
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = $"{this.VatsimClientConnection != null}, Callsign: {this.VatsimClientConnection?.Callsign ?? "none"}, Flight plan: {this.VatsimClientConnection?.Departure ?? "??"}-{this.VatsimClientConnection?.Arrival ?? "??"}, Location: {locationDiffKm:N1} km";
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet =
+                                this.VatsimClientConnection != null &&
+                                locationDiffKm < 50 &&
+                                this.VatsimClientConnection.Callsign.Equals(this.Flight.AtcCallsign, StringComparison.InvariantCultureIgnoreCase) &&
+                                this.VatsimClientConnection.Departure.Equals(this.Flight.Origin.Icao, StringComparison.InvariantCultureIgnoreCase) &&
+                                this.VatsimClientConnection.Arrival.Equals(this.Flight.Destination.Icao, StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        else
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = $"{this.VatsimClientConnection != null}, Callsign: {this.VatsimClientConnection?.Callsign ?? "none"}, Location: {locationDiffKm:N1} km";
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet =
+                                this.VatsimClientConnection != null &&
+                                locationDiffKm < 50 &&
+                                this.VatsimClientConnection.Callsign.Equals(this.Flight.AtcCallsign, StringComparison.InvariantCultureIgnoreCase);
+                        }
+
+
+                        if (this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].ConditionMet)
+                        {
+                            this.OnlineNetworkConnectionStarted ??= DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            if (this.OnlineNetworkConnectionStarted.HasValue)
+                            {
+                                this.OnlineNetworkConnectionDuration += (DateTime.UtcNow - this.OnlineNetworkConnectionStarted.Value);
+                                this.OnlineNetworkConnectionStarted = null;
+                            }
+                        }
+
 
                         SleepScheduler.SleepFor(TimeSpan.FromSeconds(this.VatsimClientConnection == null ? 15 : 60));
                     }

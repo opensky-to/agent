@@ -4333,7 +4333,7 @@
           },
           "registry": {
             "maxLength": 12,
-            "minLength": 7,
+            "minLength": 6,
             "type": "string",
             "description": "Gets or sets the aircraft registration."
           },
@@ -6729,8 +6729,8 @@
         "type": "object",
         "properties": {
           "aircraftRegistry": {
-            "maxLength": 10,
-            "minLength": 5,
+            "maxLength": 12,
+            "minLength": 6,
             "type": "string",
             "description": "Gets or sets the aircraft registry (optional, if record relates to an aircraft).",
             "nullable": true
@@ -6850,6 +6850,9 @@
           },
           "flightPhase": {
             "$ref": "#/components/schemas/FlightPhase"
+          },
+          "flightRule": {
+            "$ref": "#/components/schemas/FlightRule"
           },
           "fuelGallons": {
             "type": "number",
@@ -7160,6 +7163,9 @@
             "type": "string",
             "description": "Gets or sets the atc callsign.",
             "nullable": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/AircraftTypeCategory"
           },
           "completed": {
             "type": "string",
@@ -7501,6 +7507,9 @@
         ],
         "type": "object",
         "properties": {
+          "flightRule": {
+            "$ref": "#/components/schemas/FlightRule"
+          },
           "aircraft": {
             "$ref": "#/components/schemas/Aircraft"
           },
@@ -7648,6 +7657,29 @@
         },
         "additionalProperties": false,
         "description": "API standard response model."
+      },
+      "FlightRule": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "description": "Flight rules. 0 = IFR, 1 = VFR, 2 = IFRtoVFR, 3 = VFRtoIFR",
+        "format": "int32",
+        "x-enumNames": [
+          "IFR",
+          "VFR",
+          "IFRtoVFR",
+          "VFRtoIFR"
+        ],
+        "x-enum-varnames": [
+          "IFR",
+          "VFR",
+          "IFRtoVFR",
+          "VFRtoIFR"
+        ]
       },
       "ForgotPassword": {
         "required": [
@@ -8150,8 +8182,8 @@
         "type": "object",
         "properties": {
           "aircraftRegistry": {
-            "maxLength": 10,
-            "minLength": 5,
+            "maxLength": 12,
+            "minLength": 6,
             "type": "string",
             "description": "Gets or sets the aircraft registry the payload is currently loaded on, or NULL if stored at an airport.",
             "nullable": true

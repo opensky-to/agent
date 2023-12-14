@@ -302,7 +302,16 @@ namespace OpenSky.Agent.Simulator
                     {
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = true;
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = "Unknown";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}, Location: <50 km";
+                        
+                        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                        if (value.FlightRule != FlightRule.VFR)
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}, Location: <50 km";
+                        }
+                        else
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Location: <50 km";
+                        }
                     }
                     else
                     {

@@ -193,7 +193,7 @@ namespace OpenSky.Agent.Simulator
                         pst.New,
                         FlightTrackingEventType.TaxiLandingLightsEngine,
                         OpenSkyColors.OpenSkyRed,
-                        $"OpenSky Warning: Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
+                        $"Taxi and/or Landing light on when engine was turned {(pst.New.EngineRunning ? "on" : "off")}");
                 }
 
                 // Was the engine turned off on the ground, not moving, while tracking? -> Report that we can now finish up tracking
