@@ -7661,24 +7661,18 @@
       "FlightRule": {
         "enum": [
           0,
-          1,
-          2,
-          3
+          1
         ],
         "type": "integer",
-        "description": "Flight rules. 0 = IFR, 1 = VFR, 2 = IFRtoVFR, 3 = VFRtoIFR",
+        "description": "Flight rules. 0 = IFR, 1 = VFR",
         "format": "int32",
         "x-enumNames": [
           "IFR",
-          "VFR",
-          "IFRtoVFR",
-          "VFRtoIFR"
+          "VFR"
         ],
         "x-enum-varnames": [
           "IFR",
-          "VFR",
-          "IFRtoVFR",
-          "VFRtoIFR"
+          "VFR"
         ]
       },
       "ForgotPassword": {

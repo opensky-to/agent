@@ -12195,7 +12195,7 @@ namespace OpenSkyApi
     }
 
     /// <summary>
-    /// Flight rules. 0 = IFR, 1 = VFR, 2 = IFRtoVFR, 3 = VFRtoIFR
+    /// Flight rules. 0 = IFR, 1 = VFR
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public enum FlightRule
@@ -12204,10 +12204,6 @@ namespace OpenSkyApi
         IFR = 0,
 
         VFR = 1,
-
-        IFRtoVFR = 2,
-
-        VFRtoIFR = 3,
 
     }
 
