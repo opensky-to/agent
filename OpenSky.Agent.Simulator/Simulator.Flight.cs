@@ -230,6 +230,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.flight = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
                 this.FlightChanged?.Invoke(this, value);
 
                 if (value != null)
@@ -301,7 +302,16 @@ namespace OpenSky.Agent.Simulator
                     {
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Enabled = true;
                         this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Current = "Unknown";
-                        this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}, Location: <50 km";
+                        
+                        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                        if (value.FlightRule != FlightRule.VFR)
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Flight plan: {value.Origin.Icao}-{value.Destination.Icao}, Location: <50 km";
+                        }
+                        else
+                        {
+                            this.TrackingConditions[(int)Models.TrackingConditions.Vatsim].Expected = $"True, Callsign: {value.AtcCallsign}, Location: <50 km";
+                        }
                     }
                     else
                     {
@@ -444,6 +454,7 @@ namespace OpenSky.Agent.Simulator
 
                 this.trackingStatus = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.CanFinishTracking));
                 this.TrackingStatusChanged?.Invoke(this, value);
 
                 // Reduce the loading and fuel sample rates while preparing to make it easier for the user to adjust them for manual aircraft

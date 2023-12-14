@@ -190,7 +190,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Is the auto pilot engaged?
+        /// Is the auto-pilot engaged?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public bool AutoPilot { get; set; }
@@ -222,6 +222,14 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public bool NoSmokingSign { get; set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets or sets a value indicating whether the aircraft has "latitude longitude freeze" on, GSX
+        /// sets this during pushback.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public bool IsLatitudeLongitudeFreezeOn { get; set; }
     }
 
     /// -------------------------------------------------------------------------------------------------
@@ -250,6 +258,13 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
         /// -------------------------------------------------------------------------------------------------
         public static Simulator.Models.SecondaryTracking Convert(this SecondaryTracking secondary)
         {
+            // Detect GSX pushback
+            var pushBack = secondary.Pushback;
+            if (pushBack == Pushback.NoPushback && secondary.IsLatitudeLongitudeFreezeOn)
+            {
+                pushBack = Pushback.Straight;
+            }
+            
             return new Simulator.Models.SecondaryTracking
             {
                 UtcTime = secondary.UtcTime,
@@ -264,7 +279,7 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 EngineCombustion2 = secondary.EngineCombustion2,
                 EngineCombustion3 = secondary.EngineCombustion3,
                 EngineCombustion4 = secondary.EngineCombustion4,
-                Pushback = secondary.Pushback,
+                Pushback = pushBack,
                 ApuRunning = secondary.ApuRunning,
                 LightBeacon = secondary.LightBeacon,
                 LightNav = secondary.LightNav,
@@ -329,7 +344,8 @@ namespace OpenSky.Agent.SimConnectMSFS.Structs
                 new SimVar("BRAKE PARKING INDICATOR", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("SPOILERS ARMED", "Bool", SIMCONNECT_DATATYPE.INT32),
                 new SimVar("CABIN SEATBELTS ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32),
-                new SimVar("CABIN NO SMOKING ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32)
+                new SimVar("CABIN NO SMOKING ALERT SWITCH", "Bool", SIMCONNECT_DATATYPE.INT32),
+                new SimVar("IS LATITUDE LONGITUDE FREEZE ON", "Bool", SIMCONNECT_DATATYPE.INT32)
             };
     }
 }

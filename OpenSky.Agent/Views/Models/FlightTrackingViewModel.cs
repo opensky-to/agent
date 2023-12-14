@@ -1005,7 +1005,7 @@ namespace OpenSky.Agent.Views.Models
                         if (this.Simulator.WeightAndBalance.FuelTotalQuantity < (this.Simulator.Flight.FuelGallons ?? 0) && ((this.Simulator.Flight.FuelGallons ?? 0) - this.Simulator.WeightAndBalance.FuelTotalQuantity) > 0.2)
                         {
                             Debug.WriteLine("Fuel below flight plan, double checking with user...");
-                            ExtendedMessageBoxResult? answer = null;
+                            ExtendedMessageBoxResult? fuelAnswer = null;
                             this.StartTrackingCommand.ReportProgress(
                                 () =>
                                 {
@@ -1015,15 +1015,23 @@ namespace OpenSky.Agent.Views.Models
                                         MessageBoxButton.YesNo,
                                         ExtendedMessageBoxImage.Warning);
                                     messageBox.SetWarningColorStyle();
-                                    messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                    messageBox.Closed += (_, _) => { fuelAnswer = messageBox.Result; };
                                     this.ViewReference.ShowMessageBox(messageBox);
                                 });
-                            while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                            var waited = 0;
+                            while (fuelAnswer == null && !SleepScheduler.IsShutdownInProgress)
                             {
                                 Thread.Sleep(500);
+                                waited += 500;
+
+                                if (waited > 15000)
+                                {
+                                    Debug.WriteLine("Start tracking message box timeout for FUEL");
+                                    fuelAnswer = ExtendedMessageBoxResult.None;
+                                }
                             }
 
-                            if (answer != ExtendedMessageBoxResult.Yes)
+                            if (fuelAnswer != ExtendedMessageBoxResult.Yes)
                             {
                                 this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                                 return;
@@ -1080,7 +1088,7 @@ namespace OpenSky.Agent.Views.Models
                     if (this.Simulator.WeightAndBalance.CgPercent < this.Simulator.WeightAndBalance.CgFwdLimit || this.Simulator.WeightAndBalance.CgPercent > this.Simulator.WeightAndBalance.CgAftLimit)
                     {
                         Debug.WriteLine("CG outside limits, double checking with user...");
-                        ExtendedMessageBoxResult? answer = null;
+                        ExtendedMessageBoxResult? cgAnswer = null;
                         this.StartTrackingCommand.ReportProgress(
                             () =>
                             {
@@ -1090,15 +1098,23 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                messageBox.Closed += (_, _) => { cgAnswer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
-                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        var waited = 0;
+                        while (cgAnswer == null && !SleepScheduler.IsShutdownInProgress)
                         {
                             Thread.Sleep(500);
+                            waited += 500;
+
+                            if (waited > 15000)
+                            {
+                                Debug.WriteLine("Start tracking message box timeout for CG");
+                                cgAnswer = ExtendedMessageBoxResult.None;
+                            }
                         }
 
-                        if (answer != ExtendedMessageBoxResult.Yes)
+                        if (cgAnswer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -1108,7 +1124,7 @@ namespace OpenSky.Agent.Views.Models
                     if (Math.Abs(this.Simulator.WeightAndBalance.CgPercentLateral) > 0.01)
                     {
                         Debug.WriteLine("Lateral CG outside limits, double checking with user...");
-                        ExtendedMessageBoxResult? answer = null;
+                        ExtendedMessageBoxResult? latCgAnswer = null;
                         this.StartTrackingCommand.ReportProgress(
                             () =>
                             {
@@ -1118,15 +1134,23 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                messageBox.Closed += (_, _) => { latCgAnswer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
-                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        var waited = 0;
+                        while (latCgAnswer == null && !SleepScheduler.IsShutdownInProgress)
                         {
                             Thread.Sleep(500);
+                            waited += 500;
+
+                            if (waited > 15000)
+                            {
+                                Debug.WriteLine("Start tracking message box timeout for LAT CG");
+                                latCgAnswer = ExtendedMessageBoxResult.None;
+                            }
                         }
 
-                        if (answer != ExtendedMessageBoxResult.Yes)
+                        if (latCgAnswer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -1136,7 +1160,7 @@ namespace OpenSky.Agent.Views.Models
                     if (this.Simulator.WeightAndBalance.PayloadWeight > this.Simulator.WeightAndBalance.MaxPayloadWeight)
                     {
                         Debug.WriteLine("Payload weight outside limits, double checking with user...");
-                        ExtendedMessageBoxResult? answer = null;
+                        ExtendedMessageBoxResult? payloadAnswer = null;
                         this.StartTrackingCommand.ReportProgress(
                             () =>
                             {
@@ -1146,15 +1170,23 @@ namespace OpenSky.Agent.Views.Models
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Warning);
                                 messageBox.SetWarningColorStyle();
-                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                messageBox.Closed += (_, _) => { payloadAnswer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
-                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        var waited = 0;
+                        while (payloadAnswer == null && !SleepScheduler.IsShutdownInProgress)
                         {
                             Thread.Sleep(500);
+                            waited += 500;
+
+                            if (waited > 15000)
+                            {
+                                Debug.WriteLine("Start tracking message box timeout for PAYLOAD");
+                                payloadAnswer = ExtendedMessageBoxResult.None;
+                            }
                         }
 
-                        if (answer != ExtendedMessageBoxResult.Yes)
+                        if (payloadAnswer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -1164,7 +1196,7 @@ namespace OpenSky.Agent.Views.Models
                     if (this.Simulator.WeightAndBalance.TotalWeight > this.Simulator.WeightAndBalance.MaxGrossWeight)
                     {
                         Debug.WriteLine("Total weight outside limits, double checking with user...");
-                        ExtendedMessageBoxResult? answer = null;
+                        ExtendedMessageBoxResult? totalWeightAnswer = null;
                         this.StartTrackingCommand.ReportProgress(
                             () =>
                             {
@@ -1173,15 +1205,23 @@ namespace OpenSky.Agent.Views.Models
                                     "The total weight exceeds the limits specified for this aircraft, are you sure you want to continue?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Question);
-                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                messageBox.Closed += (_, _) => { totalWeightAnswer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
-                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        var waited = 0;
+                        while (totalWeightAnswer == null && !SleepScheduler.IsShutdownInProgress)
                         {
                             Thread.Sleep(500);
+                            waited += 500;
+
+                            if (waited > 15000)
+                            {
+                                Debug.WriteLine("Start tracking message box timeout for TOTAL WEIGHT");
+                                totalWeightAnswer = ExtendedMessageBoxResult.None;
+                            }
                         }
 
-                        if (answer != ExtendedMessageBoxResult.Yes)
+                        if (totalWeightAnswer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -1191,7 +1231,7 @@ namespace OpenSky.Agent.Views.Models
                     if (!this.Simulator.GroundHandlingComplete && this.Simulator.SecondaryTracking.EngineRunning)
                     {
                         Debug.WriteLine("Ground handling not complete, ask the user about skipping...");
-                        ExtendedMessageBoxResult? answer = null;
+                        ExtendedMessageBoxResult? groundHandlingAnswer = null;
                         this.StartTrackingCommand.ReportProgress(
                             () =>
                             {
@@ -1200,15 +1240,23 @@ namespace OpenSky.Agent.Views.Models
                                     "Ground handling not yet completed, do you want to skip it?",
                                     MessageBoxButton.YesNo,
                                     ExtendedMessageBoxImage.Question);
-                                messageBox.Closed += (_, _) => { answer = messageBox.Result; };
+                                messageBox.Closed += (_, _) => { groundHandlingAnswer = messageBox.Result; };
                                 this.ViewReference.ShowMessageBox(messageBox);
                             });
-                        while (answer == null && !SleepScheduler.IsShutdownInProgress)
+                        var waited = 0;
+                        while (groundHandlingAnswer == null && !SleepScheduler.IsShutdownInProgress)
                         {
                             Thread.Sleep(500);
+                            waited += 500;
+
+                            if (waited > 15000)
+                            {
+                                Debug.WriteLine("Start tracking message box timeout for GROUND HANDLING");
+                                groundHandlingAnswer = ExtendedMessageBoxResult.None;
+                            }
                         }
 
-                        if (answer != ExtendedMessageBoxResult.Yes)
+                        if (groundHandlingAnswer != ExtendedMessageBoxResult.Yes)
                         {
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
@@ -1254,7 +1302,7 @@ namespace OpenSky.Agent.Views.Models
                     // Set the plane registration
                     this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry.RemoveSimPrefix());
 
-                    // Start five second countdown?
+                    // Start five-second countdown?
                     if (this.Simulator.PrimaryTracking.SlewActive)
                     {
                         Debug.WriteLine("Starting 5 second resume timer...");

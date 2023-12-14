@@ -8941,7 +8941,7 @@ namespace OpenSkyApi
         /// </summary>
         [Newtonsoft.Json.JsonProperty("registry", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(12, MinimumLength = 7)]
+        [System.ComponentModel.DataAnnotations.StringLength(12, MinimumLength = 6)]
         public string Registry { get; set; }
 
         /// <summary>
@@ -11200,7 +11200,7 @@ namespace OpenSkyApi
         /// Gets or sets the aircraft registry (optional, if record relates to an aircraft).
         /// </summary>
         [Newtonsoft.Json.JsonProperty("aircraftRegistry", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 5)]
+        [System.ComponentModel.DataAnnotations.StringLength(12, MinimumLength = 6)]
         public string AircraftRegistry { get; set; }
 
         [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.Always)]
@@ -11321,6 +11321,9 @@ namespace OpenSkyApi
 
         [Newtonsoft.Json.JsonProperty("flightPhase", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public FlightPhase FlightPhase { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("flightRule", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public FlightRule FlightRule { get; set; }
 
         /// <summary>
         /// Gets or sets the fuel in gallons.
@@ -11659,6 +11662,9 @@ namespace OpenSkyApi
         /// </summary>
         [Newtonsoft.Json.JsonProperty("atcCallsign", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AtcCallsign { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public AircraftTypeCategory Category { get; set; }
 
         /// <summary>
         /// Gets or sets the Date/Time of when the flight was completed.
@@ -12026,6 +12032,9 @@ namespace OpenSkyApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class FlightPlan
     {
+        [Newtonsoft.Json.JsonProperty("flightRule", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public FlightRule FlightRule { get; set; }
+
         [Newtonsoft.Json.JsonProperty("aircraft", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Aircraft Aircraft { get; set; }
 
@@ -12182,6 +12191,19 @@ namespace OpenSkyApi
         /// </summary>
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Status { get; set; }
+
+    }
+
+    /// <summary>
+    /// Flight rules. 0 = IFR, 1 = VFR
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public enum FlightRule
+    {
+
+        IFR = 0,
+
+        VFR = 1,
 
     }
 
@@ -12710,7 +12732,7 @@ namespace OpenSkyApi
         /// Gets or sets the aircraft registry the payload is currently loaded on, or NULL if stored at an airport.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("aircraftRegistry", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 5)]
+        [System.ComponentModel.DataAnnotations.StringLength(12, MinimumLength = 6)]
         public string AircraftRegistry { get; set; }
 
         /// <summary>

@@ -139,7 +139,7 @@ namespace OpenSky.Agent.Simulator
 
             this.TrackingConditions = new Dictionary<int, TrackingCondition>
             {
-                { (int)Models.TrackingConditions.DateTime, new TrackingCondition { AutoSet = true } },
+                { (int)Models.TrackingConditions.DateTime, new TrackingCondition() },
                 { (int)Models.TrackingConditions.Fuel, new TrackingCondition { AutoSet = true } },
                 { (int)Models.TrackingConditions.Payload, new TrackingCondition { AutoSet = true } },
                 { (int)Models.TrackingConditions.PlaneModel, new TrackingCondition() },
