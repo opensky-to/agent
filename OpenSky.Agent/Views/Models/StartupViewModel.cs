@@ -216,123 +216,232 @@ namespace OpenSky.Agent.Views.Models
                     }
                 });
 
-            // Check for new flight from API
-            new Thread(
-                    () =>
+            // Start background worker threads
+            new Thread(this.CheckForNewFlights) { Name = "OpenSky.StartupViewModel.CheckForNewFlights" }.Start();
+            new Thread(this.CheckNotifications) { Name = "OpenSky.StartupViewModel.CheckNotifications" }.Start();
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Check for notifications.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 19/12/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CheckNotifications()
+        {
+            // Wait for window to load up properly
+            Thread.Sleep(5000);
+
+            while (!SleepScheduler.IsShutdownInProgress)
+            {
+                if (UserSessionService.Instance.IsUserLoggedIn)
+                {
+                    try
                     {
-                        if (UserSessionService.Instance.IsUserLoggedIn)
+                        var result = AgentOpenSkyService.Instance.GetNotificationsAsync(NotificationTarget.Agent).Result;
+                        if (!result.IsError)
                         {
-                            _ = UserSessionService.Instance.UpdateUserRoles().Result;
-                            _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
-                            _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
-                            Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
-                            UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
-                            Application.Current.Dispatcher.BeginInvoke(updateMenu);
+                            if (result.Data.Count > 0)
+                            {
+                                UpdateGUIDelegate showNotifications = () =>
+                                {
+                                    foreach (var notificationData in result.Data)
+                                    {
+                                        if (notificationData.Style is NotificationStyle.ToastInfo or NotificationStyle.ToastWarning or NotificationStyle.ToastError)
+                                        {
+                                            var icon = notificationData.Style switch
+                                            {
+                                                NotificationStyle.ToastWarning => ExtendedMessageBoxImage.Warning,
+                                                NotificationStyle.ToastError => ExtendedMessageBoxImage.Error,
+                                                _ => ExtendedMessageBoxImage.Information
+                                            };
+
+                                            var notification = new OpenSkyNotification($"Notification from \"{notificationData.Sender}\"", notificationData.Message, MessageBoxButton.OK, icon, notificationData.DisplayTimeout ?? 0);
+                                            if (notificationData.Style == NotificationStyle.ToastWarning)
+                                            {
+                                                notification.SetWarningColorStyle();
+                                            }
+
+                                            if (notificationData.Style == NotificationStyle.ToastError)
+                                            {
+                                                notification.SetErrorColorStyle();
+                                            }
+
+                                            FlightTracking.Open();
+                                            FlightTracking.Instance.ShowNotification(notification);
+                                        }
+
+                                        if (notificationData.Style is NotificationStyle.MessageBoxInfo or NotificationStyle.MessageBoxWarning or NotificationStyle.MessageBoxError)
+                                        {
+                                            var icon = notificationData.Style switch
+                                            {
+                                                NotificationStyle.MessageBoxWarning => ExtendedMessageBoxImage.Warning,
+                                                NotificationStyle.MessageBoxError => ExtendedMessageBoxImage.Error,
+                                                _ => ExtendedMessageBoxImage.Information
+                                            };
+
+                                            var messageBox = new OpenSkyMessageBox($"Notification from \"{notificationData.Sender}\"", notificationData.Message, MessageBoxButton.OK, icon, notificationData.DisplayTimeout ?? 0);
+                                            if (notificationData.Style == NotificationStyle.MessageBoxWarning)
+                                            {
+                                                messageBox.SetWarningColorStyle();
+                                            }
+
+                                            if (notificationData.Style == NotificationStyle.MessageBoxError)
+                                            {
+                                                messageBox.SetErrorColorStyle();
+                                            }
+
+                                            FlightTracking.Open();
+                                            FlightTracking.Instance.ShowMessageBox(messageBox);
+                                        }
+                                    }
+                                };
+                                Application.Current.Dispatcher.BeginInvoke(showNotifications);
+
+                                foreach (var notification in result.Data)
+                                {
+                                    _ = AgentOpenSkyService.Instance.ConfirmNotificationPickupAsync(notification.Id, NotificationTarget.Agent).Result;
+                                }
+                            }
                         }
                         else
                         {
-                            Simulator.Instance.OpenSkyUserName = null;
+                            Debug.WriteLine($"Error checking for notifications: {result.Message}\r\n{result.ErrorDetails}");
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error checking for notifications: " + ex);
+                    }
 
-                        UserSessionService.Instance.PropertyChanged += (sender, e) =>
+                    SleepScheduler.SleepFor(TimeSpan.FromMinutes(1));
+                }
+            }
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Check for new flight from API.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 18/12/2023.
+        /// </remarks>
+        /// -------------------------------------------------------------------------------------------------
+        private void CheckForNewFlights()
+        {
+            if (UserSessionService.Instance.IsUserLoggedIn)
+            {
+                _ = UserSessionService.Instance.UpdateUserRoles().Result;
+                _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
+                Application.Current.Dispatcher.BeginInvoke(updateMenu);
+            }
+            else
+            {
+                Simulator.Instance.OpenSkyUserName = null;
+            }
+
+            UserSessionService.Instance.PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn))
+                {
+                    if (UserSessionService.Instance.IsUserLoggedIn)
+                    {
+                        _ = UserSessionService.Instance.UpdateUserRoles().Result;
+                        _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
+                        _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
+                        Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
+                        UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
+                        Application.Current.Dispatcher.BeginInvoke(updateMenu);
+                    }
+                    else
+                    {
+                        Simulator.Instance.OpenSkyUserName = null;
+                    }
+                }
+            };
+
+            while (!SleepScheduler.IsShutdownInProgress)
+            {
+                if (UserSessionService.Instance.IsUserLoggedIn)
+                {
+                    try
+                    {
+                        // Check for active flight
+                        var result = AgentOpenSkyService.Instance.GetFlightAsync().Result;
+                        if (!result.IsError)
                         {
-                            if (e.PropertyName == nameof(UserSessionService.Instance.IsUserLoggedIn))
+                            if (result.Data.Id != Guid.Empty)
                             {
-                                if (UserSessionService.Instance.IsUserLoggedIn)
+                                UpdateGUIDelegate resetPausedFlights = () => this.PausedFlights.Clear();
+                                Application.Current.Dispatcher.BeginInvoke(resetPausedFlights);
+
+                                if (Simulator.Instance.Flight == null)
                                 {
-                                    _ = UserSessionService.Instance.UpdateUserRoles().Result;
-                                    _ = UserSessionService.Instance.RefreshLinkedAccounts().Result;
-                                    _ = UserSessionService.Instance.RefreshUserAccountOverview().Result;
-                                    Simulator.Instance.OpenSkyUserName = UserSessionService.Instance.Username;
-                                    UpdateGUIDelegate updateMenu = this.UpdateMainMenu;
-                                    Application.Current.Dispatcher.BeginInvoke(updateMenu);
+                                    Simulator.Instance.Flight = result.Data;
+                                    Simulator.Instance.VatsimUserID = UserSessionService.Instance.LinkedAccounts?.VatsimID;
                                 }
                                 else
                                 {
-                                    Simulator.Instance.OpenSkyUserName = null;
-                                }
-                            }
-                        };
-
-                        while (!SleepScheduler.IsShutdownInProgress)
-                        {
-                            if (UserSessionService.Instance.IsUserLoggedIn)
-                            {
-                                try
-                                {
-                                    // Check for active flight
-                                    var result = AgentOpenSkyService.Instance.GetFlightAsync().Result;
-                                    if (!result.IsError)
+                                    if (Simulator.Instance.Flight.Id != result.Data.Id)
                                     {
-                                        if (result.Data.Id != Guid.Empty)
-                                        {
-                                            UpdateGUIDelegate resetPausedFlights = () => this.PausedFlights.Clear();
-                                            Application.Current.Dispatcher.BeginInvoke(resetPausedFlights);
-
-                                            if (Simulator.Instance.Flight == null)
-                                            {
-                                                Simulator.Instance.Flight = result.Data;
-                                                Simulator.Instance.VatsimUserID = UserSessionService.Instance.LinkedAccounts?.VatsimID;
-                                            }
-                                            else
-                                            {
-                                                if (Simulator.Instance.Flight.Id != result.Data.Id)
-                                                {
-                                                    // Different flight from current one?
-                                                    Simulator.Instance.StopTracking(true);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (Simulator.Instance.Flight != null)
-                                            {
-                                                Simulator.Instance.Flight = null;
-                                            }
-
-                                            // Check for paused flights
-                                            var pausedResult = AgentOpenSkyService.Instance.GetMyFlightsAsync().Result;
-                                            if (!result.IsError)
-                                            {
-                                                UpdateGUIDelegate addPausedFlights = () =>
-                                                {
-                                                    this.PausedFlights.Clear();
-                                                    foreach (var flight in pausedResult.Data.Where(f => f.Paused.HasValue))
-                                                    {
-                                                        this.PausedFlights.Add(flight);
-                                                    }
-                                                };
-                                                Application.Current.Dispatcher.BeginInvoke(addPausedFlights);
-                                            }
-                                            else
-                                            {
-                                                Debug.WriteLine("Error checking for paused flights: " + result.Message + "\r\n" + result.ErrorDetails);
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("Error checking for new flight: " + result.Message + "\r\n" + result.ErrorDetails);
+                                        // Different flight from current one?
+                                        Simulator.Instance.StopTracking(true);
                                     }
                                 }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine("Error checking for new flight: " + ex);
-                                }
                             }
-
-                            this.NextFlightUpdateCheckSeconds = Simulator.Instance.Flight == null ? 30 : 120;
-                            while (this.NextFlightUpdateCheckSeconds > 0 && !SleepScheduler.IsShutdownInProgress)
+                            else
                             {
-                                Thread.Sleep(1000);
-                                if (this.NextFlightUpdateCheckSeconds > 0)
+                                if (Simulator.Instance.Flight != null)
                                 {
-                                    this.NextFlightUpdateCheckSeconds--;
+                                    Simulator.Instance.Flight = null;
+                                }
+
+                                // Check for paused flights
+                                var pausedResult = AgentOpenSkyService.Instance.GetMyFlightsAsync().Result;
+                                if (!result.IsError)
+                                {
+                                    UpdateGUIDelegate addPausedFlights = () =>
+                                    {
+                                        this.PausedFlights.Clear();
+                                        foreach (var flight in pausedResult.Data.Where(f => f.Paused.HasValue))
+                                        {
+                                            this.PausedFlights.Add(flight);
+                                        }
+                                    };
+                                    Application.Current.Dispatcher.BeginInvoke(addPausedFlights);
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Error checking for paused flights: " + result.Message + "\r\n" + result.ErrorDetails);
                                 }
                             }
                         }
-                    })
-                { Name = "OpenSky.StartupViewModel.CheckForFlights" }.Start();
+                        else
+                        {
+                            Debug.WriteLine($"Error checking for new flight: {result.Message}\r\n{result.ErrorDetails}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error checking for new flight: " + ex);
+                    }
+                }
+
+                this.NextFlightUpdateCheckSeconds = Simulator.Instance.Flight == null ? 30 : 120;
+                while (this.NextFlightUpdateCheckSeconds > 0 && !SleepScheduler.IsShutdownInProgress)
+                {
+                    Thread.Sleep(1000);
+                    if (this.NextFlightUpdateCheckSeconds > 0)
+                    {
+                        this.NextFlightUpdateCheckSeconds--;
+                    }
+                }
+            }
         }
 
         /// -------------------------------------------------------------------------------------------------
