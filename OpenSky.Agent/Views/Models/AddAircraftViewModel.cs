@@ -328,6 +328,7 @@ namespace OpenSky.Agent.Views.Models
                 MaxGrossWeight = Math.Round(this.Simulator.WeightAndBalance.MaxGrossWeight, 0),
                 FlapsAvailable = this.Simulator.AircraftIdentity.FlapsAvailable,
                 IsGearRetractable = this.Simulator.AircraftIdentity.GearRetractable,
+                OverrideFuelType = FuelType.NotUsed,
                 Name = this.Name,
                 Comments = this.Comments,
                 Simulator = this.Simulator.SimulatorType
