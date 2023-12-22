@@ -110,6 +110,7 @@
       <DependentUpon>FuelTankControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\OpenSkyWindow.cs" />
+    <Compile Include="Controls\OsmTileSource.cs" />
     <Compile Include="Controls\PayloadStationControl.xaml.cs">
       <DependentUpon>PayloadStationControl.xaml</DependentUpon>
     </Compile>
@@ -449,7 +450,9 @@
       <Name>OpenSky.Agent.UdpXPlane11</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\osm25.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>call "$(ProjectDir)pre-build.bat" "$(ProjectDir)" "$(ConfigurationName)"
