@@ -552,8 +552,8 @@ namespace OpenSky.Agent.Controls
                             {
                                 try
                                 {
-                                    // Wait 500 milliseconds before removing the message box, so the fade out animation has time to run
-                                    Thread.Sleep(500);
+                                    // Wait 750 milliseconds before removing the message box, so the fade out animation has time to run
+                                    Thread.Sleep(750);
                                     UpdateGUIDelegate removeNotification = () =>
                                     {
                                         lock (this.messageBoxContainer)
