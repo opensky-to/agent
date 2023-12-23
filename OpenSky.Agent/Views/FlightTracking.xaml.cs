@@ -162,7 +162,16 @@ namespace OpenSky.Agent.Views
             }
 
             // Configure map view
-            this.MapView.CredentialsProvider = new ApplicationIdCredentialsProvider(UserSessionService.Instance.LinkedAccounts?.BingMapsKey);
+            try
+            {
+                this.MapView.Children.Add(this.mapLayer);
+                this.MapView.Children.Add(this.overlayLayer);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Map layer already added error.\r\n{ex}");
+            }
+
             this.AddAircraftAndTrailsToMap();
 
             // Add fuel tank controls
@@ -286,6 +295,16 @@ namespace OpenSky.Agent.Views
         private void FlightTrackingViewModelOnResetTrackingMap(object sender, EventArgs e)
         {
             this.MapView.Children.Clear();
+            try
+            {
+                this.MapView.Children.Add(this.mapLayer);
+                this.MapView.Children.Add(this.overlayLayer);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Map layer already added error.\r\n{ex}");
+            }
+
             this.AddAircraftAndTrailsToMap();
         }
 
@@ -409,6 +428,34 @@ namespace OpenSky.Agent.Views
             }
         }
 
+        // -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The map layer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private MapTileLayer mapLayer = new MapTileLayer
+        {
+            TileSource = new OsmTileSource
+            {
+                UriFormat = "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+            },
+            Opacity = 1
+        };
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The overlay layer.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        private readonly MapTileLayer overlayLayer = new MapTileLayer
+        {
+            TileSource = new OsmTileSource()
+            {
+                // No source uri format initially for default
+            },
+            Opacity = 1
+        };
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// Map type selection changed.
@@ -425,17 +472,32 @@ namespace OpenSky.Agent.Views
         /// -------------------------------------------------------------------------------------------------
         private void MapTypeOnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.MapType.SelectedItem is ComboBoxItem item)
+            if (this.MapType.SelectedItem is ComboBoxItem { Content: string content })
             {
-                switch (item.Content as string)
+                this.MapView.Children.Remove(this.mapLayer);
+                this.mapLayer = new MapTileLayer
                 {
-                    case "Road":
-                        this.MapView.Mode = new RoadMode();
+                    TileSource = new OsmTileSource(),
+                    Opacity = 1,
+                };
+
+                switch (content)
+                {
+                    case "Dark":
+                        this.mapLayer.TileSource.UriFormat = "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
+                        break;
+                    case "Bright":
+                        this.mapLayer.TileSource.UriFormat = "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
+                        break;
+                    case "Topo":
+                        this.mapLayer.TileSource.UriFormat = "https://tile.opentopomap.org/{z}/{x}/{y}.png";
                         break;
                     case "Aerial":
-                        this.MapView.Mode = new AerialMode();
+                        this.mapLayer.TileSource.UriFormat = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
                         break;
                 }
+
+                this.MapView.Children.Insert(0, this.mapLayer);
             }
         }
 

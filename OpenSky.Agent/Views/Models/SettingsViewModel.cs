@@ -55,13 +55,6 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// The Bing maps key.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private string bingMapsKey;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Are there changes to the settings to be saved?
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -197,7 +190,6 @@ namespace OpenSky.Agent.Views.Models
             this.XplaneIPAddress = Settings.Default.XPlaneIPAddress;
             this.XplanePort = Settings.Default.XPlanePort;
             this.AircraftPositionUpdateInterval = Settings.Default.AircraftPositionUpdateInterval;
-            this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
             this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
             this.VatsimID = UserSessionService.Instance.LinkedAccounts?.VatsimID;
             this.SelectedLandingReportNotification = LandingReportNotification.Parse(Settings.Default.LandingReportNotification);
@@ -269,28 +261,6 @@ namespace OpenSky.Agent.Views.Models
                 }
 
                 this.aircraftPositionUpdateInterval = value;
-                this.NotifyPropertyChanged();
-                this.IsDirty = true;
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets or sets the Bing maps key.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public string BingMapsKey
-        {
-            get => this.bingMapsKey;
-
-            set
-            {
-                if (Equals(this.bingMapsKey, value))
-                {
-                    return;
-                }
-
-                this.bingMapsKey = value;
                 this.NotifyPropertyChanged();
                 this.IsDirty = true;
             }
@@ -766,7 +736,6 @@ namespace OpenSky.Agent.Views.Models
                 () =>
                 {
                     var wasDirty = this.IsDirty;
-                    this.BingMapsKey = null;
                     this.SimBriefUsername = null;
                     this.ProfileImage = new BitmapImage(new Uri("pack://application:,,,/OpenSky.Agent;component/Resources/profile200.png"));
                     this.IsDirty = wasDirty;
@@ -884,7 +853,6 @@ namespace OpenSky.Agent.Views.Models
             {
                 var linkedAccounts = new LinkedAccounts
                 {
-                    BingMapsKey = this.BingMapsKey,
                     SimbriefUsername = this.SimBriefUsername,
                     VatsimID = this.VatsimID
                 };
@@ -1098,7 +1066,6 @@ namespace OpenSky.Agent.Views.Models
                                 }
 
                                 var wasDirty = this.IsDirty;
-                                this.BingMapsKey = UserSessionService.Instance.LinkedAccounts?.BingMapsKey;
                                 this.SimBriefUsername = UserSessionService.Instance.LinkedAccounts?.SimbriefUsername;
                                 this.IsDirty = wasDirty;
                             }
