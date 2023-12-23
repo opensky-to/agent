@@ -12,6 +12,7 @@ namespace OpenSky.Agent.Simulator
     using System.IO;
     using System.Linq;
     using System.Media;
+    using System.Reflection;
     using System.Speech.Synthesis;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -20,7 +21,7 @@ namespace OpenSky.Agent.Simulator
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    /// Speech sound packs manager.
+    /// Speech soundpacks manager.
     /// </summary>
     /// <remarks>
     /// sushi.at, 24/12/2021.
@@ -28,13 +29,6 @@ namespace OpenSky.Agent.Simulator
     /// -------------------------------------------------------------------------------------------------
     public class SpeechSoundPacks
     {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The single static instance.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public static SpeechSoundPacks Instance { get; private set; }
-
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         /// The random generator.
@@ -48,25 +42,6 @@ namespace OpenSky.Agent.Simulator
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private readonly SpeechSynthesizer speech;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Initializes the speech sound packs.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 31/01/2022.
-        /// </remarks>
-        /// <param name="selectedSoundPack">
-        /// The selected sound pack.
-        /// </param>
-        /// <param name="textToSpeechVoice">
-        /// The text to speech voice.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        public static void InitializeSpeechSoundPacks(string selectedSoundPack, string textToSpeechVoice)
-        {
-            Instance = new SpeechSoundPacks(selectedSoundPack, textToSpeechVoice);
-        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -91,6 +66,7 @@ namespace OpenSky.Agent.Simulator
 
                 // Initialize the speech synthesizer
                 this.speech = new SpeechSynthesizer();
+                this.InitLog = $"Preparing TTS module for voice: {textToSpeechVoice}";
                 if (!string.IsNullOrEmpty(textToSpeechVoice))
                 {
                     try
@@ -99,61 +75,150 @@ namespace OpenSky.Agent.Simulator
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Error setting text-to-speech voice from settings: " + ex);
+                        Debug.WriteLine($"Error setting text-to-speech voice from settings: {ex}");
+                        this.InitLog += $"\r\nError setting text-to-speech voice from settings:\r\n{ex}";
                     }
+                }
+                else
+                {
+                    this.InitLog += "empty, skipping.";
                 }
 
                 // Scan sound pack folder for recognized wav files
-                foreach (var soundPackDirectory in Directory.EnumerateDirectories(".\\SoundPacks"))
+                var localSoundPacksPath = string.Empty;
+                try
                 {
-                    var packName = soundPackDirectory.Split('\\').Last();
-                    var packFiles = Directory.GetFiles(soundPackDirectory);
-                    var packDictionary = new Dictionary<SpeechEvent, List<string>>();
-                    foreach (SpeechEvent spEvent in Enum.GetValues(typeof(SpeechEvent)))
+                    localSoundPacksPath = Path.GetDirectoryName(".\\SoundPacks") ?? string.Empty;
+                    if (!localSoundPacksPath.EndsWith("SoundPacks"))
                     {
-                        if (spEvent != SpeechEvent.ReadyForBoarding)
-                        {
-                            var eventConfig = spEvent.GetStringValue();
-                            if (eventConfig?.Contains("|") == true)
-                            {
-                                var fileMask = eventConfig.Split('|')[0];
-                                foreach (var packFile in packFiles)
-                                {
-                                    if (Regex.IsMatch(packFile, fileMask))
-                                    {
-                                        if (!packDictionary.ContainsKey(spEvent))
-                                        {
-                                            packDictionary.Add(spEvent, new List<string>());
-                                        }
+                        // Path doesn't exist
+                        localSoundPacksPath = string.Empty;
+                    }
+                }
+                catch
+                {
+                    //Ignore
+                }
 
-                                        packDictionary[spEvent].Add(packFile);
+                var assemblyLocationSoundPacksPath = string.Empty;
+                try
+                {
+                    assemblyLocationSoundPacksPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+                }
+                catch
+                {
+                    //Ignore
+                }
+
+                if (!string.IsNullOrEmpty(assemblyLocationSoundPacksPath))
+                {
+                    assemblyLocationSoundPacksPath = $"{assemblyLocationSoundPacksPath}\\SoundPacks";
+                    if (!Directory.Exists(assemblyLocationSoundPacksPath))
+                    {
+                        assemblyLocationSoundPacksPath = string.Empty;
+                    }
+                }
+
+                var openSkyFolderPath = Environment.ExpandEnvironmentVariables("%localappdata%\\OpenSky\\SoundPacks");
+                var openSkyAppDataSoundPacksPath = Directory.Exists(openSkyFolderPath) ? openSkyFolderPath : string.Empty;
+
+                this.InitLog += $"\r\n\r\nLocal soundpacks folder            : {localSoundPacksPath}";
+                this.InitLog += $"\r\nAssembly location soundpacks folder: {assemblyLocationSoundPacksPath}";
+                this.InitLog += $"\r\nOpenSky appdata soundpacks folder  : {openSkyAppDataSoundPacksPath}";
+
+                var dirsToScan = new List<string>();
+                if (!string.IsNullOrEmpty(localSoundPacksPath))
+                {
+                    dirsToScan.Add(localSoundPacksPath);
+                }
+
+                if (!string.IsNullOrEmpty(assemblyLocationSoundPacksPath) && !localSoundPacksPath.ToLowerInvariant().Equals(assemblyLocationSoundPacksPath.ToLowerInvariant()))
+                {
+                    dirsToScan.Add(assemblyLocationSoundPacksPath);
+                }
+
+                if (!string.IsNullOrEmpty(openSkyAppDataSoundPacksPath))
+                {
+                    dirsToScan.Add(openSkyAppDataSoundPacksPath);
+                }
+
+                foreach (var packDir in dirsToScan)
+                {
+                    this.InitLog += $"\r\n\r\nScanning directory for sound packs: {packDir}\r\n";
+                    foreach (var soundPackDirectory in Directory.EnumerateDirectories(packDir))
+                    {
+                        this.InitLog += $"\r\nChecking pack directory: {soundPackDirectory}";
+                        var packName = soundPackDirectory.Split('\\').Last();
+                        var packFiles = Directory.GetFiles(soundPackDirectory);
+                        var packDictionary = new Dictionary<SpeechEvent, List<string>>();
+                        foreach (SpeechEvent spEvent in Enum.GetValues(typeof(SpeechEvent)))
+                        {
+                            if (spEvent != SpeechEvent.ReadyForBoarding)
+                            {
+                                var eventConfig = spEvent.GetStringValue();
+                                if (eventConfig?.Contains("|") == true)
+                                {
+                                    var fileMask = eventConfig.Split('|')[0];
+                                    foreach (var packFile in packFiles)
+                                    {
+                                        if (Regex.IsMatch(packFile, fileMask))
+                                        {
+                                            if (!packDictionary.ContainsKey(spEvent))
+                                            {
+                                                packDictionary.Add(spEvent, new List<string>());
+                                            }
+
+                                            packDictionary[spEvent].Add(packFile);
+                                            this.InitLog += $"\r\nFound pack file for event {spEvent}: {packFile}";
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Check for special ReadyForBoarding meta event conditions
-                    if (packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingBeginning) && packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingEnd) && packDictionary.ContainsKey(SpeechEvent.Number1) &&
-                        packDictionary.ContainsKey(SpeechEvent.Number2) && packDictionary.ContainsKey(SpeechEvent.Number3) && packDictionary.ContainsKey(SpeechEvent.Number4) && packDictionary.ContainsKey(SpeechEvent.Number5) &&
-                        packDictionary.ContainsKey(SpeechEvent.Number6) && packDictionary.ContainsKey(SpeechEvent.Number7) && packDictionary.ContainsKey(SpeechEvent.Number8) && packDictionary.ContainsKey(SpeechEvent.Number9) &&
-                        packDictionary.ContainsKey(SpeechEvent.Number0))
-                    {
-                        packDictionary.Add(SpeechEvent.ReadyForBoarding, null);
-                    }
+                        // Check for special ReadyForBoarding meta event conditions
+                        if (packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingBeginning) && packDictionary.ContainsKey(SpeechEvent.ReadyForBoardingEnd) && packDictionary.ContainsKey(SpeechEvent.Number1) &&
+                            packDictionary.ContainsKey(SpeechEvent.Number2) && packDictionary.ContainsKey(SpeechEvent.Number3) && packDictionary.ContainsKey(SpeechEvent.Number4) && packDictionary.ContainsKey(SpeechEvent.Number5) &&
+                            packDictionary.ContainsKey(SpeechEvent.Number6) && packDictionary.ContainsKey(SpeechEvent.Number7) && packDictionary.ContainsKey(SpeechEvent.Number8) && packDictionary.ContainsKey(SpeechEvent.Number9) &&
+                            packDictionary.ContainsKey(SpeechEvent.Number0))
+                        {
+                            packDictionary.Add(SpeechEvent.ReadyForBoarding, null);
+                            this.InitLog += $"\r\nMarking meta-event ReadyForBoarding as available for pack: {packName}";
+                        }
 
-                    // Does the pack contain any recognized files?
-                    if (packDictionary.Count > 0)
-                    {
-                        this.SoundPacks.Add(packName, packDictionary);
+                        // Does the pack contain any recognized files?
+                        if (packDictionary.Count > 0)
+                        {
+                            this.SoundPacks.Add(packName, packDictionary);
+                            this.InitLog += $"\r\nPack {packName} has valid events, adding to list.\r\n";
+                        }
+                        else
+                        {
+                            this.InitLog += $"\r\nPack {packName} has NO valid events!!!, skipping.\r\n";
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error initializing sound packs: {ex}");
+                this.InitLog += $"\r\n\r\nError initializing sound packs:\r\n{ex}";
             }
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// The single static instance.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public static SpeechSoundPacks Instance { get; private set; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Gets the initialize log.
+        /// </summary>
+        /// -------------------------------------------------------------------------------------------------
+        public string InitLog { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -168,6 +233,25 @@ namespace OpenSky.Agent.Simulator
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Dictionary<string, Dictionary<SpeechEvent, List<string>>> SoundPacks { get; } = new();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Initializes the speech sound packs.
+        /// </summary>
+        /// <remarks>
+        /// sushi.at, 31/01/2022.
+        /// </remarks>
+        /// <param name="selectedSoundPack">
+        /// The selected sound pack.
+        /// </param>
+        /// <param name="textToSpeechVoice">
+        /// The text to speech voice.
+        /// </param>
+        /// -------------------------------------------------------------------------------------------------
+        public static void InitializeSpeechSoundPacks(string selectedSoundPack, string textToSpeechVoice)
+        {
+            Instance = new SpeechSoundPacks(selectedSoundPack, textToSpeechVoice);
+        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

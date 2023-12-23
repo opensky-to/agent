@@ -53,5 +53,11 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock>Sound pack initialization log</TextBlock>
+            </GroupBox.Header>
+            <TextBox MinLines="40" MaxLines="40" VerticalScrollBarVisibility="Auto" IsReadOnly="True" FontFamily="Consolas" Text="{Binding InitLog, Mode=OneWay}" />
+        </GroupBox>
     </StackPanel>
 </controls:OpenSkyWindow>
