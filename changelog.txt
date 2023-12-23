@@ -7,6 +7,9 @@ Version 0.5.12 (ALPHA5)
 --------------------------------------------------------------------------------------
 - Fixed default AvGas override for new aircraft
 - Map view now using OSM, bing maps key no longer necessary, removed from settings
+- Fixed and expanded sound packs folder scanning logic, custom sound packs support
+  added in directory %localappdata%\OpenSky\SoundPacks
+- Further improvement of tracking start questions
 
 --------------------------------------------------------------------------------------
 Version 0.5.11 (ALPHA5)

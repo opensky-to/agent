@@ -994,7 +994,14 @@ namespace OpenSky.Agent.Views.Models
                     }
 
                     // Set the plane registration
-                    this.Simulator.SetAircraftRegistry(this.Simulator.Flight?.Aircraft.Registry.RemoveSimPrefix());
+                    if (this.Simulator.Flight?.Aircraft.Type.DisableAutoRegistry != true)
+                    {
+                        var reg = this.Simulator.Flight?.Aircraft.Registry.RemoveSimPrefix();
+                        if (!string.IsNullOrEmpty(reg))
+                        {
+                            this.Simulator.SetAircraftRegistry(reg);
+                        }
+                    }
 
                     // Wait a bit to make sure all structs have updated, especially time in sim
                     Thread.Sleep(this.Simulator.SampleRates[Requests.Secondary] + 1000);
@@ -1036,6 +1043,9 @@ namespace OpenSky.Agent.Views.Models
                                 this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                                 return;
                             }
+
+                            // Make sure we wait a bit before the next message box
+                            Thread.Sleep(500);
                         }
                         else if (this.Simulator.WeightAndBalance.FuelTotalQuantity > (this.Simulator.Flight.FuelGallons ?? 0) + 1)
                         {
@@ -1119,6 +1129,9 @@ namespace OpenSky.Agent.Views.Models
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
                         }
+
+                        // Make sure we wait a bit before the next message box
+                        Thread.Sleep(500);
                     }
 
                     if (Math.Abs(this.Simulator.WeightAndBalance.CgPercentLateral) > 0.01)
@@ -1155,6 +1168,9 @@ namespace OpenSky.Agent.Views.Models
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
                         }
+
+                        // Make sure we wait a bit before the next message box
+                        Thread.Sleep(500);
                     }
 
                     if (this.Simulator.WeightAndBalance.PayloadWeight > this.Simulator.WeightAndBalance.MaxPayloadWeight)
@@ -1191,6 +1207,9 @@ namespace OpenSky.Agent.Views.Models
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
                         }
+
+                        // Make sure we wait a bit before the next message box
+                        Thread.Sleep(500);
                     }
 
                     if (this.Simulator.WeightAndBalance.TotalWeight > this.Simulator.WeightAndBalance.MaxGrossWeight)
@@ -1226,6 +1245,9 @@ namespace OpenSky.Agent.Views.Models
                             this.StartTrackingCommand.ReportProgress(() => this.StartTrackingCommand.CanExecute = true);
                             return;
                         }
+
+                        // Make sure we wait a bit before the next message box
+                        Thread.Sleep(500);
                     }
 
                     if (!this.Simulator.GroundHandlingComplete && this.Simulator.SecondaryTracking.EngineRunning)
