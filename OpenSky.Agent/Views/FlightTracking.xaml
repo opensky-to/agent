@@ -59,7 +59,7 @@
         <converters:AircraftRegistryConverter x:Key="AircraftRegistryConverter" />
         <converters:CollectionEmptyVisibilityConverter x:Key="CollectionEmptyVisibilityConverter" />
     </Window.Resources>
-    <Grid Margin="20">
+    <Grid Margin="00">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -77,13 +77,12 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0">
+        <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,10,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Flight plan</TextBlock>
             </GroupBox.Header>
             <Grid Margin="5">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -107,10 +106,9 @@
                     <Button Content="{Binding Simulator.Flight.Alternate.Icao, FallbackValue=?}" FontSize="10" Height="24" FontWeight="Bold" Style="{StaticResource OpenSkyOrangeButtonStyle}" Width="55" Margin="0,2" Command="{Binding MoveMapToCoordinateCommand}" CommandParameter="{Binding Simulator.Flight.Alternate, FallbackValue={x:Null}}" />
                     <TextBlock Text="{Binding Simulator.Flight.Alternate.Name, FallbackValue=''}" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
-                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" HorizontalAlignment="Stretch" Style="{StaticResource OpenSkyButtonStyle}" Foreground="White" FontSize="14" FontWeight="SemiBold" Command="{Binding ImportSimbriefCommand}" Visibility="{Binding ImportSimbriefVisibility}">Import waypoints from Simbrief flight plan</Button>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="0" Visibility="{Binding TrackingConditionsVisibility}">
+        <GroupBox Grid.Row="1" Grid.Column="0" Visibility="{Binding TrackingConditionsVisibility}" Margin="10,0,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Tracking conditions</TextBlock>
             </GroupBox.Header>
@@ -234,7 +232,7 @@
                 </UniformGrid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="2" Grid.Column="0" Visibility="{Binding TrackingStatusVisibility}">
+        <GroupBox Grid.Row="2" Grid.Column="0" Visibility="{Binding TrackingStatusVisibility}" Margin="10,0,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Tracking Status</TextBlock>
             </GroupBox.Header>
@@ -288,7 +286,7 @@
                 <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" MaxWidth="330" HorizontalAlignment="Left" Foreground="Black" Margin="10,10">Note: You can close this window and OpenSky will monitor your flight in the background...</TextBlock>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="3" Grid.Column="0" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesVisibility}">
+        <GroupBox Grid.Row="3" Grid.Column="0" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesVisibility}" Margin="10,0,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Weights and Balances</TextBlock>
             </GroupBox.Header>
@@ -323,7 +321,7 @@
                 <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Stretch" Command="{Binding ToggleAdvancedWeightAndBalanceCommand}" Content="{Binding ShowHideAdvancedWeightAndBalanceButtonText}" />
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="5" Grid.Column="0" Visibility="{Binding Simulator.GroundHandlingComplete, Converter={StaticResource InvertedBooleanVisibilityConverter}}">
+        <GroupBox Grid.Row="5" Grid.Column="0" Visibility="{Binding Simulator.GroundHandlingComplete, Converter={StaticResource InvertedBooleanVisibilityConverter}}" Margin="10,0,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Ground Handling</TextBlock>
             </GroupBox.Header>
@@ -365,19 +363,19 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="6" Grid.Column="0">
+        <GroupBox Grid.Row="6" Grid.Column="0" Margin="10,0,0,0">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Payload</TextBlock>
             </GroupBox.Header>
             <TextBlock Text="{Binding Simulator.Flight.PayloadSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
         </GroupBox>
-        <GroupBox Grid.Row="7" Grid.Column="0">
+        <GroupBox Grid.Row="7" Grid.Column="0" Margin="10,0,0,10">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Crew</TextBlock>
             </GroupBox.Header>
             <TextBlock Text="{Binding Simulator.Flight.CrewSummary, FallbackValue=None}" FontSize="12" Margin="5,0" />
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}">
+        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="1" IsEnabled="{Binding Simulator.TrackingStatus, Converter={StaticResource CanSetWeightAndBalancesConverter}}" Visibility="{Binding WeightAndBalancesAdvancedVisibility}" Margin="0,10,0,10">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">Weights and Balances</TextBlock>
@@ -540,7 +538,7 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="3" Visibility="{Binding OfpVisibility}">
+        <GroupBox Grid.Row="0" Grid.RowSpan="8" Grid.Column="3" Visibility="{Binding OfpVisibility}" Margin="0,10,0,10">
             <GroupBox.Header>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="15" FontWeight="DemiBold">OFP</TextBlock>
@@ -549,7 +547,7 @@
             </GroupBox.Header>
             <TextBox Text="{Binding Simulator.Flight.OfpHtml, FallbackValue=''}" IsReadOnly="True" FontFamily="Consolas" FontSize="13" />
         </GroupBox>
-        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="8">
+        <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="8" Margin="0,7,10,7">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -666,7 +664,7 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <GroupBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="8" Margin="5,3">
+        <GroupBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="8" Margin="5,10,5,10">
             <GroupBox.Header>
                 <TextBlock FontSize="15" FontWeight="DemiBold">Map</TextBlock>
             </GroupBox.Header>
@@ -704,7 +702,7 @@
                 <Image Source="/Resources/osm25.png" Width="25" Height="25" Margin="65,0,0,12" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
             </Grid>
         </GroupBox>
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="8" Grid.ColumnSpan="5" Background="#CC000000" Margin="-20" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
+        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="8" Grid.ColumnSpan="5" Background="#CC000000" Visibility="{Binding NoFlightVisibility, Mode=OneWay}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="40" HorizontalAlignment="Center">No flight ready for tracking</TextBlock>
                 <TextBlock HorizontalAlignment="Center" MaxWidth="550" FontSize="13">Please start a new flight from the OpenSky client first, or resume a saved one:</TextBlock>

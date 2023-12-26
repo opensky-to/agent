@@ -9,17 +9,11 @@ namespace OpenSky.Agent.Views.Models
     using System;
     using System.Device.Location;
     using System.Diagnostics;
-    using System.IO;
-    using System.Net;
-    using System.Text;
     using System.Windows;
-    using System.Xml.Linq;
 
     using Microsoft.Maps.MapControl.WPF;
 
     using OpenSky.Agent.MVVM;
-    using OpenSky.Agent.Simulator.Controls;
-    using OpenSky.Agent.Simulator.Controls.Models;
     using OpenSky.Agent.Simulator.Models;
     using OpenSky.Agent.Simulator.Tools;
 
@@ -52,13 +46,6 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         private bool followPlane = true;
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// The import simbrief visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        private Visibility importSimbriefVisibility = Visibility.Visible;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -159,13 +146,6 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Gets the import simbrief command.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public AsynchronousCommand ImportSimbriefCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Gets or sets the date/time of the last user map interaction.
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
@@ -191,101 +171,6 @@ namespace OpenSky.Agent.Views.Models
         /// </summary>
         /// -------------------------------------------------------------------------------------------------
         public Command MoveMapToCoordinateCommand { get; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Import simbrief waypoints.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 22/03/2021.
-        /// </remarks>
-        /// -------------------------------------------------------------------------------------------------
-        private void ImportSimbrief()
-        {
-            using var client = new WebClient();
-            try
-            {
-                Debug.WriteLine("Importing sim brief flight plan waypoints");
-                if (string.IsNullOrEmpty(UserSessionService.Instance.LinkedAccounts?.SimbriefUsername))
-                {
-                    throw new Exception("No Simbrief user name configured, please configure it using the OpenSky client!");
-                }
-
-                if (this.Simulator.Flight == null)
-                {
-                    throw new Exception("No flight loaded!");
-                }
-
-                var xml = client.DownloadString($"https://www.simbrief.com/api/xml.fetcher.php?username={UserSessionService.Instance.LinkedAccounts?.SimbriefUsername}");
-
-                var ofp = XElement.Parse(xml);
-                var originICAO = (string)ofp.Element("origin")?.Element("icao_code");
-                var destinationICAO = (string)ofp.Element("destination")?.Element("icao_code");
-
-                if (!this.Simulator.Flight.Origin.Icao.Trim().Equals(originICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                {
-                    throw new Exception("Departure airport doesn't match!");
-                }
-
-                if (!this.Simulator.Flight.Destination.Icao.Trim().Equals(destinationICAO.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                {
-                    throw new Exception("Destination airport doesn't match!");
-                }
-
-                this.Simulator.ImportSimbrief(ofp);
-                this.ImportSimbriefVisibility = Visibility.Collapsed;
-            }
-            catch (WebException ex)
-            {
-                Debug.WriteLine("Web error received from simBrief api: " + ex);
-
-                var responseStream = ex.Response.GetResponseStream();
-                if (responseStream != null)
-                {
-                    var responseString = string.Empty;
-                    var reader = new StreamReader(responseStream, Encoding.UTF8);
-                    var buffer = new char[1024];
-                    var count = reader.Read(buffer, 0, buffer.Length);
-                    while (count > 0)
-                    {
-                        responseString += new string(buffer, 0, count);
-                        count = reader.Read(buffer, 0, buffer.Length);
-                    }
-
-                    Debug.WriteLine(responseString);
-                    if (responseString.Contains("<OFP>"))
-                    {
-                        var ofp = XElement.Parse(responseString);
-                        var status = ofp.Element("fetch")?.Element("status")?.Value;
-                        if (!string.IsNullOrWhiteSpace(status))
-                        {
-                            Debug.WriteLine("Error fetching flight plan from simBrief: " + status);
-                            this.ImportSimbriefCommand.ReportProgress(
-                                () =>
-                                {
-                                    var notification = new OpenSkyNotification("Error fetching flight plan from simBrief", status, MessageBoxButton.OK, ExtendedMessageBoxImage.Error, 30);
-                                    notification.SetErrorColorStyle();
-                                    this.ViewReference.ShowNotification(notification);
-                                });
-                            return;
-                        }
-                    }
-                }
-
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error fetching flight plan from simBrief: " + ex);
-                this.ImportSimbriefCommand.ReportProgress(
-                    () =>
-                    {
-                        var notification = new OpenSkyNotification(new ErrorDetails { DetailedMessage = ex.Message, Exception = ex }, "Error fetching flight plan from simBrief", ex.Message, ExtendedMessageBoxImage.Error, 30);
-                        notification.SetErrorColorStyle();
-                        this.ViewReference.ShowNotification(notification);
-                    });
-            }
-        }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
