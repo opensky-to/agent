@@ -332,7 +332,6 @@ namespace OpenSky.Agent.Simulator
                         {
                             if (value.NavlogFixes?.Count > 0)
                             {
-                                this.SimbriefOfpLoaded = true;
                                 foreach (var flightNavlogFix in value.NavlogFixes)
                                 {
                                     this.SimbriefRouteLocations.Add(new Location(flightNavlogFix.Latitude, flightNavlogFix.Longitude));
@@ -397,7 +396,6 @@ namespace OpenSky.Agent.Simulator
                     this.flightLoadingTempModels = null;
                     this.StopTracking(false);
                     this.lastFlightLogAutoSave = DateTime.MinValue;
-                    this.simbriefOfpLoaded = false;
                     this.OnlineNetworkConnectionDuration = TimeSpan.Zero;
                     this.OnlineNetworkConnectionStarted = null;
                     this.VatsimClientConnection = null;

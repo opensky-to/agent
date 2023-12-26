@@ -165,7 +165,6 @@ namespace OpenSky.Agent.Views.Models
             this.Simulator.TrackingStatusChanged += this.SimulatorTrackingStatusChanged;
             this.Simulator.FlightChanged += this.SimulatortFlightChanged;
             this.Simulator.LocationChanged += this.SimulatorLocationChanged;
-            this.Simulator.SimbriefOfpLoadedChanged += this.SimulatorOfpLoadedChanged;
 
             // Create commands
             this.SetFuelAndPayloadCommand = new Command(this.SetFuelAndPayload);
@@ -178,7 +177,6 @@ namespace OpenSky.Agent.Views.Models
             this.AbortFlightCommand = new AsynchronousCommand(this.AbortFlight, false);
             this.ToggleFlightPauseCommand = new AsynchronousCommand(this.ToggleFlightPause, false);
             this.StopTrackingCommand = new AsynchronousCommand(this.StopTracking, false);
-            this.ImportSimbriefCommand = new AsynchronousCommand(this.ImportSimbrief, false);
             this.MoveMapToCoordinateCommand = new Command(this.MoveMapToCoordinate);
             this.SlewIntoPositionCommand = new AsynchronousCommand(this.SlewIntoPosition);
             this.ToggleOfpCommand = new Command(this.ToggleOfp);
@@ -190,10 +188,6 @@ namespace OpenSky.Agent.Views.Models
             // Are we already preparing/resuming/tracking?
             this.SimulatorTrackingStatusChanged(this, this.Simulator.TrackingStatus);
             this.SimulatortFlightChanged(this, this.Simulator.Flight);
-            if (this.Simulator.SimbriefOfpLoaded)
-            {
-                this.ImportSimbriefVisibility = Visibility.Collapsed;
-            }
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -234,27 +228,6 @@ namespace OpenSky.Agent.Views.Models
                 }
 
                 this.groundHandlingWarningVisibility = value;
-                this.NotifyPropertyChanged();
-            }
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Gets the import simbrief visibility.
-        /// </summary>
-        /// -------------------------------------------------------------------------------------------------
-        public Visibility ImportSimbriefVisibility
-        {
-            get => this.importSimbriefVisibility;
-
-            private set
-            {
-                if (Equals(this.importSimbriefVisibility, value))
-                {
-                    return;
-                }
-
-                this.importSimbriefVisibility = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -701,25 +674,6 @@ namespace OpenSky.Agent.Views.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        /// Simulator ofp loaded changed.
-        /// </summary>
-        /// <remarks>
-        /// sushi.at, 18/11/2023.
-        /// </remarks>
-        /// <param name="sender">
-        /// Source of the event.
-        /// </param>
-        /// <param name="loaded">
-        /// True if the data was loaded.
-        /// </param>
-        /// -------------------------------------------------------------------------------------------------
-        private void SimulatorOfpLoadedChanged(object sender, bool loaded)
-        {
-            this.ImportSimbriefVisibility = loaded ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
         /// Simulator flight changed.
         /// </summary>
         /// <remarks>
@@ -738,7 +692,6 @@ namespace OpenSky.Agent.Views.Models
             {
                 this.AbortFlightCommand.CanExecute = e != null;
                 this.StartTrackingCommand.CanExecute = e != null;
-                this.ImportSimbriefCommand.CanExecute = e != null;
                 this.NoFlightVisibility = e != null ? Visibility.Collapsed : Visibility.Visible;
                 this.StartTrackingButtonText = e?.Resume == true ? "Resume Tracking" : "Start Tracking";
 
@@ -801,11 +754,6 @@ namespace OpenSky.Agent.Views.Models
                 this.TrackingConditionsVisibility = Visibility.Visible;
                 this.TrackingStatusVisibility = Visibility.Collapsed;
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
-                if (!this.Simulator.SimbriefOfpLoaded)
-                {
-                    this.ImportSimbriefVisibility = Visibility.Visible;
-                }
-
                 this.ResumeFlightTipsVisibility = Visibility.Collapsed;
                 this.GroundHandlingWarningVisibility = Visibility.Collapsed;
                 UpdateGUIDelegate updateTrackingCommands = () =>
@@ -823,7 +771,6 @@ namespace OpenSky.Agent.Views.Models
                 this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
                 this.TrackingConditionsVisibility = Visibility.Visible;
                 this.TrackingStatusVisibility = Visibility.Collapsed;
-                this.ImportSimbriefVisibility = Visibility.Collapsed;
                 this.ResumeFlightTipsVisibility = Visibility.Visible;
                 this.GroundHandlingWarningVisibility = Visibility.Collapsed;
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
@@ -835,7 +782,6 @@ namespace OpenSky.Agent.Views.Models
                 this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
                 this.TrackingConditionsVisibility = Visibility.Collapsed;
                 this.TrackingStatusVisibility = Visibility.Visible;
-                this.ImportSimbriefVisibility = Visibility.Collapsed;
                 this.ResumeFlightTipsVisibility = Visibility.Collapsed;
                 this.GroundHandlingWarningVisibility = Visibility.Visible;
                 this.SkipGroundHandlingVisibility = Visibility.Visible;
@@ -853,7 +799,6 @@ namespace OpenSky.Agent.Views.Models
                 this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
                 this.TrackingConditionsVisibility = Visibility.Collapsed;
                 this.TrackingStatusVisibility = Visibility.Visible;
-                this.ImportSimbriefVisibility = Visibility.Collapsed;
                 this.ResumeFlightTipsVisibility = Visibility.Collapsed;
                 this.GroundHandlingWarningVisibility = Visibility.Collapsed;
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
@@ -871,7 +816,6 @@ namespace OpenSky.Agent.Views.Models
                 this.WeightAndBalancesAdvancedVisibility = Visibility.Collapsed;
                 this.TrackingConditionsVisibility = Visibility.Visible;
                 this.TrackingStatusVisibility = Visibility.Collapsed;
-                this.ImportSimbriefVisibility = Visibility.Visible;
                 this.ResumeFlightTipsVisibility = Visibility.Collapsed;
                 this.GroundHandlingWarningVisibility = Visibility.Collapsed;
                 this.SkipGroundHandlingVisibility = Visibility.Collapsed;
